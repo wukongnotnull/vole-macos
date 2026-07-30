@@ -51,6 +51,44 @@ private final class PipeAccumulator: @unchecked Sendable {
     }
 }
 
+private final class StdoutLineAccumulator: @unchecked Sendable {
+    private let lock = NSLock()
+    private var buffer = Data()
+    private let onLine: @Sendable (String) -> Void
+
+    init(onLine: @escaping @Sendable (String) -> Void) {
+        self.onLine = onLine
+    }
+
+    func append(_ chunk: Data) {
+        guard !chunk.isEmpty else { return }
+        lock.lock()
+        defer { lock.unlock() }
+        buffer.append(chunk)
+        drainCompleteLines()
+    }
+
+    func flushTrailing() {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !buffer.isEmpty else { return }
+        if let line = String(data: buffer, encoding: .utf8), !line.isEmpty {
+            onLine(line)
+        }
+        buffer.removeAll()
+    }
+
+    private func drainCompleteLines() {
+        while let range = buffer.range(of: Data([0x0A])) {
+            let lineData = buffer.subdata(in: buffer.startIndex..<range.lowerBound)
+            buffer.removeSubrange(buffer.startIndex...range.lowerBound)
+            if let line = String(data: lineData, encoding: .utf8), !line.isEmpty {
+                onLine(line)
+            }
+        }
+    }
+}
+
 actor VoleProcess {
     private var process: Process?
 
@@ -84,20 +122,9 @@ actor VoleProcess {
 
         return await withCheckedContinuation { continuation in
             let stderrAccumulator = PipeAccumulator()
-            var stdoutBuffer = Data()
+            let stdoutAccumulator = StdoutLineAccumulator(onLine: onStdoutLine)
             let outHandle = outPipe.fileHandleForReading
             let errHandle = errPipe.fileHandleForReading
-
-            func drainStdoutLines(from chunk: Data) {
-                stdoutBuffer.append(chunk)
-                while let range = stdoutBuffer.range(of: Data([0x0A])) {
-                    let lineData = stdoutBuffer.subdata(in: stdoutBuffer.startIndex..<range.lowerBound)
-                    stdoutBuffer.removeSubrange(stdoutBuffer.startIndex...range.lowerBound)
-                    if let line = String(data: lineData, encoding: .utf8), !line.isEmpty {
-                        onStdoutLine(line)
-                    }
-                }
-            }
 
             outHandle.readabilityHandler = { handle in
                 let chunk = handle.availableData
@@ -105,7 +132,7 @@ actor VoleProcess {
                     handle.readabilityHandler = nil
                     return
                 }
-                drainStdoutLines(from: chunk)
+                stdoutAccumulator.append(chunk)
             }
 
             errHandle.readabilityHandler = { handle in
@@ -123,7 +150,8 @@ actor VoleProcess {
                 outHandle.readabilityHandler = nil
                 errHandle.readabilityHandler = nil
 
-                drainStdoutLines(from: outHandle.availableData)
+                stdoutAccumulator.append(outHandle.availableData)
+                stdoutAccumulator.flushTrailing()
                 stderrAccumulator.append(errHandle.availableData)
 
                 let code = proc.terminationStatus
