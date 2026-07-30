@@ -8,12 +8,4 @@
 import Testing
 @testable import vole_macos
 
-struct vole_macosTests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-        // Swift Testing Documentation
-        // https://developer.apple.com/documentation/testing
-    }
-
-}
+struct vole_macosTests {}
