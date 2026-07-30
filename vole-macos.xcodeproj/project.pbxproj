@@ -99,6 +99,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 67FB4FAA301BA00200E0AFC2 /* Build configuration list for PBXNativeTarget "vole-macos" */;
 			buildPhases = (
+				A1EMBED001301BA00200E0AFC2 /* Embed vole sidecar */,
 				67FB4F85301BA00000E0AFC2 /* Sources */,
 				67FB4F86301BA00000E0AFC2 /* Frameworks */,
 				67FB4F87301BA00000E0AFC2 /* Resources */,
@@ -230,6 +231,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1EMBED001301BA00200E0AFC2 /* Embed vole sidecar */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed vole sidecar";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "\"${SRCROOT}/scripts/embed-vole.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		67FB4F85301BA00000E0AFC2 /* Sources */ = {
