@@ -23,8 +23,9 @@ struct CleanCandidatesView: View {
                     Toggle(isOn: Binding(
                         get: { session.selectedIDs.contains(entry.id) },
                         set: { on in
-                            if on { session.selectedIDs.insert(entry.id) }
-                            else { session.selectedIDs.remove(entry.id) }
+                            var ids = session.selectedIDs
+                            if on { ids.insert(entry.id) } else { ids.remove(entry.id) }
+                            session.selectedIDs = ids
                         }
                     )) {
                         VStack(alignment: .leading) {
