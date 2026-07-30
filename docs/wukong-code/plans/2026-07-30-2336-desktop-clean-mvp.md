@@ -766,12 +766,8 @@ enum SidecarRunner {
 
     static func rulesEnvironment() -> [String: String] {
         var env = ProcessInfo.processInfo.environment
-        if let rules = Bundle.main.bundleURL
-            .appendingPathComponent("Contents/share/vole/rules").path as String?,
-           FileManager.default.fileExists(atPath: rules) {
-            env["VOLE_RULES_DIR"] = rules
-        }
-        // Prefer relative discovery; VOLE_RULES_DIR is fallback when layout differs.
+        // Relative discovery (MacOS/vole → ../share/vole/rules) usually works;
+        // VOLE_RULES_DIR is an explicit fallback when Bundle layout differs.
         let relative = Bundle.main.bundleURL
             .appendingPathComponent("Contents/share/vole/rules").path
         if FileManager.default.fileExists(atPath: relative) {
@@ -853,22 +849,6 @@ actor VoleProcess {
     }
 }
 ```
-
-注意：`rulesEnvironment` 里不要写无效 optional 绑定；实现时保持：
-
-```swift
-static func rulesEnvironment() -> [String: String] {
-    var env = ProcessInfo.processInfo.environment
-    let relative = Bundle.main.bundleURL
-        .appendingPathComponent("Contents/share/vole/rules").path
-    if FileManager.default.fileExists(atPath: relative) {
-        env["VOLE_RULES_DIR"] = relative
-    }
-    return env
-}
-```
-
-（上面长块中若有重复/笔误，以本精简版为准。）
 
 - [ ] **Step 4: 跑测试确认通过**
 
