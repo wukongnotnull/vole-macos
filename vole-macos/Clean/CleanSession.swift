@@ -1,6 +1,24 @@
 import Foundation
 import Combine
 
+/// Thread-safe box for capturing the last `.done` report from a sync stdout callback.
+private final class ReportBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: VoleReport?
+
+    func set(_ report: VoleReport) {
+        lock.lock()
+        value = report
+        lock.unlock()
+    }
+
+    func get() -> VoleReport? {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+}
+
 @MainActor
 final class CleanSession: ObservableObject {
     enum Phase: Equatable {
@@ -40,6 +58,9 @@ final class CleanSession: ObservableObject {
     }
 
     func startScan() {
+        cleanupFullPlan()
+        fullPlan = nil
+        coverageNote = nil
         errorMessage = nil
         report = nil
         entries = []
@@ -100,22 +121,22 @@ final class CleanSession: ObservableObject {
                 try PlanIO.write(filtered, to: applyURL)
                 defer { try? FileManager.default.removeItem(at: applyURL) }
 
-                var lastReport: VoleReport?
+                let reportBox = ReportBox()
                 let exit = await process.run(arguments: [
                     "clean", "--apply", applyURL.path, "--json-stream",
                 ]) { [weak self] line in
-                    Task { @MainActor in
-                        if let event = try? VoleStreamEvent.decodeNDJSONLine(line) {
-                            if case let .done(report) = event {
-                                lastReport = report
-                            }
-                            if case let .progress(scanned, current) = event {
-                                self?.progressScanned = scanned
-                                self?.progressCurrent = current
-                            }
+                    guard let event = try? VoleStreamEvent.decodeNDJSONLine(line) else { return }
+                    if case let .done(report) = event {
+                        reportBox.set(report)
+                    }
+                    if case let .progress(scanned, current) = event {
+                        Task { @MainActor in
+                            self?.progressScanned = scanned
+                            self?.progressCurrent = current
                         }
                     }
                 }
+                let lastReport = reportBox.get()
                 cleanupFullPlan()
                 switch exit {
                 case .success:
@@ -138,6 +159,7 @@ final class CleanSession: ObservableObject {
 
     func reset() {
         cleanupFullPlan()
+        fullPlan = nil
         phase = .idle
         entries = []
         selectedIDs = []
@@ -168,6 +190,7 @@ final class CleanSession: ObservableObject {
                 selectedIDs = Set(entries.map(\.id))
                 phase = .candidates
             } catch {
+                cleanupFullPlan()
                 errorMessage = "无法读取 plan: \(error.localizedDescription)"
                 phase = .idle
             }
