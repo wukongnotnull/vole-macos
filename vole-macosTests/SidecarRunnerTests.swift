@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import vole_macos
 
@@ -11,5 +12,26 @@ struct SidecarRunnerTests {
             return
         }
         #expect(message.contains("正在运行"))
+    }
+
+    @Test func mapsSigtermToCancelled() {
+        #expect(
+            SidecarRunner.mapExitCode(15, stderr: "", terminationReason: .uncaughtSignal)
+                == .cancelled
+        )
+    }
+
+    @Test func mapsSigintToCancelled() {
+        #expect(
+            SidecarRunner.mapExitCode(2, stderr: "", terminationReason: .uncaughtSignal)
+                == .cancelled
+        )
+    }
+
+    @Test func mapsCancelRequestedToCancelled() {
+        #expect(
+            SidecarRunner.mapExitCode(1, stderr: "interrupted", cancelRequested: true)
+                == .cancelled
+        )
     }
 }

@@ -39,6 +39,38 @@ struct PlanIOTests {
         #expect(!PlanIO.isExpired(plan, now: fresh))
     }
 
+    @Test func encodedPlanUsesFrozenSnakeCaseKeys() throws {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("vole-planio-keys-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("plan.json")
+        try PlanIO.write(samplePlan(), to: url)
+
+        let data = try Data(contentsOf: url)
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            Issue.record("expected top-level JSON object")
+            return
+        }
+
+        let topKeys = Set(json.keys)
+        #expect(topKeys == Set(["schema_version", "created_at", "ttl_secs", "entries", "coverage_note"]))
+
+        guard let entries = json["entries"] as? [[String: Any]], entries.count == 2 else {
+            Issue.record("expected two plan entries")
+            return
+        }
+
+        let entryWithoutSkip = Set(entries[0].keys)
+        #expect(entryWithoutSkip == Set(["id", "path", "label", "size", "rule_id", "dev", "ino", "mtime"]))
+
+        let entryWithSkip = Set(entries[1].keys)
+        #expect(
+            entryWithSkip
+                == Set(["id", "path", "label", "size", "rule_id", "skip_reason", "dev", "ino", "mtime"])
+        )
+    }
+
     @Test func writeReadRoundTrip() throws {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("vole-planio-\(UUID().uuidString)", isDirectory: true)

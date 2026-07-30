@@ -13,7 +13,18 @@ enum SidecarRunner {
                 .appendingPathComponent("Contents/MacOS/vole")
     }
 
-    static func mapExitCode(_ code: Int32, stderr: String) -> SidecarExit {
+    static func mapExitCode(
+        _ code: Int32,
+        stderr: String,
+        cancelRequested: Bool = false,
+        terminationReason: Process.TerminationReason? = nil
+    ) -> SidecarExit {
+        if cancelRequested {
+            return .cancelled
+        }
+        if terminationReason == .uncaughtSignal, code == 15 || code == 2 {
+            return .cancelled
+        }
         switch code {
         case 0: return .success
         case 130: return .cancelled
@@ -89,8 +100,32 @@ private final class StdoutLineAccumulator: @unchecked Sendable {
     }
 }
 
+private final class CancelFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    nonisolated func reset() {
+        lock.lock()
+        value = false
+        lock.unlock()
+    }
+
+    nonisolated func set() {
+        lock.lock()
+        value = true
+        lock.unlock()
+    }
+
+    nonisolated func get() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+}
+
 actor VoleProcess {
     private var process: Process?
+    private let cancelFlag = CancelFlag()
 
     func run(
         arguments: [String],
@@ -113,6 +148,8 @@ actor VoleProcess {
         proc.standardInput = FileHandle.nullDevice
 
         self.process = proc
+        let runCancelFlag = cancelFlag
+        runCancelFlag.reset()
 
         do {
             try proc.run()
@@ -155,13 +192,20 @@ actor VoleProcess {
                 stderrAccumulator.append(errHandle.availableData)
 
                 let code = proc.terminationStatus
+                let reason = proc.terminationReason
                 let stderr = String(data: stderrAccumulator.snapshot, encoding: .utf8) ?? ""
-                continuation.resume(returning: SidecarRunner.mapExitCode(code, stderr: stderr))
+                continuation.resume(returning: SidecarRunner.mapExitCode(
+                    code,
+                    stderr: stderr,
+                    cancelRequested: runCancelFlag.get(),
+                    terminationReason: reason
+                ))
             }
         }
     }
 
     func cancel() {
+        cancelFlag.set()
         process?.terminate()
     }
 }

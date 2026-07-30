@@ -1,6 +1,24 @@
 import Foundation
 import Combine
 
+/// Thread-safe box for capturing stdout lines from a sync callback.
+private final class LinesBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var lines: [String] = []
+
+    nonisolated func append(_ line: String) {
+        lock.lock()
+        lines.append(line)
+        lock.unlock()
+    }
+
+    nonisolated func lastTrimmed() -> String? {
+        lock.lock()
+        defer { lock.unlock() }
+        return lines.last?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 /// Thread-safe box for capturing the last `.done` report from a sync stdout callback.
 private final class ReportBox: @unchecked Sendable {
     private let lock = NSLock()
@@ -47,12 +65,12 @@ final class CleanSession: ObservableObject {
     func refreshVersion() {
         Task {
             let proc = VoleProcess()
-            var lines: [String] = []
+            let linesBox = LinesBox()
             let exit = await proc.run(arguments: ["--version"]) { line in
-                lines.append(line)
+                linesBox.append(line)
             }
             if case .success = exit {
-                voleVersion = lines.last?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                voleVersion = linesBox.lastTrimmed() ?? ""
             }
         }
     }
