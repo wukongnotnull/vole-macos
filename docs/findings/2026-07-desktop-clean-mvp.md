@@ -1,7 +1,7 @@
 # Desktop Clean MVP findings
 
 **日期**：2026-07-30  
-**状态**：部分（自动化已验；UI 流程待人工收口）  
+**状态**：自动化门禁通过；三项 UI 人工验收列为合并后跟进（不阻塞 PR #1）  
 **设计**：[`docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md`](../wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md)
 
 ## 验收
@@ -10,9 +10,9 @@
 |---|---|
 | Bundle 含 vole + rules | ✅ 自动化已验证 |
 | 两仓并列 → Xcode Run / 启动 | ✅ 自动化已验证 |
-| plan → 勾选 → 废纸篓 | ⏳ 待人工 |
-| 取消扫描 | ⏳ 待人工 |
-| FDA 提示 | ⏳ 待人工 |
+| plan → 勾选 → 废纸篓 | ⏳ 合并后人工跟进 |
+| 取消扫描 | ⏳ 合并后人工跟进（单测已覆盖 exit 映射） |
+| FDA 提示 | ⏳ 合并后人工跟进 |
 
 ## 自动化验证（2026-07-31）
 
@@ -24,7 +24,15 @@
 | `vole --version` | `vole 1.2.0` |
 | 嵌入 sidecar `clean --plan-out` | exit 0，990 entries，ttl 900s |
 | `open` 启动 App | 进程 `vole-macos` 正常拉起 |
-| 单元测试 `vole-macosTests` | 9/9 通过 |
+| 单元测试 `vole-macosTests` | ✅（含 cancel/success 优先级、schema_version 校验） |
+
+## Code review 修复（合入前）
+
+| 项 | 处理 |
+|---|---|
+| `cancelRequested` 掩盖 exit 0 | `mapExitCode`：`code == 0` 优先于 cancel |
+| TTL 过期未清状态 | `applySelected` 过期时清 plan/entries/selected/缓存文件 |
+| 未校验 `schema_version` | `PlanIO.read` 要求 `== 1`，否则 `PlanIOError.unsupportedSchema` |
 
 DerivedData 产物路径（本机）：
 

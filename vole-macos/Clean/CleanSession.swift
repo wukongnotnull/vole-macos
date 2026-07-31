@@ -115,16 +115,21 @@ final class CleanSession: ObservableObject {
     }
 
     func applySelected() {
-        guard let fullPlan else {
+        guard let plan = fullPlan else {
             errorMessage = "缺少 plan，请重新扫描"
             return
         }
-        if PlanIO.isExpired(fullPlan) {
+        if PlanIO.isExpired(plan) {
+            cleanupFullPlan()
+            fullPlan = nil
+            entries = []
+            selectedIDs = []
+            coverageNote = nil
             errorMessage = "计划已过期，请重新扫描"
             phase = .idle
             return
         }
-        let filtered = PlanIO.filter(plan: fullPlan, selectedIDs: selectedIDs)
+        let filtered = PlanIO.filter(plan: plan, selectedIDs: selectedIDs)
         guard !filtered.entries.isEmpty else {
             errorMessage = "请至少选择一项"
             return

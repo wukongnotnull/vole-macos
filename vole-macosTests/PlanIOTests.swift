@@ -82,4 +82,26 @@ struct PlanIOTests {
         #expect(loaded.entries.count == 2)
         #expect(loaded.entries[0].mtime == 3)
     }
+
+    @Test func readRejectsUnsupportedSchema() throws {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("vole-planio-schema-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("plan.json")
+        var plan = samplePlan()
+        plan.schemaVersion = 99
+        try PlanIO.write(plan, to: url)
+        do {
+            _ = try PlanIO.read(from: url)
+            Issue.record("expected unsupportedSchema")
+        } catch let error as PlanIOError {
+            guard case .unsupportedSchema(99) = error else {
+                Issue.record("wrong PlanIOError")
+                return
+            }
+        } catch {
+            Issue.record("unexpected error \(error)")
+        }
+    }
 }

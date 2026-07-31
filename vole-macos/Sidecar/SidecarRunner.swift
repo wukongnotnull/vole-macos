@@ -19,6 +19,11 @@ enum SidecarRunner {
         cancelRequested: Bool = false,
         terminationReason: Process.TerminationReason? = nil
     ) -> SidecarExit {
+        // Successful exit wins even if the user clicked cancel in the same moment —
+        // otherwise a finished plan (or apply) would be discarded.
+        if code == 0 {
+            return .success
+        }
         if cancelRequested {
             return .cancelled
         }
@@ -26,7 +31,6 @@ enum SidecarRunner {
             return .cancelled
         }
         switch code {
-        case 0: return .success
         case 130: return .cancelled
         default:
             let trimmed = stderr.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -34,4 +34,10 @@ struct SidecarRunnerTests {
                 == .cancelled
         )
     }
+
+    @Test func successWinsOverCancelRequested() {
+        #expect(
+            SidecarRunner.mapExitCode(0, stderr: "", cancelRequested: true) == .success
+        )
+    }
 }

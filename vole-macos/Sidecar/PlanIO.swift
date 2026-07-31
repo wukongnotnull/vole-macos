@@ -1,6 +1,19 @@
 import Foundation
 
+enum PlanIOError: LocalizedError {
+    case unsupportedSchema(UInt32)
+
+    var errorDescription: String? {
+        switch self {
+        case let .unsupportedSchema(version):
+            return "不支持的 plan schema_version=\(version)，请重新扫描"
+        }
+    }
+}
+
 enum PlanIO {
+    static let expectedSchemaVersion: UInt32 = 1
+
     static func filter(plan: VolePlan, selectedIDs: Set<String>) -> VolePlan {
         var copy = plan
         copy.entries = plan.entries.filter { selectedIDs.contains($0.id) }
@@ -21,7 +34,11 @@ enum PlanIO {
 
     static func read(from url: URL) throws -> VolePlan {
         let data = try Data(contentsOf: url)
-        return try JSONDecoder().decode(VolePlan.self, from: data)
+        let plan = try JSONDecoder().decode(VolePlan.self, from: data)
+        guard plan.schemaVersion == expectedSchemaVersion else {
+            throw PlanIOError.unsupportedSchema(plan.schemaVersion)
+        }
+        return plan
     }
 
     static func cachesDirectory() throws -> URL {
