@@ -9,7 +9,7 @@
 
 /* Begin PBXBuildFile section */
 		A1HELPPROD301BA00200E0AFC2 /* VolePrivilegedHelper in Embed Privileged Helper */ = {isa = PBXBuildFile; fileRef = A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		A1PLIST02301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist in Embed LaunchDaemons */ = {isa = PBXBuildFile; fileRef = A1PLIST01301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist */; };
+		A1PLIST02301BA00200E0AFC2 /* cn.waytoai.volemacos.helper.plist in Embed LaunchDaemons */ = {isa = PBXBuildFile; fileRef = A1PLIST01301BA00200E0AFC2 /* cn.waytoai.volemacos.helper.plist */; };
 /* End PBXBuildFile section */
 
 
@@ -44,7 +44,7 @@
 		67FB4FA0301BA00200E0AFC2 /* vole-macosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vole-macosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 
 		A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VolePrivilegedHelper; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1PLIST01301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "cn.waytoai.vole-macos.helper.plist"; path = "LaunchDaemons/cn.waytoai.vole-macos.helper.plist"; sourceTree = SOURCE_ROOT; };
+		A1PLIST01301BA00200E0AFC2 /* cn.waytoai.volemacos.helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "cn.waytoai.volemacos.helper.plist"; path = "LaunchDaemons/cn.waytoai.volemacos.helper.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -145,7 +145,7 @@
 			dstPath = "Contents/Library/LaunchDaemons";
 			dstSubfolderSpec = 1;
 			files = (
-				A1PLIST02301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist in Embed LaunchDaemons */,
+				A1PLIST02301BA00200E0AFC2 /* cn.waytoai.volemacos.helper.plist in Embed LaunchDaemons */,
 			);
 			name = "Embed LaunchDaemons";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -533,7 +533,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macos";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacos";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -565,7 +565,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macos";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacos";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -587,7 +587,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macosTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -608,7 +608,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macosTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -627,7 +627,7 @@
 				DEVELOPMENT_TEAM = WCYC8XY4V2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macosUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacosUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -646,7 +646,7 @@
 				DEVELOPMENT_TEAM = WCYC8XY4V2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macosUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacosUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -666,7 +666,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macos.helper";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacos.helper";
 				PRODUCT_NAME = VolePrivilegedHelper;
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -685,7 +685,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.vole-macos.helper";
+				PRODUCT_BUNDLE_IDENTIFIER = "cn.waytoai.volemacos.helper";
 				PRODUCT_NAME = VolePrivilegedHelper;
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

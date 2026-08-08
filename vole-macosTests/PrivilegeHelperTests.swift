@@ -5,10 +5,10 @@ import Testing
 
 struct PrivilegeHelperTests {
     @Test func serviceIdentifiersMatchDesign() {
-        #expect(HelperServiceIDs.machServiceName == "cn.waytoai.vole-macos.helper")
-        #expect(HelperServiceIDs.launchDaemonPlistName == "cn.waytoai.vole-macos.helper.plist")
+        #expect(HelperServiceIDs.machServiceName == "cn.waytoai.volemacos.helper")
+        #expect(HelperServiceIDs.launchDaemonPlistName == "cn.waytoai.volemacos.helper.plist")
         #expect(HelperServiceIDs.helperExecutableName == "VolePrivilegedHelper")
-        #expect(HelperServiceIDs.appBundleIdentifier == "cn.waytoai.vole-macos")
+        #expect(HelperServiceIDs.appBundleIdentifier == "cn.waytoai.volemacos")
         #expect(HelperServiceIDs.teamIdentifier == "WCYC8XY4V2")
     }
 

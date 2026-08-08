@@ -35,7 +35,7 @@ Documents/vole-macos
 
 - Target：`VolePrivilegedHelper`（特权 XPC：`ping` / `removeAuthorizedPaths` / `bootoutLaunchdLabel`）
 - 注册：`HelperRegistration` → `SMAppService.daemon`
-- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
+- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.volemacos.helper.plist`
 - 白名单 fail-closed：见 `PathAuthorization`（永不含 `/Library/Updates`、`/macOS Install Data`）
 - Clean UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
 - Uninstall UI：尚未落地；`PrivilegedApply` 为共享扩展点
