@@ -41,9 +41,9 @@ struct ShellView: View {
                 SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
                     .frame(width: sidebarWidth)
                     .padding(.leading, VoleTheme.Spacing.sm)
-                    .padding(.trailing, VoleTheme.Spacing.md)
-                    .padding(.top, 0)
-                    .padding(.bottom, VoleTheme.Spacing.md)
+                    .padding(.trailing, VoleTheme.Spacing.sm)
+                    .padding(.top, 6)
+                    .padding(.bottom, VoleTheme.Spacing.sm)
 
                 // Same row as traffic lights (leading ~70pt for system buttons).
                 HStack(spacing: 8) {
@@ -60,9 +60,10 @@ struct ShellView: View {
             .background(VoleTheme.Colors.canvas)
 
             detailView
-                .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.top, 8)
-                .padding(.bottom, VoleTheme.Spacing.md)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.trailing, VoleTheme.Spacing.sm)
+                .padding(.top, 6)
+                .padding(.bottom, VoleTheme.Spacing.sm)
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
