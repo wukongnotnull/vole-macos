@@ -20,6 +20,8 @@ enum VoleTheme {
         static let blush = Color(hex: 0xF4A6A1)
         /// Layering / skip-zone background.
         static let molehill = Color(hex: 0xE8D5C0)
+        /// App icon ground; brand support (badges, empty states). Not a text color.
+        static let sage = Color(hex: 0xC9D8B6)
         /// Deep text support (dark content base).
         static let ink = Color(hex: 0x1C1613)
 

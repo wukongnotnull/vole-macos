@@ -28,6 +28,13 @@ final class VoleThemeTests: XCTestCase {
         XCTAssertEqual(burrow.2, 28, accuracy: 1)
     }
 
+    func test_sageMatchesAppIconGround() {
+        let (r, g, b) = components(VoleTheme.Colors.sage)
+        XCTAssertEqual(r, 201, accuracy: 1)
+        XCTAssertEqual(g, 216, accuracy: 1)
+        XCTAssertEqual(b, 182, accuracy: 1)
+    }
+
     func test_contentBackgroundResolvesInDarkAppearance() {
         let view = Rectangle().fill(VoleTheme.Colors.contentBackground)
         XCTAssertNotNil(view)
