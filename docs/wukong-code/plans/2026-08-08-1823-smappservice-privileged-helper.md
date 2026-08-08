@@ -115,13 +115,13 @@ EOF
 
 ---
 
-## 剩余工作（可用通道 · 不在本 plan 必做）
+## 可用通道增量（本分支）
 
-1. 真机批准流验收（uid==0 ping）
-2. XPC `removeAuthorizedPaths` / `bootoutLaunchdLabel` + 白名单
-3. Clean/Uninstall UI 接线与降级文案
-4. Hardened Runtime / 公证
-5. vole coverage「仍未移植」删除；可选 PrivilegeBackend 桌面适配 design
+1. [x] XPC `removeAuthorizedPaths` / `bootoutLaunchdLabel` + `PathAuthorization` 白名单（fail-closed）
+2. [x] Clean UI 接线与无 Helper 降级；Uninstall 扩展点 `PrivilegedApply`
+3. [x] Hardened Runtime 启用；公证凭据缺失已文档化（不伪造）
+4. [~] 真机批准流：UI/API 就绪；需用户批准后台项后 ping `uid==0`
+5. [ ] vole coverage「仍未移植」删除（待 uid==0 验收）+ 可选 PrivilegeBackend design
 
 ## Spec coverage
 

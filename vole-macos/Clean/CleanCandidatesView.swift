@@ -2,7 +2,14 @@ import SwiftUI
 
 struct CleanCandidatesView: View {
     @ObservedObject var session: CleanSession
+    @ObservedObject var helperStatus: HelperStatusModel
     @State private var confirm = false
+
+    private var selectedPrivilegedCount: Int {
+        session.entries
+            .filter { session.selectedIDs.contains($0.id) && PathAuthorization.requiresPrivilegedHelper($0.path) }
+            .count
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -14,6 +21,15 @@ struct CleanCandidatesView: View {
             }
             if let note = session.coverageNote {
                 Text(note).font(.caption).foregroundStyle(.secondary)
+            }
+            if selectedPrivilegedCount > 0 && !helperStatus.isReady {
+                Text("已选 \(selectedPrivilegedCount) 项系统路径：特权助手未就绪，清理时将跳过这些项（不会假装成功）。可返回首页启用助手。")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            } else if selectedPrivilegedCount > 0 {
+                Text("已选 \(selectedPrivilegedCount) 项系统路径将经特权助手永久删除（非废纸篓）。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             if let error = session.errorMessage {
                 Text(error).foregroundStyle(.red)
@@ -50,7 +66,13 @@ struct CleanCandidatesView: View {
                     .disabled(session.selectedIDs.isEmpty)
             }
         }
-        .confirmationDialog("将把已选项目移到废纸篓", isPresented: $confirm, titleVisibility: .visible) {
+        .confirmationDialog(
+            selectedPrivilegedCount > 0
+                ? "用户域移到废纸篓；系统路径经特权助手永久删除（助手未就绪则跳过）"
+                : "将把已选项目移到废纸篓",
+            isPresented: $confirm,
+            titleVisibility: .visible
+        ) {
             Button("确认清理", role: .destructive) { session.applySelected() }
             Button("取消", role: .cancel) {}
         }

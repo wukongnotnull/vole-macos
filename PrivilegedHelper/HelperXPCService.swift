@@ -23,6 +23,77 @@ final class HelperXPCService: NSObject, NSXPCListenerDelegate, VoleHelperProtoco
         reply(getpid(), Int32(getuid()))
     }
 
+    func removeAuthorizedPaths(
+        _ paths: [String],
+        reply: @escaping (Bool, String?) -> Void
+    ) {
+        guard !paths.isEmpty else {
+            reply(false, "No paths provided")
+            return
+        }
+
+        var authorized: [String] = []
+        authorized.reserveCapacity(paths.count)
+        for path in paths {
+            do {
+                authorized.append(try PathAuthorization.authorizePath(path))
+            } catch {
+                reply(false, error.localizedDescription)
+                return
+            }
+        }
+
+        let fm = FileManager.default
+        for path in authorized {
+            do {
+                if fm.fileExists(atPath: path) {
+                    try fm.removeItem(atPath: path)
+                }
+            } catch {
+                reply(false, "Failed to remove \(path): \(error.localizedDescription)")
+                return
+            }
+        }
+        reply(true, nil)
+    }
+
+    func bootoutLaunchdLabel(
+        _ label: String,
+        reply: @escaping (Bool, String?) -> Void
+    ) {
+        let authorized: String
+        do {
+            authorized = try PathAuthorization.authorizeLaunchdLabel(label)
+        } catch {
+            reply(false, error.localizedDescription)
+            return
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/launchctl")
+        process.arguments = ["bootout", "system/\(authorized)"]
+        let stderr = Pipe()
+        process.standardOutput = Pipe()
+        process.standardError = stderr
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            reply(false, "Failed to run launchctl: \(error.localizedDescription)")
+            return
+        }
+
+        if process.terminationStatus == 0 {
+            reply(true, nil)
+            return
+        }
+
+        let errData = stderr.fileHandleForReading.readDataToEndOfFile()
+        let errText = String(data: errData, encoding: .utf8)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        reply(false, errText?.isEmpty == false ? errText : "launchctl bootout failed (\(process.terminationStatus))")
+    }
+
     private func isAuthorizedClient(_ connection: NSXPCConnection) -> Bool {
         var guest: SecCode?
         let attrs: [CFString: Any] = [
@@ -45,7 +116,8 @@ final class HelperXPCService: NSObject, NSXPCListenerDelegate, VoleHelperProtoco
         }
 
         let requirementString =
-            "anchor apple generic and certificate leaf[subject.OU] = \"\(HelperServiceIDs.teamIdentifier)\""
+            "anchor apple generic and certificate leaf[subject.OU] = \"\(HelperServiceIDs.teamIdentifier)\" "
+            + "and identifier \"\(HelperServiceIDs.appBundleIdentifier)\""
         var requirement: SecRequirement?
         let reqStatus = SecRequirementCreateWithString(
             requirementString as CFString,
@@ -64,11 +136,14 @@ final class HelperXPCService: NSObject, NSXPCListenerDelegate, VoleHelperProtoco
         return allowDebugFallback(connection)
     }
 
-    /// Debug-only: accept unsigned/ad-hoc same-user clients while skeleton signing is unsettled.
+    /// Debug-only: accept same-Team unsigned/ad-hoc clients while local signing settles.
     private func allowDebugFallback(_ connection: NSXPCConnection) -> Bool {
         #if DEBUG
+        // When the helper is already root, only accept non-root app clients from the console user.
+        if getuid() == 0 {
+            return connection.effectiveUserIdentifier != 0
+        }
         return connection.effectiveUserIdentifier == getuid()
-            || connection.effectiveUserIdentifier == 0
         #else
         _ = connection
         return false
