@@ -61,11 +61,6 @@ struct SidebarView: View {
                         Text(module.title)
                             .font(VoleTheme.TypeScale.body())
                         Spacer(minLength: 0)
-                        if !module.isAvailable {
-                            Text("未开")
-                                .font(.system(size: 10, weight: .medium, design: .rounded))
-                                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.35))
-                        }
                     }
                     .padding(.horizontal, VoleTheme.Spacing.sm)
                     .padding(.vertical, 9)
