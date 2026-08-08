@@ -32,8 +32,8 @@ struct ShellView: View {
         HStack(alignment: .center, spacing: 0) {
             SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
                 .frame(width: sidebarWidth)
-                .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.vertical, VoleTheme.Spacing.md)
+                .padding(.leading, VoleTheme.Spacing.md)
+                .padding(.bottom, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
 
             detailView
