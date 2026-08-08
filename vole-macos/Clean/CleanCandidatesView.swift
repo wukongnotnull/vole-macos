@@ -47,12 +47,6 @@ struct CleanCandidatesView: View {
                 caption: "已选 \(session.selectedIDs.count) · 共 \(session.entries.count)"
             )
 
-            if let note = session.coverageNote {
-                Text(note)
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
-            }
-
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {
                 Text("已选 \(selectedPrivilegedCount) 项系统路径：特权助手未就绪，清理时将跳过这些项（不会假装成功）。")
                     .font(VoleTheme.TypeScale.caption())
