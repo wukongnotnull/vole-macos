@@ -61,7 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		67FB4F89301BA00000E0AFC2 /* vole-macos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "vole-macos.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		67FB4F89301BA00000E0AFC2 /* Vole.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vole.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67FB4F96301BA00200E0AFC2 /* vole-macosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vole-macosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		67FB4FA0301BA00200E0AFC2 /* vole-macosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vole-macosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VolePrivilegedHelper; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,7 +147,7 @@
 		67FB4F8A301BA00000E0AFC2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				67FB4F89301BA00000E0AFC2 /* vole-macos.app */,
+				67FB4F89301BA00000E0AFC2 /* Vole.app */,
 				67FB4F96301BA00200E0AFC2 /* vole-macosTests.xctest */,
 				67FB4FA0301BA00200E0AFC2 /* vole-macosUITests.xctest */,
 			);
@@ -180,7 +180,7 @@
 			packageProductDependencies = (
 			);
 			productName = "vole-macos";
-			productReference = 67FB4F89301BA00000E0AFC2 /* vole-macos.app */;
+			productReference = 67FB4F89301BA00000E0AFC2 /* Vole.app */;
 			productType = "com.apple.product-type.application";
 		};
 		67FB4F95301BA00200E0AFC2 /* vole-macosTests */ = {
@@ -537,7 +537,7 @@
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.waytoai.volemacos;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Vole;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -571,7 +571,7 @@
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.waytoai.volemacos;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Vole;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -599,7 +599,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vole-macos.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vole-macos";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vole.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vole";
 			};
 			name = Debug;
 		};
@@ -620,7 +620,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/vole-macos.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/vole-macos";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vole.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vole";
 			};
 			name = Release;
 		};
