@@ -28,27 +28,7 @@ struct SidebarView: View {
             .background(VoleTheme.Colors.ink)
             .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
             .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
-
-            collapseButton
         }
-    }
-
-    private var collapseButton: some View {
-        Button {
-            withAnimation(VoleTheme.Motion.easing) {
-                isCollapsed.toggle()
-            }
-        } label: {
-            Image(systemName: isCollapsed ? "sidebar.left" : "sidebar.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.8))
-                .frame(width: 26, height: 26)
-                .background(VoleTheme.Colors.onInk.opacity(0.08))
-                .clipShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .padding(6)
-        .accessibilityLabel(isCollapsed ? "展开侧栏" : "收起侧栏")
     }
 
     private var brandHeader: some View {

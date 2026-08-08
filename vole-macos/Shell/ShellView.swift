@@ -30,11 +30,23 @@ struct ShellView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
-                .frame(width: sidebarWidth)
-                .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.vertical, VoleTheme.Spacing.md)
-                .background(VoleTheme.Colors.canvas)
+            VStack(spacing: 0) {
+                // Traffic-light row: collapse toggle sits on the same line.
+                HStack(spacing: 0) {
+                    Spacer()
+                        .frame(width: 78)
+                    collapseToggle
+                    Spacer()
+                }
+                .frame(height: 28)
+                .padding(.top, VoleTheme.Spacing.xs)
+
+                SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
+                    .frame(width: sidebarWidth)
+                    .padding(.horizontal, VoleTheme.Spacing.md)
+                    .padding(.bottom, VoleTheme.Spacing.md)
+            }
+            .background(VoleTheme.Colors.canvas)
 
             detailView
                 .padding(.horizontal, VoleTheme.Spacing.md)
@@ -43,6 +55,21 @@ struct ShellView: View {
         }
         .frame(minWidth: 720, minHeight: 480)
         .animation(VoleTheme.Motion.easing, value: sidebarCollapsed)
+    }
+
+    private var collapseToggle: some View {
+        Button {
+            withAnimation(VoleTheme.Motion.easing) {
+                sidebarCollapsed.toggle()
+            }
+        } label: {
+            Image(systemName: sidebarCollapsed ? "sidebar.left" : "sidebar.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(VoleTheme.Colors.ink.opacity(0.7))
+                .frame(width: 26, height: 26)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(sidebarCollapsed ? "展开侧栏" : "收起侧栏")
     }
 
     @ViewBuilder
