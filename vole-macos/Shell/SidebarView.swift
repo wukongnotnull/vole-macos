@@ -27,16 +27,16 @@ struct SidebarView: View {
                     RadialGradient(
                         colors: [Color(hex: 0x5A473B), VoleTheme.Colors.ink],
                         center: .init(x: 0.5, y: 0.3),
-                        startRadius: 10,
-                        endRadius: 44
+                        startRadius: 12,
+                        endRadius: 52
                     )
                 )
-                .frame(width: 84, height: 84)
+                .frame(width: 100, height: 100)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
             Image("VoleLogo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 80, height: 80)
+                .frame(width: 96, height: 96)
                 .accessibilityLabel("Vole 标志")
         }
         .frame(maxWidth: .infinity)
