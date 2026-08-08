@@ -115,7 +115,7 @@ EOF
 
 ---
 
-## 可用通道增量（本分支）
+## 可用通道增量（已合入 [#3](https://github.com/wukongnotnull/vole-macos/pull/3) · 待真机）
 
 1. [x] XPC `removeAuthorizedPaths` / `bootoutLaunchdLabel` + `PathAuthorization` 白名单（fail-closed）
 2. [x] Clean UI 接线与无 Helper 降级；Uninstall 扩展点 `PrivilegedApply`
