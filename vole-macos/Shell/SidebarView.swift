@@ -26,7 +26,7 @@ struct SidebarView: View {
             .padding(.bottom, VoleTheme.Spacing.md)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(VoleTheme.Colors.ink)
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 0, bottomLeadingRadius: VoleTheme.Radius.card, bottomTrailingRadius: VoleTheme.Radius.card, topTrailingRadius: 0))
+            .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
             .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
 
             collapseButton

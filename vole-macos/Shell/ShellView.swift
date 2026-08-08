@@ -13,16 +13,6 @@ struct WindowAccessor: NSViewRepresentable {
             window.titleVisibility = .hidden
             window.isMovableByWindowBackground = true
             window.toolbar = nil
-
-            // Float traffic lights over the sidebar instead of pushing content down.
-            let inset: CGFloat = 10
-            for buttonType in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
-                if let button = window.standardWindowButton(buttonType) {
-                    var frame = button.frame
-                    frame.origin.y = window.contentLayoutRect.maxY - frame.height - inset
-                    button.setFrameOrigin(frame.origin)
-                }
-            }
         }
         return view
     }
@@ -42,8 +32,8 @@ struct ShellView: View {
         HStack(alignment: .center, spacing: 0) {
             SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
                 .frame(width: sidebarWidth)
-                .padding(.leading, VoleTheme.Spacing.md)
-                .padding(.bottom, VoleTheme.Spacing.md)
+                .padding(.horizontal, VoleTheme.Spacing.md)
+                .padding(.vertical, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
 
             detailView
