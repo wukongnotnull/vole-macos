@@ -30,30 +30,21 @@ struct ShellView: View {
     @ObservedObject var session: CleanSession
     @ObservedObject var helperStatus: HelperStatusModel
     @State private var selection: ShellModule = .clean
-    @State private var sidebarCollapsed = false
 
-    private var sidebarWidth: CGFloat { sidebarCollapsed ? 64 : 200 }
+    private let sidebarWidth: CGFloat = 200
     private var sidebarColumnWidth: CGFloat { sidebarWidth + VoleTheme.Spacing.sm * 2 }
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Fixed-width column — do not let overlay Spacers expand this into a mid-window void.
-            ZStack(alignment: .topLeading) {
-                SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
-                    .frame(width: sidebarWidth)
-                    .padding(.leading, VoleTheme.Spacing.sm)
-                    .padding(.trailing, VoleTheme.Spacing.sm)
-                    .padding(.top, 6)
-                    .padding(.bottom, VoleTheme.Spacing.sm)
-
-                // Same row as traffic lights (leading ~70pt for system buttons).
-                collapseToggle
-                    .padding(.leading, VoleTheme.Spacing.sm + 70)
-                    .padding(.top, 10)
-            }
-            .frame(width: sidebarColumnWidth)
-            .frame(maxHeight: .infinity, alignment: .top)
-            .background(VoleTheme.Colors.canvas)
+            SidebarView(selection: $selection)
+                .frame(width: sidebarWidth)
+                .padding(.leading, VoleTheme.Spacing.sm)
+                .padding(.trailing, VoleTheme.Spacing.sm)
+                .padding(.top, 6)
+                .padding(.bottom, VoleTheme.Spacing.sm)
+                .frame(width: sidebarColumnWidth)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .background(VoleTheme.Colors.canvas)
 
             detailView
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -67,24 +58,6 @@ struct ShellView: View {
         .background(WindowAccessor())
         // Draw under the transparent titlebar; traffic lights float on the sidebar.
         .ignoresSafeArea(.container, edges: .top)
-        .animation(VoleTheme.Motion.easing, value: sidebarCollapsed)
-    }
-
-    private var collapseToggle: some View {
-        Button {
-            withAnimation(VoleTheme.Motion.easing) {
-                sidebarCollapsed.toggle()
-            }
-        } label: {
-            Image(systemName: sidebarCollapsed ? "sidebar.left" : "sidebar.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.85))
-                .frame(width: 26, height: 26)
-                .background(VoleTheme.Colors.onInk.opacity(0.12))
-                .clipShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(sidebarCollapsed ? "展开侧栏" : "收起侧栏")
     }
 
     @ViewBuilder

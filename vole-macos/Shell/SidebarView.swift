@@ -2,26 +2,16 @@ import SwiftUI
 
 struct SidebarView: View {
     @Binding var selection: ShellModule
-    @Binding var isCollapsed: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
-            if isCollapsed {
-                collapsedHeader
-                collapsedModuleList
-            } else {
-                brandHeader
-                moduleList
-            }
+            brandHeader
+            moduleList
             Spacer(minLength: VoleTheme.Spacing.md)
-            if isCollapsed {
-                collapsedFooter
-            } else {
-                moreRow
-            }
+            moreRow
         }
-        // Top inset clears floating traffic lights + collapse toggle.
-        .padding(.top, 44)
+        // Top inset clears floating traffic lights.
+        .padding(.top, 36)
         .padding(.horizontal, VoleTheme.Spacing.sm)
         .padding(.bottom, VoleTheme.Spacing.md)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -69,16 +59,6 @@ struct SidebarView: View {
         }
     }
 
-    private var collapsedHeader: some View {
-        Image("VoleLogo")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 32, height: 32)
-            .frame(maxWidth: .infinity)
-            .accessibilityLabel("Vole 标志")
-            .padding(.bottom, VoleTheme.Spacing.xs)
-    }
-
     private var moduleList: some View {
         VStack(alignment: .leading, spacing: 2) {
             ForEach(ShellModule.allCases) { module in
@@ -109,40 +89,6 @@ struct SidebarView: View {
                 .help(module.isAvailable ? module.title : "\(module.title) · 即将推出")
             }
         }
-    }
-
-    private var collapsedModuleList: some View {
-        VStack(spacing: VoleTheme.Spacing.xs) {
-            ForEach(ShellModule.allCases) { module in
-                Button {
-                    selection = module
-                } label: {
-                    Image(systemName: module.systemImage)
-                        .font(.system(size: 15, weight: .semibold))
-                        .frame(width: 34, height: 34)
-                        .foregroundStyle(foreground(for: module))
-                        .background(background(for: module))
-                        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
-                }
-                .buttonStyle(.plain)
-                .disabled(!module.isAvailable)
-                .help(module.isAvailable ? module.title : "\(module.title) · 即将推出")
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var collapsedFooter: some View {
-        Button {
-        } label: {
-            Image(systemName: "gearshape")
-                .font(.system(size: 15, weight: .semibold))
-                .frame(width: 34, height: 34)
-                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.55))
-        }
-        .buttonStyle(.plain)
-        .help("设置")
-        .frame(maxWidth: .infinity)
     }
 
     private var moreRow: some View {
