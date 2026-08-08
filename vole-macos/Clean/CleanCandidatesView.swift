@@ -44,7 +44,7 @@ struct CleanCandidatesView: View {
             SoilPanel(
                 fraction: strataFraction(entries: session.entries, selectedIDs: session.selectedIDs),
                 valueText: ByteFormat.string(selectedBytes),
-                caption: "已选 \(session.selectedIDs.count) · 共 \(session.entries.count)"
+                caption: candidatesCaption
             )
 
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {

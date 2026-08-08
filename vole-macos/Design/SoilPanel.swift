@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Strata band + tabular value + caption. Used across Clean states.
+/// Thin strata seam + caption + metric — no nested card chrome.
 struct SoilPanel: View {
     let fraction: Double?
     var valueText: String
@@ -9,22 +9,18 @@ struct SoilPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
             SoilStrataView(fraction: fraction)
-            HStack(alignment: .firstTextBaseline) {
+
+            HStack(alignment: .firstTextBaseline, spacing: VoleTheme.Spacing.sm) {
                 Text(caption)
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
-                Spacer()
+                Spacer(minLength: 0)
                 Text(valueText)
                     .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(VoleTheme.Colors.text)
+                    .monospacedDigit()
             }
         }
-        .padding(VoleTheme.Spacing.md)
-        .background(Color(.windowBackgroundColor).opacity(0.6))
-        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
-        .overlay(
-            RoundedRectangle(cornerRadius: VoleTheme.Radius.card)
-                .stroke(VoleTheme.Colors.molehill, lineWidth: 1)
-        )
+        .accessibilityElement(children: .combine)
     }
 }
