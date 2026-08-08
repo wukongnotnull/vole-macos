@@ -49,9 +49,9 @@ struct ShellView: View {
 
             detailView
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.trailing, VoleTheme.Spacing.sm)
-                .padding(.top, 6)
-                .padding(.bottom, VoleTheme.Spacing.sm)
+                .padding(.trailing, sidebarGutter)
+                .padding(.top, sidebarGutter)
+                .padding(.bottom, sidebarGutter)
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
