@@ -12,6 +12,7 @@ struct WindowAccessor: NSViewRepresentable {
             window.titlebarAppearsTransparent = true
             window.titleVisibility = .hidden
             window.isMovableByWindowBackground = true
+            window.toolbar = nil
         }
         return view
     }
@@ -28,13 +29,15 @@ struct ShellView: View {
         HStack(spacing: 0) {
             SidebarView(selection: $selection)
                 .frame(width: 200)
-                .padding(.top, 28)
+                .padding(.top, VoleTheme.Spacing.md)
                 .padding(.horizontal, VoleTheme.Spacing.md)
                 .padding(.bottom, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
 
             detailView
-                .padding(VoleTheme.Spacing.md)
+                .padding(.top, VoleTheme.Spacing.md)
+                .padding(.horizontal, VoleTheme.Spacing.md)
+                .padding(.bottom, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
