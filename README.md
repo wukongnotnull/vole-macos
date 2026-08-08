@@ -35,7 +35,7 @@ Documents/vole-macos
 
 - Target：`VolePrivilegedHelper`（特权 XPC：`ping` / `removeAuthorizedPaths` / `bootoutLaunchdLabel`）
 - 注册：`HelperRegistration` → `SMAppService.daemon`
-- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.volemacos.helper.plist`
+- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
 - 白名单 fail-closed：见 `PathAuthorization`（永不含 `/Library/Updates`、`/macOS Install Data`）
 - Clean UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
 - Uninstall UI：尚未落地；`PrivilegedApply` 为共享扩展点
@@ -54,6 +54,8 @@ Documents/vole-macos
 2. 运行 App →「启用特权助手」→ 在系统设置批准
 3. 状态变为「已启用」，点击「重新检查」应显示 `uid=0`
 4. 勾选白名单内系统路径清理，确认永久删除；关闭后台项后系统路径应被跳过
+
+**2026-08-09 本机已通过：** BTM `VolePrivilegedHelper` disposition `[enabled, allowed]`；`launchctl` 显示 `system/cn.waytoai.vole-macos.helper` `state=running` 且进程 `uid=0`；特权 XPC `ping pid=87586 uid=0`（Mach `cn.waytoai.vole-macos.helper`）。Bundle / Mach 标识须保持 design §4.2 带连字符形式，勿改成 `volemacos`（否则与已批准 daemon 失配）。
 
 ## 验收
 

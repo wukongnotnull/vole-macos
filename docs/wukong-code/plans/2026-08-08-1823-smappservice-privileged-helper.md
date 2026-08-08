@@ -115,13 +115,13 @@ EOF
 
 ---
 
-## 可用通道增量（已合入 [#3](https://github.com/wukongnotnull/vole-macos/pull/3) · 待真机）
+## 可用通道增量（已合入 [#3](https://github.com/wukongnotnull/vole-macos/pull/3) · 真机已验收）
 
 1. [x] XPC `removeAuthorizedPaths` / `bootoutLaunchdLabel` + `PathAuthorization` 白名单（fail-closed）
 2. [x] Clean UI 接线与无 Helper 降级；Uninstall 扩展点 `PrivilegedApply`
 3. [x] Hardened Runtime 启用；公证凭据缺失已文档化（不伪造）
-4. [~] 真机批准流：UI/API 就绪；需用户批准后台项后 ping `uid==0`
-5. [ ] vole coverage「仍未移植」删除（待 uid==0 验收）+ 可选 PrivilegeBackend design
+4. [x] 真机批准流：BTM/daemon `enabled` + XPC ping `uid==0`（2026-08-09；证据见 README）
+5. [x] vole coverage「仍未移植」删除（配对 PR）+ 可选 PrivilegeBackend design（仍未做）
 
 ## Spec coverage
 
