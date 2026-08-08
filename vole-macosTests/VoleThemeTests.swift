@@ -27,4 +27,14 @@ final class VoleThemeTests: XCTestCase {
         XCTAssertEqual(burrow.1, 33, accuracy: 1)
         XCTAssertEqual(burrow.2, 28, accuracy: 1)
     }
+
+    func test_contentBackgroundResolvesInDarkAppearance() {
+        let view = Rectangle().fill(VoleTheme.Colors.contentBackground)
+        XCTAssertNotNil(view)
+    }
+
+    func test_motionDurationsAscending() {
+        XCTAssertLessThan(VoleTheme.Motion.quick, VoleTheme.Motion.standard)
+        XCTAssertLessThan(VoleTheme.Motion.standard, VoleTheme.Motion.slow)
+    }
 }

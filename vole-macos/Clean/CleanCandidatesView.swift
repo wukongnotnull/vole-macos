@@ -142,5 +142,8 @@ struct CleanCandidatesView: View {
             }
         }
         .toggleStyle(.checkbox)
+        .accessibilityLabel("\(entry.label)，\(ByteFormat.string(entry.size))")
+        .accessibilityValue(session.selectedIDs.contains(entry.id) ? "已选" : "未选")
+        .accessibilityHint(isPrivileged ? "系统路径，需特权助手永久删除" : "移动到废纸篓")
     }
 }

@@ -12,6 +12,8 @@ struct SoilStrataView: View {
         fraction.map { min(max($0, 0), 1) }
     }
 
+    private var prefersReducedMotion: Bool { reduceMotion || !animated }
+
     private var isIdle: Bool { fraction == nil }
 
     var body: some View {
@@ -22,7 +24,7 @@ struct SoilStrataView: View {
                     RoundedRectangle(cornerRadius: VoleTheme.Radius.strata)
                         .fill(strataGradient)
                         .frame(width: max(geo.size.width * f, 12))
-                        .animation(reduceMotion || !animated ? nil : VoleTheme.Motion.easing, value: f)
+                        .animation(prefersReducedMotion ? nil : VoleTheme.Motion.easing, value: f)
                 }
             }
         }
