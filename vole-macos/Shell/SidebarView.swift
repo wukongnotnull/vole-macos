@@ -2,18 +2,51 @@ import SwiftUI
 
 struct SidebarView: View {
     @Binding var selection: ShellModule
+    @Binding var isCollapsed: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
-            brandHeader
-            moduleList
-            Spacer()
-            moreRow
+        ZStack(alignment: .topTrailing) {
+            VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+                if isCollapsed {
+                    collapsedHeader
+                    collapsedModuleList
+                } else {
+                    brandHeader
+                    moduleList
+                }
+                Spacer()
+                if !isCollapsed {
+                    moreRow
+                }
+            }
+            .padding(.top, 36)
+            .padding(.horizontal, VoleTheme.Spacing.sm)
+            .padding(.bottom, VoleTheme.Spacing.md)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(VoleTheme.Colors.ink)
+            .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
+            .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
+
+            collapseButton
         }
-        .padding(VoleTheme.Spacing.md)
-        .background(VoleTheme.Colors.ink)
-        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
-        .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
+    }
+
+    private var collapseButton: some View {
+        Button {
+            withAnimation(VoleTheme.Motion.easing) {
+                isCollapsed.toggle()
+            }
+        } label: {
+            Image(systemName: isCollapsed ? "sidebar.left" : "sidebar.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.8))
+                .frame(width: 26, height: 26)
+                .background(VoleTheme.Colors.onInk.opacity(0.08))
+                .clipShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .padding(6)
+        .accessibilityLabel(isCollapsed ? "展开侧栏" : "收起侧栏")
     }
 
     private var brandHeader: some View {
@@ -55,6 +88,16 @@ struct SidebarView: View {
         }
     }
 
+    private var collapsedHeader: some View {
+        Image("VoleLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 34, height: 34)
+            .frame(maxWidth: .infinity)
+            .accessibilityLabel("Vole 标志")
+            .padding(.bottom, VoleTheme.Spacing.sm)
+    }
+
     private var moduleList: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
             ForEach(ShellModule.allCases) { module in
@@ -85,6 +128,27 @@ struct SidebarView: View {
                 .disabled(!module.isAvailable)
             }
         }
+    }
+
+    private var collapsedModuleList: some View {
+        VStack(spacing: VoleTheme.Spacing.xs) {
+            ForEach(ShellModule.allCases) { module in
+                Button {
+                    selection = module
+                } label: {
+                    Text(String(module.title.prefix(1)))
+                        .font(VoleTheme.TypeScale.body().weight(.bold))
+                        .frame(width: 34, height: 34)
+                        .foregroundStyle(foreground(for: module))
+                        .background(background(for: module))
+                        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+                }
+                .buttonStyle(.plain)
+                .disabled(!module.isAvailable)
+                .help(module.title)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var moreRow: some View {

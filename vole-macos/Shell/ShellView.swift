@@ -24,11 +24,14 @@ struct ShellView: View {
     @ObservedObject var session: CleanSession
     @ObservedObject var helperStatus: HelperStatusModel
     @State private var selection: ShellModule = .clean
+    @State private var sidebarCollapsed = false
+
+    private var sidebarWidth: CGFloat { sidebarCollapsed ? 64 : 200 }
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            SidebarView(selection: $selection)
-                .frame(width: 200)
+            SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
+                .frame(width: sidebarWidth)
                 .padding(.horizontal, VoleTheme.Spacing.md)
                 .padding(.vertical, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
@@ -39,6 +42,7 @@ struct ShellView: View {
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
+        .animation(VoleTheme.Motion.easing, value: sidebarCollapsed)
     }
 
     @ViewBuilder
