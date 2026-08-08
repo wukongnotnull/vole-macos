@@ -25,6 +25,15 @@ struct CleanCandidatesView: View {
         selectedTotalBytes(entries: session.entries, selectedIDs: session.selectedIDs)
     }
 
+    private var candidatesCaption: String {
+        let selected = session.selectedIDs.count
+        let total = session.entries.count
+        if selected == total {
+            return "\(total) 项"
+        }
+        return "\(selected) / \(total)"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.md) {
             HStack(alignment: .firstTextBaseline) {
