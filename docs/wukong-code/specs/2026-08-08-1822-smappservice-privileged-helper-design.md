@@ -198,12 +198,13 @@ App 启动或用户点击「启用特权助手」
 - [x] 测试：标识与状态映射
 - [x] vole 计划 Task D1 标注部分完成 + 阻塞项（Helper 未到「可用」则不改 coverage）
 
-### 9.2 可用通道（后续 PR）
+### 9.2 可用通道（本增量）
 
-- [ ] 真机批准流 + ping uid==0
-- [ ] 白名单删除 / bootout
-- [ ] UI 入口与失败降级
-- [ ] 改 vole coverage；必要时 PrivilegeBackend design
+- [x] 批准流 API + UI 入口；ping 校验 uid==0（需用户在系统设置批准一次；自动化无法代批）
+- [x] 白名单删除 / bootout（`removeAuthorizedPaths` / `bootoutLaunchdLabel` + `PathAuthorization`）
+- [x] Clean UI 接线与无 Helper 降级；Uninstall 留 `PrivilegedApply` 扩展点
+- [~] Hardened Runtime 已开；公证阻塞于 notarytool 凭据（见 README）
+- [ ] 改 vole coverage；必要时 PrivilegeBackend design（待真机 uid==0 验收后）
 
 ## 10. 开放问题（已拍板）
 

@@ -57,6 +57,7 @@ final class CleanSession: ObservableObject {
     @Published var showFDAAlert: Bool = false
     @Published var voleVersion: String = ""
     @Published var coverageNote: String?
+    @Published var helperDegradeNote: String?
 
     private var process = VoleProcess()
     private var fullPlanURL: URL?
@@ -125,6 +126,7 @@ final class CleanSession: ObservableObject {
             entries = []
             selectedIDs = []
             coverageNote = nil
+            helperDegradeNote = nil
             errorMessage = "计划已过期，请重新扫描"
             phase = .idle
             return
@@ -134,45 +136,101 @@ final class CleanSession: ObservableObject {
             errorMessage = "请至少选择一项"
             return
         }
+        let parts = PrivilegedApply.partition(filtered.entries)
+        let helperReady = HelperRegistration.currentStatus().isReadyForXPC
         phase = .applying
         errorMessage = nil
+        helperDegradeNote = nil
 
         Task {
             do {
-                let dir = try PlanIO.cachesDirectory()
-                let applyURL = dir.appendingPathComponent("clean-apply-\(UUID().uuidString).json")
-                try PlanIO.write(filtered, to: applyURL)
-                defer { try? FileManager.default.removeItem(at: applyURL) }
+                var sidecarReport: VoleReport?
+                if !parts.userEntries.isEmpty {
+                    let userPlan = VolePlan(
+                        schemaVersion: filtered.schemaVersion,
+                        createdAt: filtered.createdAt,
+                        ttlSecs: filtered.ttlSecs,
+                        entries: parts.userEntries,
+                        coverageNote: filtered.coverageNote
+                    )
+                    let dir = try PlanIO.cachesDirectory()
+                    let applyURL = dir.appendingPathComponent("clean-apply-\(UUID().uuidString).json")
+                    try PlanIO.write(userPlan, to: applyURL)
+                    defer { try? FileManager.default.removeItem(at: applyURL) }
 
-                let reportBox = ReportBox()
-                let exit = await process.run(arguments: [
-                    "clean", "--apply", applyURL.path, "--json-stream",
-                ]) { [weak self] line in
-                    guard let event = try? VoleStreamEvent.decodeNDJSONLine(line) else { return }
-                    if case let .done(report) = event {
-                        reportBox.set(report)
-                    }
-                    if case let .progress(scanned, current) = event {
-                        Task { @MainActor in
-                            self?.progressScanned = scanned
-                            self?.progressCurrent = current
+                    let reportBox = ReportBox()
+                    let exit = await process.run(arguments: [
+                        "clean", "--apply", applyURL.path, "--json-stream",
+                    ]) { [weak self] line in
+                        guard let event = try? VoleStreamEvent.decodeNDJSONLine(line) else { return }
+                        if case let .done(report) = event {
+                            reportBox.set(report)
+                        }
+                        if case let .progress(scanned, current) = event {
+                            Task { @MainActor in
+                                self?.progressScanned = scanned
+                                self?.progressCurrent = current
+                            }
                         }
                     }
+                    sidecarReport = reportBox.get()
+                    switch exit {
+                    case .success, .cancelled:
+                        break
+                    case .failed(let message):
+                        cleanupFullPlan()
+                        errorMessage = message
+                        phase = .candidates
+                        return
+                    }
+                    if case .cancelled = exit {
+                        errorMessage = "已取消（可能已部分清理）"
+                        report = sidecarReport
+                        cleanupFullPlan()
+                        phase = .result
+                        return
+                    }
                 }
-                let lastReport = reportBox.get()
+
+                var privilegedDeleted: UInt64 = 0
+                var privilegedFailed: UInt64 = 0
+                if !parts.privilegedEntries.isEmpty {
+                    if helperReady {
+                        progressCurrent = "特权助手删除系统路径…"
+                        do {
+                            try await PrivilegedApply.applyPrivilegedPaths(
+                                parts.privilegedEntries.map(\.path)
+                            )
+                            privilegedDeleted = UInt64(parts.privilegedEntries.count)
+                        } catch {
+                            privilegedFailed = UInt64(parts.privilegedEntries.count)
+                            errorMessage = "特权助手：\(error.localizedDescription)"
+                        }
+                    } else {
+                        helperDegradeNote =
+                            "已跳过 \(parts.privilegedEntries.count) 项系统路径（特权助手未启用）。用户域清理不受影响。"
+                    }
+                }
+
                 cleanupFullPlan()
-                switch exit {
-                case .success:
-                    report = lastReport
-                    phase = .result
-                case .cancelled:
-                    errorMessage = "已取消（可能已部分清理）"
-                    report = lastReport
-                    phase = .result
-                case .failed(let message):
-                    errorMessage = message
-                    phase = .candidates
+                var merged = sidecarReport ?? VoleReport(
+                    succeeded: 0,
+                    skipped: 0,
+                    failed: 0,
+                    skippedByReason: [],
+                    trashedBytes: 0,
+                    deletedBytes: 0,
+                    coverageNote: filtered.coverageNote
+                )
+                merged.succeeded += privilegedDeleted
+                merged.failed += privilegedFailed
+                if let note = helperDegradeNote {
+                    merged.skipped += UInt64(parts.privilegedEntries.count)
+                    let existing = merged.coverageNote.map { $0 + "\n" } ?? ""
+                    merged.coverageNote = existing + note
                 }
+                report = merged
+                phase = .result
             } catch {
                 errorMessage = error.localizedDescription
                 phase = .candidates
@@ -189,6 +247,7 @@ final class CleanSession: ObservableObject {
         report = nil
         errorMessage = nil
         coverageNote = nil
+        helperDegradeNote = nil
     }
 
     private func handleStreamLine(_ line: String) {
