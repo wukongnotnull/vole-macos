@@ -5,6 +5,6 @@ struct ContentView: View {
     @ObservedObject var helperStatus: HelperStatusModel
 
     var body: some View {
-        CleanRootView(session: session, helperStatus: helperStatus)
+        ShellView(session: session, helperStatus: helperStatus)
     }
 }
