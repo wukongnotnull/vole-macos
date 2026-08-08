@@ -102,9 +102,9 @@ struct SidebarView: View {
 
     private func foreground(for module: ShellModule) -> Color {
         if selection == module {
-            return VoleTheme.Colors.burrow
+            return Color(hex: 0x2E2721)
         }
-        return VoleTheme.Colors.onBurrow.opacity(module.isAvailable ? 1 : 0.4)
+        return Color(hex: 0xFAF6F0).opacity(module.isAvailable ? 1 : 0.72)
     }
 
     @ViewBuilder
