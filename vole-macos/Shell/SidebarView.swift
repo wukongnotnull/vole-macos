@@ -12,7 +12,7 @@ struct SidebarView: View {
         }
         .padding(.vertical, VoleTheme.Spacing.md)
         .padding(.horizontal, VoleTheme.Spacing.sm)
-        .background(VoleTheme.Colors.burrow)
+        .background(VoleTheme.Colors.ink)
     }
 
     private var brandHeader: some View {
@@ -21,7 +21,7 @@ struct SidebarView: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: 0x4A352C), VoleTheme.Colors.burrow],
+                            colors: [Color(hex: 0x5A473B), VoleTheme.Colors.ink],
                             center: .init(x: 0.5, y: 0.3),
                             startRadius: 8,
                             endRadius: 34
@@ -38,18 +38,18 @@ struct SidebarView: View {
             VStack(spacing: 2) {
                 Text("Vole")
                     .font(VoleTheme.TypeScale.headline())
-                    .foregroundStyle(VoleTheme.Colors.onBurrow)
+                    .foregroundStyle(VoleTheme.Colors.onInk)
                 Text("BURROW & SORT")
                     .font(.system(size: 10, weight: .regular, design: .monospaced))
                     .tracking(2)
-                    .foregroundStyle(VoleTheme.Colors.onBurrow.opacity(0.45))
+                    .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.45))
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.bottom, VoleTheme.Spacing.sm)
         .overlay(alignment: .bottom) {
             Rectangle()
-                .fill(VoleTheme.Colors.onBurrow.opacity(0.06))
+                .fill(VoleTheme.Colors.onInk.opacity(0.08))
                 .frame(height: 1)
         }
     }
@@ -89,22 +89,22 @@ struct SidebarView: View {
     private var moreRow: some View {
         Text("更多 · 设置")
             .font(VoleTheme.TypeScale.caption())
-            .foregroundStyle(VoleTheme.Colors.onBurrow.opacity(0.45))
+            .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.6))
             .padding(.horizontal, VoleTheme.Spacing.sm)
             .padding(.vertical, VoleTheme.Spacing.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
             .overlay(alignment: .top) {
                 Rectangle()
-                    .fill(VoleTheme.Colors.onBurrow.opacity(0.06))
+                    .fill(VoleTheme.Colors.onInk.opacity(0.08))
                     .frame(height: 1)
             }
     }
 
     private func foreground(for module: ShellModule) -> Color {
         if selection == module {
-            return VoleTheme.Colors.burrow
+            return VoleTheme.Colors.onFur
         }
-        return VoleTheme.Colors.onBurrow.opacity(module.isAvailable ? 1 : 0.4)
+        return VoleTheme.Colors.onInk.opacity(module.isAvailable ? 1 : 0.72)
     }
 
     @ViewBuilder
