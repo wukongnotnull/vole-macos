@@ -21,7 +21,7 @@ struct SidebarView: View {
                     moreRow
                 }
             }
-            .padding(.top, 28)
+            .padding(.top, 8)
             .padding(.horizontal, VoleTheme.Spacing.sm)
             .padding(.bottom, VoleTheme.Spacing.md)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -13,6 +13,16 @@ struct WindowAccessor: NSViewRepresentable {
             window.titleVisibility = .hidden
             window.isMovableByWindowBackground = true
             window.toolbar = nil
+
+            // Float traffic lights over the sidebar instead of pushing content down.
+            let inset: CGFloat = 10
+            for buttonType in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
+                if let button = window.standardWindowButton(buttonType) {
+                    var frame = button.frame
+                    frame.origin.y = window.contentLayoutRect.maxY - frame.height - inset
+                    button.setFrameOrigin(frame.origin)
+                }
+            }
         }
         return view
     }
