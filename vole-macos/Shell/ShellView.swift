@@ -1,4 +1,23 @@
 import SwiftUI
+import AppKit
+
+/// Applies full-size content + transparent title so the canvas reaches the top edge,
+/// keeping only the traffic-light controls.
+struct WindowAccessor: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            window.styleMask.insert(.fullSizeContentView)
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.isMovableByWindowBackground = true
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
 
 struct ShellView: View {
     @ObservedObject var session: CleanSession
@@ -9,7 +28,9 @@ struct ShellView: View {
         HStack(spacing: 0) {
             SidebarView(selection: $selection)
                 .frame(width: 200)
-                .padding(VoleTheme.Spacing.md)
+                .padding(.top, 28)
+                .padding(.horizontal, VoleTheme.Spacing.md)
+                .padding(.bottom, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
 
             detailView

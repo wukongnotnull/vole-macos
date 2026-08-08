@@ -8,6 +8,9 @@ struct vole_macosApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(session: session, helperStatus: helperStatus)
+                .background(WindowAccessor())
         }
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unifiedCompact(showsTitle: false))
     }
 }
