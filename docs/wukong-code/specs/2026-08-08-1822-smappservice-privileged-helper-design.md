@@ -204,7 +204,8 @@ App 启动或用户点击「启用特权助手」
 - [x] 白名单删除 / bootout（`removeAuthorizedPaths` / `bootoutLaunchdLabel` + `PathAuthorization`）
 - [x] Clean UI 接线与无 Helper 降级；Uninstall 留 `PrivilegedApply` 扩展点
 - [~] Hardened Runtime 已开；公证阻塞于 notarytool 凭据（见 README）
-- [ ] 改 vole coverage；必要时 PrivilegeBackend design（待真机 uid==0 验收后）
+- [x] 真机可用通道验收：`SMAppService`/BTM enabled + XPC `ping pid=… uid=0`（2026-08-09）
+- [x] 改 vole coverage「仍未移植：桌面 SMAppService / 特权助手」（配对 PR）；PrivilegeBackend 桌面适配仍可选另开 design
 
 ## 10. 开放问题（已拍板）
 

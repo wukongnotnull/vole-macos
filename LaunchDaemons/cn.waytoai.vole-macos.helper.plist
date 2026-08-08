@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>cn.waytoai.volemacos.helper</string>
+	<string>cn.waytoai.vole-macos.helper</string>
 	<key>BundleProgram</key>
 	<string>Contents/MacOS/VolePrivilegedHelper</string>
 	<key>MachServices</key>
 	<dict>
-		<key>cn.waytoai.volemacos.helper</key>
+		<key>cn.waytoai.vole-macos.helper</key>
 		<true/>
 	</dict>
 </dict>

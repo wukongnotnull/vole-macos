@@ -48,7 +48,7 @@ enum PlanIO {
             appropriateFor: nil,
             create: true
         )
-        let dir = base.appendingPathComponent("cn.waytoai.volemacos", isDirectory: true)
+        let dir = base.appendingPathComponent("cn.waytoai.vole-macos", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }

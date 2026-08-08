@@ -5,10 +5,10 @@ import Testing
 
 struct PrivilegeHelperTests {
     @Test func serviceIdentifiersMatchDesign() {
-        #expect(HelperServiceIDs.machServiceName == "cn.waytoai.volemacos.helper")
-        #expect(HelperServiceIDs.launchDaemonPlistName == "cn.waytoai.volemacos.helper.plist")
+        #expect(HelperServiceIDs.machServiceName == "cn.waytoai.vole-macos.helper")
+        #expect(HelperServiceIDs.launchDaemonPlistName == "cn.waytoai.vole-macos.helper.plist")
         #expect(HelperServiceIDs.helperExecutableName == "VolePrivilegedHelper")
-        #expect(HelperServiceIDs.appBundleIdentifier == "cn.waytoai.volemacos")
+        #expect(HelperServiceIDs.appBundleIdentifier == "cn.waytoai.vole-macos")
         #expect(HelperServiceIDs.teamIdentifier == "WCYC8XY4V2")
     }
 
@@ -36,5 +36,16 @@ struct PrivilegeHelperTests {
         } catch {
             Issue.record("unexpected error: \(error)")
         }
+    }
+
+    @Test func pingReturnsRootUidWhenEnabled() async throws {
+        let status = HelperRegistration.currentStatus()
+        guard status == .enabled else {
+            // Device approval is required; skip when helper is not enabled here.
+            return
+        }
+        let result = try await HelperXPCClient.ping()
+        #expect(result.uid == 0)
+        #expect(result.pid > 0)
     }
 }
