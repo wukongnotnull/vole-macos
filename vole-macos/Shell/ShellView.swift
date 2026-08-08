@@ -7,17 +7,23 @@ struct WindowAccessor: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            guard let window = view.window else { return }
-            window.styleMask.insert(.fullSizeContentView)
-            window.titlebarAppearsTransparent = true
-            window.titleVisibility = .hidden
-            window.isMovableByWindowBackground = true
-            window.toolbar = nil
+            Self.applyChrome(to: view.window)
         }
         return view
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {}
+    func updateNSView(_ nsView: NSView, context: Context) {
+        Self.applyChrome(to: nsView.window)
+    }
+
+    private static func applyChrome(to window: NSWindow?) {
+        guard let window else { return }
+        window.styleMask.insert(.fullSizeContentView)
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.isMovableByWindowBackground = true
+        window.toolbar = nil
+    }
 }
 
 struct ShellView: View {
@@ -29,32 +35,41 @@ struct ShellView: View {
     private var sidebarWidth: CGFloat { sidebarCollapsed ? 64 : 200 }
 
     var body: some View {
-        HStack(alignment: .center, spacing: 0) {
-            ZStack(alignment: .top) {
+        HStack(alignment: .top, spacing: 0) {
+            // Sidebar column extends under the titlebar so traffic lights sit on the ink card.
+            ZStack(alignment: .topLeading) {
                 SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
                     .frame(width: sidebarWidth)
-                    .padding(.horizontal, VoleTheme.Spacing.md)
-                    .padding(.vertical, VoleTheme.Spacing.md)
+                    .padding(.leading, VoleTheme.Spacing.sm)
+                    .padding(.trailing, VoleTheme.Spacing.md)
+                    .padding(.top, 0)
+                    .padding(.bottom, VoleTheme.Spacing.md)
 
-                // Traffic-light row overlay: toggle floats on the same line as
-                // the window controls, without reserving layout height.
-                HStack(spacing: 0) {
+                // Same row as traffic lights (leading ~70pt for system buttons).
+                HStack(spacing: 8) {
                     Spacer()
-                        .frame(width: 78)
+                        .frame(width: 70)
                     collapseToggle
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
                 .frame(height: 28)
-                .padding(.top, 6)
+                .padding(.leading, VoleTheme.Spacing.sm)
+                .padding(.top, 10)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             .background(VoleTheme.Colors.canvas)
 
             detailView
                 .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.vertical, VoleTheme.Spacing.md)
+                .padding(.top, 8)
+                .padding(.bottom, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
+        .background(VoleTheme.Colors.canvas)
+        .background(WindowAccessor())
+        // Draw under the transparent titlebar; traffic lights float on the sidebar.
+        .ignoresSafeArea(.container, edges: .top)
         .animation(VoleTheme.Motion.easing, value: sidebarCollapsed)
     }
 
@@ -66,8 +81,10 @@ struct ShellView: View {
         } label: {
             Image(systemName: sidebarCollapsed ? "sidebar.left" : "sidebar.right")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(VoleTheme.Colors.ink.opacity(0.7))
+                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.85))
                 .frame(width: 26, height: 26)
+                .background(VoleTheme.Colors.onInk.opacity(0.12))
+                .clipShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(sidebarCollapsed ? "展开侧栏" : "收起侧栏")

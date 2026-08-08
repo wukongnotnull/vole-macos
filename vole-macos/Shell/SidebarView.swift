@@ -5,30 +5,36 @@ struct SidebarView: View {
     @Binding var isCollapsed: Bool
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
-                if isCollapsed {
-                    collapsedHeader
-                    collapsedModuleList
-                } else {
-                    brandHeader
-                    moduleList
-                }
-                Spacer()
-                if isCollapsed {
-                    collapsedFooter
-                } else {
-                    moreRow
-                }
+        VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+            if isCollapsed {
+                collapsedHeader
+                collapsedModuleList
+            } else {
+                brandHeader
+                moduleList
             }
-            .padding(.top, 8)
-            .padding(.horizontal, VoleTheme.Spacing.sm)
-            .padding(.bottom, VoleTheme.Spacing.md)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(VoleTheme.Colors.ink)
-            .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
-            .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
+            Spacer()
+            if isCollapsed {
+                collapsedFooter
+            } else {
+                moreRow
+            }
         }
+        // Top inset clears floating traffic lights + collapse toggle.
+        .padding(.top, 44)
+        .padding(.horizontal, VoleTheme.Spacing.sm)
+        .padding(.bottom, VoleTheme.Spacing.md)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(VoleTheme.Colors.ink)
+        .clipShape(
+            UnevenRoundedRectangle(
+                topLeadingRadius: 0,
+                bottomLeadingRadius: VoleTheme.Radius.card,
+                bottomTrailingRadius: VoleTheme.Radius.card,
+                topTrailingRadius: VoleTheme.Radius.card
+            )
+        )
+        .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
     }
 
     private var brandHeader: some View {
