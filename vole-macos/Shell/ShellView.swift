@@ -33,10 +33,11 @@ struct ShellView: View {
     @State private var sidebarCollapsed = false
 
     private var sidebarWidth: CGFloat { sidebarCollapsed ? 64 : 200 }
+    private var sidebarColumnWidth: CGFloat { sidebarWidth + VoleTheme.Spacing.sm * 2 }
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Sidebar column extends under the titlebar so traffic lights sit on the ink card.
+            // Fixed-width column — do not let overlay Spacers expand this into a mid-window void.
             ZStack(alignment: .topLeading) {
                 SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
                     .frame(width: sidebarWidth)
@@ -46,16 +47,11 @@ struct ShellView: View {
                     .padding(.bottom, VoleTheme.Spacing.sm)
 
                 // Same row as traffic lights (leading ~70pt for system buttons).
-                HStack(spacing: 8) {
-                    Spacer()
-                        .frame(width: 70)
-                    collapseToggle
-                    Spacer(minLength: 0)
-                }
-                .frame(height: 28)
-                .padding(.leading, VoleTheme.Spacing.sm)
-                .padding(.top, 10)
+                collapseToggle
+                    .padding(.leading, VoleTheme.Spacing.sm + 70)
+                    .padding(.top, 10)
             }
+            .frame(width: sidebarColumnWidth)
             .frame(maxHeight: .infinity, alignment: .top)
             .background(VoleTheme.Colors.canvas)
 
