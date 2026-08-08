@@ -17,15 +17,15 @@ final class VoleThemeTests: XCTestCase {
         XCTAssertEqual(b, 113, accuracy: 1)
     }
 
-    func test_soilAndBurrow() {
+    func test_inkAndSoil() {
+        let ink = components(VoleTheme.Colors.ink)
+        XCTAssertEqual(ink.0, 62, accuracy: 1)
+        XCTAssertEqual(ink.1, 50, accuracy: 1)
+        XCTAssertEqual(ink.2, 42, accuracy: 1)
         let soil = components(VoleTheme.Colors.soil)
-        XCTAssertEqual(soil.0, 125, accuracy: 1)
-        XCTAssertEqual(soil.1, 93, accuracy: 1)
-        XCTAssertEqual(soil.2, 74, accuracy: 1)
-        let burrow = components(VoleTheme.Colors.burrow)
-        XCTAssertEqual(burrow.0, 44, accuracy: 1)
-        XCTAssertEqual(burrow.1, 33, accuracy: 1)
-        XCTAssertEqual(burrow.2, 28, accuracy: 1)
+        XCTAssertEqual(soil.0, 138, accuracy: 1)
+        XCTAssertEqual(soil.1, 106, accuracy: 1)
+        XCTAssertEqual(soil.2, 82, accuracy: 1)
     }
 
     func test_sageMatchesAppIconGround() {

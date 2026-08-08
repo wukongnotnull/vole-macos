@@ -36,7 +36,7 @@ struct SoilStrataView: View {
 
     private var strataGradient: LinearGradient {
         LinearGradient(
-            colors: [VoleTheme.Colors.soil, VoleTheme.Colors.strataMid, VoleTheme.Colors.fur, VoleTheme.Colors.molehill],
+            colors: [VoleTheme.Colors.soil, VoleTheme.Colors.strataMid, VoleTheme.Colors.fur, VoleTheme.Colors.sage],
             startPoint: .leading,
             endPoint: .trailing
         )

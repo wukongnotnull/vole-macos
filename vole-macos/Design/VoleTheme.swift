@@ -8,29 +8,33 @@ enum VoleTheme {
     // MARK: Color
 
     enum Colors {
-        /// Shell sidebar base (constant across appearances).
-        static let burrow = Color(hex: 0x2C211C)
-        /// Primary actions (scan / clean / confirm).
-        static let soil = Color(hex: 0x7D5D4A)
+        /// Sidebar base (constant across appearances).
+        static let ink = Color(hex: 0x3E322A)
+        /// Window / shell canvas.
+        static let canvas = Color(hex: 0xEFE6DB)
+        /// Content card surface.
+        static let card = Color(hex: 0xFFFFFF)
         /// Brand accent: selection, strata mid, emphasis.
         static let fur = Color(hex: 0xC99971)
-        /// Content background (light).
-        static let clay = Color(hex: 0xF6F0E8)
+        /// Primary actions (scan / clean / confirm).
+        static let soil = Color(hex: 0x8A6A52)
+        /// App icon ground; strata terminal stop, badges/empty states. Not a text color.
+        static let sage = Color(hex: 0xC9D8B6)
+        /// Layering / skip-zone background.
+        static let molehill = Color(hex: 0xE0D0BE)
         /// Micro-accent: success hint / mascot blush. Never a primary CTA.
         static let blush = Color(hex: 0xF4A6A1)
-        /// Layering / skip-zone background.
-        static let molehill = Color(hex: 0xE8D5C0)
-        /// App icon ground; brand support (badges, empty states). Not a text color.
-        static let sage = Color(hex: 0xC9D8B6)
-        /// Deep text support (dark content base).
-        static let ink = Color(hex: 0x1C1613)
+        /// Primary text (light content).
+        static let text = Color(hex: 0x3E322A)
 
         /// Content background that flips with appearance.
-        static let contentBackground = Color(light: 0xF6F0E8, dark: 0x1C1613)
-        /// Primary text on burrow.
-        static let onBurrow = Color(light: 0xF6F0E8, dark: 0xF0E6DC)
+        static let contentBackground = Color(light: 0xFFFFFF, dark: 0x1C1613)
+        /// Primary text on ink sidebar.
+        static let onInk = Color(hex: 0xFAF6F0)
+        /// Selected sidebar label.
+        static let onFur = Color(hex: 0x2E2721)
         /// Strata gradient mid stop between soil and fur.
-        static let strataMid = Color(hex: 0xA67C52)
+        static let strataMid = Color(hex: 0xB3895F)
     }
 
     // MARK: Type
