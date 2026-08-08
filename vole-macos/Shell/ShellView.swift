@@ -26,18 +26,16 @@ struct ShellView: View {
     @State private var selection: ShellModule = .clean
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(alignment: .center, spacing: 0) {
             SidebarView(selection: $selection)
                 .frame(width: 200)
-                .padding(.top, VoleTheme.Spacing.md)
                 .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.bottom, VoleTheme.Spacing.md)
+                .padding(.vertical, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
 
             detailView
-                .padding(.top, VoleTheme.Spacing.md)
                 .padding(.horizontal, VoleTheme.Spacing.md)
-                .padding(.bottom, VoleTheme.Spacing.md)
+                .padding(.vertical, VoleTheme.Spacing.md)
                 .background(VoleTheme.Colors.canvas)
         }
         .frame(minWidth: 720, minHeight: 480)
