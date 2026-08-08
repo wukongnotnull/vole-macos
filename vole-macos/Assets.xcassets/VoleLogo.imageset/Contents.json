@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "vole-logo.png",
+      "filename" : "vole-500-nobg.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "vole-1000-nobg.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "vole-1500-nobg.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
