@@ -1,78 +1,117 @@
 import SwiftUI
 
+/// Compact system-path helper strip — status by icon, action by short verb.
 struct HelperStatusCard: View {
     @ObservedObject var model: HelperStatusModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
-            HStack(spacing: VoleTheme.Spacing.sm) {
-                Image(systemName: model.isReady ? "checkmark.seal.fill" : "lock.shield")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(model.isReady ? VoleTheme.Colors.sage : VoleTheme.Colors.soil)
-                Text("特权助手")
-                    .font(VoleTheme.TypeScale.headline())
-                    .foregroundStyle(VoleTheme.Colors.text)
-                Spacer(minLength: 0)
-                Text(model.isReady ? "已就绪" : "未启用")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
-            }
+        HStack(spacing: VoleTheme.Spacing.sm) {
+            Image(systemName: iconName)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(iconColor)
+                .frame(width: 20)
 
-            Text("清理系统路径前需批准一次后台项；用户域仍走 sidecar。")
-                .font(VoleTheme.TypeScale.caption())
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            Text("系统路径")
+                .font(VoleTheme.TypeScale.body())
+                .foregroundStyle(VoleTheme.Colors.text)
 
-            if !model.isReady {
-                Text(model.statusText)
+            if let hint = compactHint {
+                Text(hint)
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(VoleTheme.Colors.soil)
-            } else if let ping = model.lastPing {
-                Text("助手在线 · pid \(ping.pid)")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
             }
 
-            if let error = model.lastError {
-                Text(error)
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(Color(hex: 0xB54A3C))
+            Spacer(minLength: VoleTheme.Spacing.sm)
+
+            if model.status == .requiresApproval {
+                Button("批准") { model.openSettings() }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
             }
 
-            HStack(spacing: VoleTheme.Spacing.sm) {
-                Button(model.isReady ? "重新检查" : "启用特权助手") {
-                    if model.isReady {
-                        Task { await model.ping() }
-                    } else {
-                        model.registerAndGuide()
-                    }
-                }
-                .buttonStyle(.bordered)
-                .tint(VoleTheme.Colors.soil)
-                .disabled(model.isBusy)
-
-                if model.status == .requiresApproval {
-                    Button("打开系统设置") { model.openSettings() }
-                        .buttonStyle(.bordered)
-                }
+            Button(primaryTitle) {
                 if model.isReady {
-                    Button("注销", role: .destructive) { model.unregister() }
+                    Task { await model.ping() }
+                } else {
+                    model.registerAndGuide()
                 }
+            }
+            .buttonStyle(.bordered)
+            .tint(VoleTheme.Colors.soil)
+            .controlSize(.small)
+            .disabled(model.isBusy)
+            .help(primaryHelp)
+
+            if model.isReady {
+                Button {
+                    model.unregister()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 10, weight: .bold))
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+                .help("注销助手")
             }
         }
-        .padding(VoleTheme.Spacing.md)
+        .padding(.horizontal, VoleTheme.Spacing.md)
+        .padding(.vertical, VoleTheme.Spacing.sm)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(VoleTheme.Colors.molehill.opacity(0.45))
+        .background(VoleTheme.Colors.molehill.opacity(0.35))
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
         .overlay(
             RoundedRectangle(cornerRadius: VoleTheme.Radius.control)
-                .stroke(VoleTheme.Colors.molehill, lineWidth: 1)
+                .stroke(
+                    VoleTheme.Colors.soil.opacity(0.35),
+                    style: StrokeStyle(lineWidth: 1, dash: [3, 3])
+                )
         )
         .onAppear {
             model.refresh()
             if model.isReady {
                 Task { await model.ping() }
             }
+        }
+    }
+
+    private var iconName: String {
+        if model.isReady { return "checkmark.seal.fill" }
+        if model.status == .requiresApproval { return "hand.raised.fill" }
+        return "lock.shield"
+    }
+
+    private var iconColor: Color {
+        if model.isReady { return VoleTheme.Colors.sage }
+        return VoleTheme.Colors.soil
+    }
+
+    private var primaryTitle: String {
+        model.isReady ? "检查" : "启用"
+    }
+
+    private var primaryHelp: String {
+        if model.isReady {
+            return "检查特权助手是否在线"
+        }
+        return "启用特权助手以清理系统路径"
+    }
+
+    /// Only show a one-line hint when something needs attention.
+    private var compactHint: String? {
+        if let error = model.lastError, !error.isEmpty {
+            return error
+        }
+        switch model.status {
+        case .notFound:
+            return "构建缺 Helper"
+        case .requiresApproval:
+            return "待批准"
+        case .unknown:
+            return model.statusText
+        default:
+            return nil
         }
     }
 }
