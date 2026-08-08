@@ -36,7 +36,7 @@ struct SidebarView: View {
             Image("VoleLogo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 64, height: 64)
+                .frame(width: 74, height: 74)
                 .accessibilityLabel("Vole 标志")
         }
         .frame(maxWidth: .infinity)
