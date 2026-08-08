@@ -32,16 +32,17 @@ struct ShellView: View {
     @State private var selection: ShellModule = .clean
 
     private let sidebarWidth: CGFloat = 200
-    private var sidebarColumnWidth: CGFloat { sidebarWidth + VoleTheme.Spacing.sm * 2 }
+    private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
+    private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             SidebarView(selection: $selection)
                 .frame(width: sidebarWidth)
-                .padding(.leading, VoleTheme.Spacing.sm)
-                .padding(.trailing, VoleTheme.Spacing.sm)
-                .padding(.top, 6)
-                .padding(.bottom, VoleTheme.Spacing.sm)
+                .padding(.leading, sidebarGutter)
+                .padding(.trailing, sidebarGutter)
+                .padding(.top, sidebarGutter)
+                .padding(.bottom, sidebarGutter)
                 .frame(width: sidebarColumnWidth)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .background(VoleTheme.Colors.canvas)
