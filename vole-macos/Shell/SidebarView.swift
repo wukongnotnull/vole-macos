@@ -21,34 +21,23 @@ struct SidebarView: View {
     }
 
     private var brandHeader: some View {
-        VStack(spacing: VoleTheme.Spacing.xs) {
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color(hex: 0x5A473B), VoleTheme.Colors.ink],
-                            center: .init(x: 0.5, y: 0.3),
-                            startRadius: 6,
-                            endRadius: 28
-                        )
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color(hex: 0x5A473B), VoleTheme.Colors.ink],
+                        center: .init(x: 0.5, y: 0.3),
+                        startRadius: 10,
+                        endRadius: 44
                     )
-                    .frame(width: 52, height: 52)
-                    .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
-                Image("VoleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 38, height: 38)
-                    .accessibilityLabel("Vole 标志")
-            }
-            VStack(spacing: 1) {
-                Text("Vole")
-                    .font(VoleTheme.TypeScale.headline())
-                    .foregroundStyle(VoleTheme.Colors.onInk)
-                Text("BURROW & SORT")
-                    .font(.system(size: 9, weight: .regular, design: .monospaced))
-                    .tracking(1.6)
-                    .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.4))
-            }
+                )
+                .frame(width: 84, height: 84)
+                .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
+            Image("VoleLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 64, height: 64)
+                .accessibilityLabel("Vole 标志")
         }
         .frame(maxWidth: .infinity)
         .padding(.bottom, VoleTheme.Spacing.sm)
