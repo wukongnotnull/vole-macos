@@ -25,7 +25,18 @@ Documents/vole-macos
 
 ## 设计
 
-见 [`docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md`](docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md)。
+- Clean MVP：[`docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md`](docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md)
+- 特权助手（SMAppService）：[`docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md`](docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md)
+
+## 特权助手（骨架）
+
+当前为 **可编译骨架**，不是可用提权通道：
+
+- Target：`VolePrivilegedHelper`（特权 XPC，仅 `ping`）
+- 注册：`HelperRegistration` → `SMAppService.daemon`
+- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
+- **未接线** Clean apply；**无**白名单删除 / `launchctl bootout`
+- 剩余步骤见 design §9.2 与 [`docs/wukong-code/plans/2026-08-08-1823-smappservice-privileged-helper.md`](docs/wukong-code/plans/2026-08-08-1823-smappservice-privileged-helper.md)
 
 ## 验收
 
