@@ -31,7 +31,7 @@ struct ShellView: View {
     @ObservedObject var helperStatus: HelperStatusModel
     @State private var selection: ShellModule = .clean
 
-    private let sidebarWidth: CGFloat = 200
+    private let sidebarWidth: CGFloat = 168
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
     private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
