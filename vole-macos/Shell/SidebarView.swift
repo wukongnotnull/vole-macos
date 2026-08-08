@@ -15,7 +15,9 @@ struct SidebarView: View {
                     moduleList
                 }
                 Spacer()
-                if !isCollapsed {
+                if isCollapsed {
+                    collapsedFooter
+                } else {
                     moreRow
                 }
             }
@@ -136,8 +138,8 @@ struct SidebarView: View {
                 Button {
                     selection = module
                 } label: {
-                    Text(String(module.title.prefix(1)))
-                        .font(VoleTheme.TypeScale.body().weight(.bold))
+                    Image(systemName: module.systemImage)
+                        .font(.system(size: 15, weight: .semibold))
                         .frame(width: 34, height: 34)
                         .foregroundStyle(foreground(for: module))
                         .background(background(for: module))
@@ -148,6 +150,20 @@ struct SidebarView: View {
                 .help(module.title)
             }
         }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var collapsedFooter: some View {
+        // Placeholder: settings panel not implemented yet.
+        Button {
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: 15, weight: .semibold))
+                .frame(width: 34, height: 34)
+                .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.6))
+        }
+        .buttonStyle(.plain)
+        .help("设置")
         .frame(maxWidth: .infinity)
     }
 

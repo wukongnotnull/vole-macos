@@ -15,4 +15,13 @@ enum ShellModule: String, CaseIterable, Identifiable {
     }
 
     var isAvailable: Bool { self == .clean }
+
+    var systemImage: String {
+        switch self {
+        case .clean: return "sparkles"
+        case .uninstall: return "trash"
+        case .optimize: return "gauge"
+        case .status: return "chart.bar"
+        }
+    }
 }
