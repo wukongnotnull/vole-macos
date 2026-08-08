@@ -30,8 +30,14 @@ struct ShellView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            VStack(spacing: 0) {
-                // Traffic-light row: collapse toggle sits on the same line.
+            ZStack(alignment: .top) {
+                SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
+                    .frame(width: sidebarWidth)
+                    .padding(.horizontal, VoleTheme.Spacing.md)
+                    .padding(.vertical, VoleTheme.Spacing.md)
+
+                // Traffic-light row overlay: toggle floats on the same line as
+                // the window controls, without reserving layout height.
                 HStack(spacing: 0) {
                     Spacer()
                         .frame(width: 78)
@@ -39,12 +45,7 @@ struct ShellView: View {
                     Spacer()
                 }
                 .frame(height: 28)
-                .padding(.top, VoleTheme.Spacing.xs)
-
-                SidebarView(selection: $selection, isCollapsed: $sidebarCollapsed)
-                    .frame(width: sidebarWidth)
-                    .padding(.horizontal, VoleTheme.Spacing.md)
-                    .padding(.bottom, VoleTheme.Spacing.md)
+                .padding(.top, 6)
             }
             .background(VoleTheme.Colors.canvas)
 
