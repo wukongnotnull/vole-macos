@@ -1,0 +1,30 @@
+import XCTest
+import SwiftUI
+import AppKit
+@testable import vole_macos
+
+final class VoleThemeTests: XCTestCase {
+    private func components(_ color: Color) -> (CGFloat, CGFloat, CGFloat) {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        NSColor(color).getRed(&r, green: &g, blue: &b, alpha: &a)
+        return (round(r * 255), round(g * 255), round(b * 255))
+    }
+
+    func test_furMatchesLockedBrandValue() {
+        let (r, g, b) = components(VoleTheme.Colors.fur)
+        XCTAssertEqual(r, 201, accuracy: 1)
+        XCTAssertEqual(g, 153, accuracy: 1)
+        XCTAssertEqual(b, 113, accuracy: 1)
+    }
+
+    func test_soilAndBurrow() {
+        let soil = components(VoleTheme.Colors.soil)
+        XCTAssertEqual(soil.0, 125, accuracy: 1)
+        XCTAssertEqual(soil.1, 93, accuracy: 1)
+        XCTAssertEqual(soil.2, 74, accuracy: 1)
+        let burrow = components(VoleTheme.Colors.burrow)
+        XCTAssertEqual(burrow.0, 44, accuracy: 1)
+        XCTAssertEqual(burrow.1, 33, accuracy: 1)
+        XCTAssertEqual(burrow.2, 28, accuracy: 1)
+    }
+}
