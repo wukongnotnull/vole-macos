@@ -10,9 +10,10 @@ struct SidebarView: View {
             Spacer()
             moreRow
         }
-        .padding(.vertical, VoleTheme.Spacing.md)
-        .padding(.horizontal, VoleTheme.Spacing.sm)
+        .padding(VoleTheme.Spacing.md)
         .background(VoleTheme.Colors.ink)
+        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
+        .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
     }
 
     private var brandHeader: some View {

@@ -6,22 +6,32 @@ struct ShellView: View {
     @State private var selection: ShellModule = .clean
 
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing: 0) {
             SidebarView(selection: $selection)
-                .frame(minWidth: 188)
-                .toolbar(removing: .sidebarToggle)
-        } detail: {
-            Group {
-                switch selection {
-                case .clean:
-                    CleanRootView(session: session, helperStatus: helperStatus)
-                case .uninstall, .optimize, .status:
-                    ComingSoonView(module: selection)
-                }
-            }
-            .frame(minWidth: 520, minHeight: 420)
+                .frame(width: 200)
+                .padding(VoleTheme.Spacing.md)
+                .background(VoleTheme.Colors.canvas)
+
+            detailView
+                .padding(VoleTheme.Spacing.md)
+                .background(VoleTheme.Colors.canvas)
         }
-        .navigationSplitViewStyle(.balanced)
+        .frame(minWidth: 720, minHeight: 480)
+    }
+
+    @ViewBuilder
+    private var detailView: some View {
+        Group {
+            switch selection {
+            case .clean:
+                CleanRootView(session: session, helperStatus: helperStatus)
+            case .uninstall, .optimize, .status:
+                ComingSoonView(module: selection)
+            }
+        }
+        .background(VoleTheme.Colors.card)
+        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
+        .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
     }
 }
 
@@ -37,6 +47,5 @@ private struct ComingSoonView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(VoleTheme.Colors.contentBackground)
     }
 }

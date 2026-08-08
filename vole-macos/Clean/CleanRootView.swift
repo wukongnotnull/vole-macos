@@ -14,8 +14,7 @@ struct CleanRootView: View {
             case .result: CleanResultView(session: session)
             }
         }
-        .frame(minWidth: 520, minHeight: 420)
-        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .alert("需要完全磁盘访问", isPresented: $session.showFDAAlert) {
             Button("打开系统设置") { FDAProbe.openSettings() }
             Button("稍后", role: .cancel) {}
