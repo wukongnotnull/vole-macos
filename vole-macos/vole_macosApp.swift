@@ -11,6 +11,5 @@ struct vole_macosApp: App {
                 .background(WindowAccessor())
         }
         .windowStyle(.hiddenTitleBar)
-        .windowToolbarStyle(.unifiedCompact(showsTitle: false))
     }
 }
