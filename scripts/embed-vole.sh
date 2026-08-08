@@ -30,14 +30,12 @@ VOLE_SRC="${VOLE_SRC:-$SRCROOT/../vole}"
 CONTENTS="$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH"
 MACOS_DIR="$CONTENTS/MacOS"
 RULES_DST="$CONTENTS/share/vole/rules"
+# Not named `vole`: PRODUCT_NAME=Vole would collide on case-insensitive APFS.
+SIDECAR_NAME="vole-cli"
 
-# Sidecar path is Contents/MacOS/vole. APFS is case-insensitive by default, so
-# PRODUCT_NAME must not case-fold to "vole" or the app binary and sidecar collide
-# (launch then re-execs the SwiftUI app as `vole --version` in a fork loop).
 PRODUCT_NAME="${PRODUCT_NAME:-}"
-if [[ -n "$PRODUCT_NAME" && "$(printf '%s' "$PRODUCT_NAME" | tr '[:upper:]' '[:lower:]')" == "vole" ]]; then
-  echo "error: PRODUCT_NAME='$PRODUCT_NAME' collides with embedded sidecar 'vole'" >&2
-  echo "hint: keep PRODUCT_NAME=vole-macos and set CFBundleDisplayName/CFBundleName=Vole" >&2
+if [[ -n "$PRODUCT_NAME" && "$(printf '%s' "$PRODUCT_NAME" | tr '[:upper:]' '[:lower:]')" == "$(printf '%s' "$SIDECAR_NAME" | tr '[:upper:]' '[:lower:]')" ]]; then
+  echo "error: PRODUCT_NAME='$PRODUCT_NAME' collides with embedded sidecar '$SIDECAR_NAME'" >&2
   exit 1
 fi
 
@@ -60,15 +58,16 @@ if [[ ! -x "$VOLE_BIN" ]]; then
 fi
 
 mkdir -p "$MACOS_DIR" "$RULES_DST"
-cp -f "$VOLE_BIN" "$MACOS_DIR/vole"
-chmod 755 "$MACOS_DIR/vole"
+# Drop legacy name that collided with PRODUCT_NAME=Vole.
+rm -f "$MACOS_DIR/vole"
+cp -f "$VOLE_BIN" "$MACOS_DIR/$SIDECAR_NAME"
+chmod 755 "$MACOS_DIR/$SIDECAR_NAME"
 
 if [[ -n "$PRODUCT_NAME" && -e "$MACOS_DIR/$PRODUCT_NAME" ]]; then
-  vole_ino="$(stat -f '%i' "$MACOS_DIR/vole")"
+  sidecar_ino="$(stat -f '%i' "$MACOS_DIR/$SIDECAR_NAME")"
   app_ino="$(stat -f '%i' "$MACOS_DIR/$PRODUCT_NAME")"
-  if [[ "$vole_ino" == "$app_ino" ]]; then
-    echo "error: $MACOS_DIR/vole and $MACOS_DIR/$PRODUCT_NAME are the same inode" >&2
-    echo "hint: PRODUCT_NAME must not case-fold-collide with sidecar name 'vole'" >&2
+  if [[ "$sidecar_ino" == "$app_ino" ]]; then
+    echo "error: $MACOS_DIR/$SIDECAR_NAME and $MACOS_DIR/$PRODUCT_NAME are the same inode" >&2
     exit 1
   fi
 fi
@@ -81,5 +80,5 @@ if (( ${#RULES[@]} == 0 )); then
 fi
 rsync -a --delete "$VOLE_SRC/data/rules/" "$RULES_DST/"
 
-echo "note: embedded vole → $MACOS_DIR/vole"
+echo "note: embedded vole → $MACOS_DIR/$SIDECAR_NAME"
 echo "note: embedded rules → $RULES_DST ($(ls -1 "$RULES_DST" | wc -l | tr -d ' ') files)"

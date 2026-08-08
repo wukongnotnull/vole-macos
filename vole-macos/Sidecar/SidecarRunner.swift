@@ -7,10 +7,14 @@ enum SidecarExit: Equatable {
 }
 
 enum SidecarRunner {
+    /// Embedded CLI binary name. Must not case-fold-collide with PRODUCT_NAME
+    /// (`Vole`) on APFS, or `Process` re-launches the SwiftUI app.
+    static let embeddedExecutableName = "vole-cli"
+
     static func bundledVoleURL() -> URL? {
-        Bundle.main.url(forAuxiliaryExecutable: "vole")
+        Bundle.main.url(forAuxiliaryExecutable: embeddedExecutableName)
             ?? Bundle.main.bundleURL
-                .appendingPathComponent("Contents/MacOS/vole")
+                .appendingPathComponent("Contents/MacOS/\(embeddedExecutableName)")
     }
 
     static func mapExitCode(

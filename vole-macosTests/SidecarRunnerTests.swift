@@ -3,12 +3,13 @@ import Testing
 @testable import vole_macos
 
 struct SidecarRunnerTests {
-    /// PRODUCT_NAME must not case-fold-collide with the embedded `vole` sidecar
-    /// (APFS default is case-insensitive). Collision turns `vole --version` into
-    /// a recursive re-launch of the SwiftUI app.
-    @Test func embeddedVoleIsDistinctFromAppExecutable() throws {
+    /// Sidecar is `vole-cli` so PRODUCT_NAME can be `Vole` (Dock / App Switcher)
+    /// without case-fold-colliding on APFS (which would fork-loop on --version).
+    @Test func embeddedSidecarIsVoleCliDistinctFromAppExecutable() throws {
         let voleURL = try #require(SidecarRunner.bundledVoleURL())
         let appURL = try #require(Bundle.main.executableURL)
+
+        #expect(voleURL.lastPathComponent == "vole-cli")
 
         var voleStat = stat()
         var appStat = stat()
@@ -16,7 +17,7 @@ struct SidecarRunnerTests {
         #expect(stat(appURL.path, &appStat) == 0)
         #expect(
             voleStat.st_ino != appStat.st_ino,
-            "Contents/MacOS/vole inode matches app executable — PRODUCT_NAME likely collides with sidecar on case-insensitive FS"
+            "sidecar inode matches app executable — name collision on case-insensitive FS"
         )
     }
 
