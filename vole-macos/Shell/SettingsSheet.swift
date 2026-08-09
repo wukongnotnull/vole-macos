@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct SettingsSheet: View {
-    @ObservedObject var helperStatus: HelperStatusModel
     @ObservedObject var tools: SettingsToolsModel
     let voleVersion: String
     let onRefreshVersion: () -> Void
@@ -24,12 +23,6 @@ struct SettingsSheet: View {
                     Spacer()
                     Button("完成") { dismiss() }
                         .keyboardShortcut(.defaultAction)
-                }
-
-                Group {
-                    Text("root权限助手")
-                        .font(VoleTheme.TypeScale.body().weight(.semibold))
-                    HelperStatusCard(model: helperStatus)
                 }
 
                 Group {
@@ -88,7 +81,6 @@ struct SettingsSheet: View {
         .frame(minWidth: 460, minHeight: 520)
         .background(VoleTheme.Colors.contentBackground)
         .onAppear {
-            helperStatus.refresh()
             onRefreshVersion()
             tools.refreshTouchId()
         }

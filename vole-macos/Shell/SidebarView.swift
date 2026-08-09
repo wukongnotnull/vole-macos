@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarView: View {
     @Binding var selection: ShellModule
     @Binding var showSettings: Bool
+    @ObservedObject var helperStatus: HelperStatusModel
     var mascotActivity: MascotActivity = .idle
 
     var body: some View {
@@ -11,6 +12,12 @@ struct SidebarView: View {
             moduleList
                 .padding(.horizontal, VoleTheme.Spacing.sm)
             Spacer(minLength: VoleTheme.Spacing.md)
+            SidebarRootHelperRow(model: helperStatus)
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(VoleTheme.Colors.onInk.opacity(0.08))
+                        .frame(height: 1)
+                }
             moreRow
                 .padding(.horizontal, VoleTheme.Spacing.sm)
         }

@@ -61,6 +61,7 @@ struct ShellView: View {
             SidebarView(
                 selection: $selection,
                 showSettings: $showSettings,
+                helperStatus: helperStatus,
                 mascotActivity: sidebarMascotActivity
             )
                 .frame(width: sidebarWidth)
@@ -86,7 +87,6 @@ struct ShellView: View {
         .ignoresSafeArea(.container, edges: .top)
         .sheet(isPresented: $showSettings) {
             SettingsSheet(
-                helperStatus: helperStatus,
                 tools: settingsTools,
                 voleVersion: session.voleVersion,
                 onRefreshVersion: { session.refreshVersion() }
