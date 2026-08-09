@@ -69,7 +69,6 @@ struct StatusRootView: View {
     private func dashboard(_ snap: StatusSnapshot) -> some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.md) {
             SoilPanel(
-                fraction: max(0, min(1, Double(snap.healthScore) / 100)),
                 valueText: "\(snap.healthScore)",
                 caption: snap.healthScoreMsg.isEmpty ? "健康分" : snap.healthScoreMsg
             )

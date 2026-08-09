@@ -13,12 +13,6 @@ struct CleanApplyingView: View {
         )
     }
 
-    private var applyFraction: Double? {
-        usesIndeterminate
-            ? nil
-            : applyProgressFraction(scanned: session.progressScanned, total: applyTotal)
-    }
-
     private var valueText: String {
         if usesIndeterminate {
             return "…"
@@ -46,8 +40,6 @@ struct CleanApplyingView: View {
             }
 
             SoilPanel(
-                fraction: applyFraction,
-                indeterminate: usesIndeterminate,
                 valueText: valueText,
                 caption: caption
             )

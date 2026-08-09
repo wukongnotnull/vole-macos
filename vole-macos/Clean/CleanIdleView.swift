@@ -9,7 +9,7 @@ struct CleanIdleView: View {
                 .font(VoleTheme.TypeScale.title())
                 .foregroundStyle(VoleTheme.Colors.text)
 
-            SoilPanel(fraction: nil, valueText: "—", caption: "待扫描")
+            SoilPanel(valueText: "—", caption: "待扫描")
 
             if let error = session.errorMessage {
                 Text(error)

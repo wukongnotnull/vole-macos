@@ -19,8 +19,6 @@ struct CleanScanningView: View {
             }
 
             SoilPanel(
-                fraction: nil,
-                indeterminate: true,
                 valueText: "\(session.progressScanned)",
                 caption: "已扫条目"
             )

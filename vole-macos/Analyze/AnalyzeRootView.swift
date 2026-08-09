@@ -36,7 +36,6 @@ struct AnalyzeRootView: View {
                 .textSelection(.enabled)
 
             SoilPanel(
-                fraction: nil,
                 valueText: ByteFormat.string(UInt64(clamping: max(session.totalSize, 0))),
                 caption: session.isScanning
                     ? "扫描中…"

@@ -9,7 +9,7 @@ struct PlanModuleIdleView: View {
                 .font(VoleTheme.TypeScale.title())
                 .foregroundStyle(VoleTheme.Colors.text)
 
-            SoilPanel(fraction: nil, valueText: "—", caption: session.kind.idleCaption)
+            SoilPanel(valueText: "—", caption: session.kind.idleCaption)
 
             if let error = session.errorMessage {
                 Text(error)
@@ -61,8 +61,6 @@ struct PlanModuleScanningView: View {
             }
 
             SoilPanel(
-                fraction: nil,
-                indeterminate: true,
                 valueText: "\(session.progressScanned)",
                 caption: "已扫条目"
             )
@@ -136,7 +134,6 @@ struct PlanModuleCandidatesView: View {
             }
 
             SoilPanel(
-                fraction: strataFraction(entries: session.entries, selectedIDs: session.selectedIDs),
                 valueText: ByteFormat.string(selectedBytes),
                 caption: candidatesCaption
             )
@@ -148,11 +145,11 @@ struct PlanModuleCandidatesView: View {
             }
 
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {
-                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件：root权限助手未就绪，执行时将跳过这些项（不会假装成功）。")
+                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，需开启 Root 权限才能永久删除，否则将跳过。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.orange)
             } else if selectedPrivilegedCount > 0 {
-                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件将经 root权限助手永久删除（非废纸篓）。")
+                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，将经 Root 权限永久删除（不进废纸篓）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
             }
@@ -263,12 +260,6 @@ struct PlanModuleApplyingView: View {
         )
     }
 
-    private var applyFraction: Double? {
-        usesIndeterminate
-            ? nil
-            : applyProgressFraction(scanned: session.progressScanned, total: applyTotal)
-    }
-
     private var valueText: String {
         if usesIndeterminate {
             return "…"
@@ -296,8 +287,6 @@ struct PlanModuleApplyingView: View {
             }
 
             SoilPanel(
-                fraction: applyFraction,
-                indeterminate: usesIndeterminate,
                 valueText: valueText,
                 caption: caption
             )
@@ -356,7 +345,6 @@ struct PlanModuleResultView: View {
 
             if let report = session.report {
                 SoilPanel(
-                    fraction: 1,
                     valueText: ByteFormat.string(recoveredBytes(report)),
                     caption: "已回收 / 触及"
                 )

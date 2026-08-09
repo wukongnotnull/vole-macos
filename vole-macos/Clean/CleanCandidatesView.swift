@@ -51,17 +51,16 @@ struct CleanCandidatesView: View {
             }
 
             SoilPanel(
-                fraction: strataFraction(entries: session.entries, selectedIDs: session.selectedIDs),
                 valueText: ByteFormat.string(selectedBytes),
                 caption: candidatesCaption
             )
 
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {
-                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件：root权限助手未就绪，清理时将跳过这些项（不会假装成功）。")
+                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，需开启 Root 权限才能永久删除，否则将跳过。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.orange)
             } else if selectedPrivilegedCount > 0 {
-                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件将经 root权限助手永久删除（非废纸篓）。")
+                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，将经 Root 权限永久删除（不进废纸篓）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
             }

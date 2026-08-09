@@ -24,7 +24,6 @@ struct CleanResultView: View {
 
             if let report = session.report {
                 SoilPanel(
-                    fraction: 1,
                     valueText: ByteFormat.string(recoveredBytes(report)),
                     caption: "已回收"
                 )
