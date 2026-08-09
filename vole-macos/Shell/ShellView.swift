@@ -35,7 +35,7 @@ struct ShellView: View {
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
 
-    private let sidebarWidth: CGFloat = 132
+    private let sidebarWidth: CGFloat = 148
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
     private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
@@ -82,6 +82,14 @@ struct ShellView: View {
                 PlanModuleRootView(session: uninstallSession, helperStatus: helperStatus)
             case .optimize:
                 PlanModuleRootView(session: optimizeSession, helperStatus: helperStatus)
+            case .purge:
+                ModulePlaceholderView(title: "净化")
+            case .installer:
+                ModulePlaceholderView(title: "安装包")
+            case .analyze:
+                ModulePlaceholderView(title: "分析")
+            case .history:
+                ModulePlaceholderView(title: "历史")
             case .status:
                 StatusRootView(session: statusSession)
             }
