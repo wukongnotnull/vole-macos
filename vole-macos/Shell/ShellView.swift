@@ -36,6 +36,7 @@ struct ShellView: View {
     @StateObject private var analyzeSession = AnalyzeSession()
     @StateObject private var historySession = HistorySession()
     @StateObject private var statusSession = StatusSession()
+    @StateObject private var settingsTools = SettingsToolsModel()
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
 
@@ -70,6 +71,7 @@ struct ShellView: View {
         .sheet(isPresented: $showSettings) {
             SettingsSheet(
                 helperStatus: helperStatus,
+                tools: settingsTools,
                 voleVersion: session.voleVersion,
                 onRefreshVersion: { session.refreshVersion() }
             )
