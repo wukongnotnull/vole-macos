@@ -8,44 +8,83 @@ struct SidebarView: View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
             brandHeader
             moduleList
+                .padding(.horizontal, VoleTheme.Spacing.sm)
             Spacer(minLength: VoleTheme.Spacing.md)
             moreRow
+                .padding(.horizontal, VoleTheme.Spacing.sm)
         }
         // Top inset clears floating traffic lights.
         .padding(.top, 36)
-        .padding(.horizontal, VoleTheme.Spacing.sm)
         .padding(.bottom, VoleTheme.Spacing.md)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(VoleTheme.Colors.ink)
+        .background(
+            LinearGradient(
+                colors: [VoleTheme.Colors.inkSun, VoleTheme.Colors.ink],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
         .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
     }
 
     private var brandHeader: some View {
-        ZStack {
+        ZStack(alignment: .center) {
+            // Soft sun bloom — keeps the clearing readable against warm soil.
+            Circle()
+                .fill(VoleTheme.Colors.fur.opacity(0.62))
+                .frame(width: 132, height: 132)
+                .blur(radius: 14)
+
+            // Sunlit molehill mouth (sage matches app-icon ground).
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [Color(hex: 0x5A473B), VoleTheme.Colors.ink],
-                        center: .init(x: 0.5, y: 0.3),
-                        startRadius: 12,
-                        endRadius: 52
+                        colors: [
+                            Color(hex: 0xF7F0E4),
+                            VoleTheme.Colors.molehill,
+                            VoleTheme.Colors.sage,
+                        ],
+                        center: .center,
+                        startRadius: 2,
+                        endRadius: 62
                     )
                 )
-                .frame(width: 100, height: 100)
-                .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
+                .frame(width: 118, height: 118)
+                .overlay {
+                    Circle()
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    VoleTheme.Colors.onInk.opacity(0.55),
+                                    VoleTheme.Colors.ink.opacity(0.2),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 2
+                        )
+                }
+                .shadow(color: Color(hex: 0x2C211C, alpha: 0.36), radius: 12, x: 0, y: 6)
+
+            // Slightly larger than the disk so the vole peeks out of the burrow.
+            // Asset bbox is ~1.6pt right / 0.7pt down at this size — nudge back to optical center.
             Image("VoleLogo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 96, height: 96)
+                .frame(width: 124, height: 124)
+                .offset(x: -1.6, y: -0.7)
+                .shadow(color: Color(hex: 0x2C211C, alpha: 0.22), radius: 3, x: 0, y: 2)
                 .accessibilityLabel("Vole 标志")
         }
-        .frame(maxWidth: .infinity)
+        .frame(width: 132, height: 132)
+        .frame(maxWidth: .infinity, alignment: .center)
         .padding(.bottom, VoleTheme.Spacing.sm)
         .overlay(alignment: .bottom) {
             Rectangle()
                 .fill(VoleTheme.Colors.onInk.opacity(0.08))
                 .frame(height: 1)
+                .padding(.horizontal, VoleTheme.Spacing.sm)
         }
     }
 

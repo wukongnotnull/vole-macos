@@ -8,8 +8,10 @@ enum VoleTheme {
     // MARK: Color
 
     enum Colors {
-        /// Sidebar base (constant across appearances).
-        static let ink = Color(hex: 0x3E322A)
+        /// Sidebar base — warm spring soil / burrow wall (constant across appearances).
+        static let ink = Color(hex: 0x6E4A2E)
+        /// Sidebar gradient top — sun-warmed surface loam.
+        static let inkSun = Color(hex: 0x855C38)
         /// Window / shell canvas.
         static let canvas = Color(hex: 0xEFE6DB)
         /// Content card surface.

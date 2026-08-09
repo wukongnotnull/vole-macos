@@ -19,9 +19,13 @@ final class VoleThemeTests: XCTestCase {
 
     func test_inkAndSoil() {
         let ink = components(VoleTheme.Colors.ink)
-        XCTAssertEqual(ink.0, 62, accuracy: 1)
-        XCTAssertEqual(ink.1, 50, accuracy: 1)
-        XCTAssertEqual(ink.2, 42, accuracy: 1)
+        XCTAssertEqual(ink.0, 110, accuracy: 1)
+        XCTAssertEqual(ink.1, 74, accuracy: 1)
+        XCTAssertEqual(ink.2, 46, accuracy: 1)
+        let inkSun = components(VoleTheme.Colors.inkSun)
+        XCTAssertEqual(inkSun.0, 133, accuracy: 1)
+        XCTAssertEqual(inkSun.1, 92, accuracy: 1)
+        XCTAssertEqual(inkSun.2, 56, accuracy: 1)
         let soil = components(VoleTheme.Colors.soil)
         XCTAssertEqual(soil.0, 138, accuracy: 1)
         XCTAssertEqual(soil.1, 106, accuracy: 1)
