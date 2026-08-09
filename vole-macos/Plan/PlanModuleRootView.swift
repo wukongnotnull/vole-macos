@@ -8,7 +8,7 @@ struct PlanModuleRootView: View {
         Group {
             switch session.phase {
             case .idle:
-                PlanModuleIdleView(session: session, helperStatus: helperStatus)
+                PlanModuleIdleView(session: session)
             case .scanning:
                 PlanModuleScanningView(session: session)
             case .candidates:

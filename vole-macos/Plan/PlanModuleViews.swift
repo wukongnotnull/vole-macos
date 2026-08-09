@@ -2,7 +2,6 @@ import SwiftUI
 
 struct PlanModuleIdleView: View {
     @ObservedObject var session: PlanModuleSession
-    @ObservedObject var helperStatus: HelperStatusModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.xl) {
@@ -11,8 +10,6 @@ struct PlanModuleIdleView: View {
                 .foregroundStyle(VoleTheme.Colors.text)
 
             SoilPanel(fraction: nil, valueText: "—", caption: session.kind.idleCaption)
-
-            HelperStatusCard(model: helperStatus)
 
             if let error = session.errorMessage {
                 Text(error)

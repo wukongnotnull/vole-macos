@@ -2,7 +2,6 @@ import SwiftUI
 
 struct CleanIdleView: View {
     @ObservedObject var session: CleanSession
-    @ObservedObject var helperStatus: HelperStatusModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.xl) {
@@ -11,8 +10,6 @@ struct CleanIdleView: View {
                 .foregroundStyle(VoleTheme.Colors.text)
 
             SoilPanel(fraction: nil, valueText: "—", caption: "待扫描")
-
-            HelperStatusCard(model: helperStatus)
 
             if let error = session.errorMessage {
                 Text(error)
