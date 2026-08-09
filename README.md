@@ -1,6 +1,6 @@
 # vole-macos
 
-Vole 的 macOS SwiftUI 桌面端（GPL-3.0）。本里程碑：内嵌 `vole` sidecar，提供 `clean` 的 plan → 勾选 → apply（默认废纸篓）；系统路径经 SMAppService 特权助手永久删除。
+Vole 的 macOS SwiftUI 桌面端（GPL-3.0）。内嵌 `vole-cli` sidecar，侧栏提供 **清理 / 卸载 / 优化 / 状态**；设置面板归位特权助手、完全磁盘访问与 sidecar 版本。Clean / Uninstall / Optimize 均为 plan → 勾选 → apply（用户域默认废纸篓；系统路径经 SMAppService 特权助手永久删除，未就绪则跳过）。
 
 ## 前置
 
@@ -37,8 +37,9 @@ Documents/vole-macos
 - 注册：`HelperRegistration` → `SMAppService.daemon`
 - Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
 - 白名单 fail-closed：见 `PathAuthorization`（永不含 `/Library/Updates`、`/macOS Install Data`）
-- Clean UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
-- Uninstall UI：尚未落地；`PrivilegedApply` 为共享扩展点
+- Clean / Uninstall / Optimize UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
+- Status UI：`vole status --json` 仪表盘（健康分 / CPU / 内存 / 磁盘），支持手动刷新与短轮询「实时」
+- 设置：侧栏齿轮打开 Helper / FDA / 关于
 
 ### Hardened Runtime / 公证
 
