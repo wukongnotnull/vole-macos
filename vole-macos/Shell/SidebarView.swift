@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SidebarView: View {
     @Binding var selection: ShellModule
+    @Binding var showSettings: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
@@ -77,6 +78,7 @@ struct SidebarView: View {
 
     private var moreRow: some View {
         Button {
+            showSettings = true
         } label: {
             HStack(spacing: VoleTheme.Spacing.sm) {
                 Image(systemName: "gearshape")
