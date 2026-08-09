@@ -175,7 +175,7 @@
 			name = "vole-macos";
 			packageProductDependencies = (
 			);
-			productName = "vole-macos";
+			productName = Vole;
 			productReference = 67FB4F89301BA00000E0AFC2 /* Vole.app */;
 			productType = "com.apple.product-type.application";
 		};

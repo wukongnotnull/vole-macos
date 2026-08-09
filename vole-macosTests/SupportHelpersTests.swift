@@ -9,6 +9,10 @@ struct SupportHelpersTests {
             || FDAProbe.settingsURL.scheme == "x-apple.systempreferences")
     }
 
+    @Test func displayAppNameMatchesProductBranding() {
+        #expect(FDAProbe.displayAppName == "Vole")
+    }
+
     @Test func byteFormatUsesBinaryUnits() {
         let zero = ByteFormat.string(0)
         #expect(zero == "0 B" || zero.lowercased().contains("zero") || zero.contains("0"))

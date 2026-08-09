@@ -31,15 +31,21 @@ struct SettingsSheet: View {
             Group {
                 Text("完全磁盘访问")
                     .font(VoleTheme.TypeScale.body().weight(.semibold))
-                HStack(spacing: VoleTheme.Spacing.sm) {
-                    Image(systemName: fdaDenied ? "exclamationmark.triangle.fill" : "checkmark.seal.fill")
-                        .foregroundStyle(fdaDenied ? VoleTheme.Colors.soil : VoleTheme.Colors.sage)
-                    Text(fdaDenied ? "可能未授权（扫描结果可能偏少）" : "探测通过")
-                        .font(VoleTheme.TypeScale.body())
-                    Spacer()
-                    Button("打开系统设置") { FDAProbe.openSettings() }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+                VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+                    HStack(spacing: VoleTheme.Spacing.sm) {
+                        Image(systemName: fdaDenied ? "exclamationmark.triangle.fill" : "checkmark.seal.fill")
+                            .foregroundStyle(fdaDenied ? VoleTheme.Colors.soil : VoleTheme.Colors.sage)
+                        Text(fdaDenied ? "可能未授权（扫描结果可能偏少）" : "探测通过")
+                            .font(VoleTheme.TypeScale.body())
+                        Spacer()
+                        Button("打开系统设置") { FDAProbe.openSettings() }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                    }
+                    Text("请勾选 \(FDAProbe.displayAppName)；若仍见灰色占位的 vole-macos.app，先删掉再用「+」添加访达中高亮的 \(FDAProbe.displayAppName).app。")
+                        .font(VoleTheme.TypeScale.caption())
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal, VoleTheme.Spacing.md)
                 .padding(.vertical, VoleTheme.Spacing.sm)
@@ -51,7 +57,7 @@ struct SettingsSheet: View {
                 Text("关于")
                     .font(VoleTheme.TypeScale.body().weight(.semibold))
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
-                    Text("田鼠工坊 · vole-macos")
+                    Text("田鼠工坊 · Vole")
                         .font(VoleTheme.TypeScale.body())
                     if voleVersion.isEmpty {
                         Text("sidecar 版本未知（可点刷新）")

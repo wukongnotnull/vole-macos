@@ -21,7 +21,7 @@ Documents/vole-macos
 2. 确认 Build Settings：`ENABLE_APP_SANDBOX=NO`、`ENABLE_USER_SCRIPT_SANDBOXING=NO`；App 与 Helper 已启用 **Hardened Runtime**
 3. Product → Run（首次会 `cargo build -p vole-cli --release`，较慢）
 4. 若报 `cargo not found`：确认已装 rustup，且 `~/.cargo/bin/cargo` 存在；或在 Build Phase「Embed vole sidecar」里设环境变量 `CARGO=/绝对路径/cargo`
-5. 若清理扫描结果异常少：系统设置 → 隐私与安全性 → 完全磁盘访问，勾选 **vole-macos**
+5. 若清理扫描结果异常少：系统设置 → 隐私与安全性 → 完全磁盘访问，勾选 **Vole**（勿勾选旧的 `vole-macos.app` 占位项；可先删掉再点「+」添加当前 `Vole.app`）
 6. 系统路径清理：首页「启用特权助手」→ 系统设置批准后台项 → 状态「已启用」且 ping `uid=0`
 
 ## 设计

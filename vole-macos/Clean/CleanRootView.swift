@@ -19,7 +19,7 @@ struct CleanRootView: View {
             Button("打开系统设置") { FDAProbe.openSettings() }
             Button("稍后", role: .cancel) {}
         } message: {
-            Text("未授权时扫描结果可能偏少。请在「隐私与安全性 → 完全磁盘访问」中勾选 vole-macos。")
+            Text("未授权时扫描结果可能偏少。请在「隐私与安全性 → 完全磁盘访问」中勾选 \(FDAProbe.displayAppName)。")
         }
         .onAppear {
             session.refreshVersion()

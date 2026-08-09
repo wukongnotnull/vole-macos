@@ -26,6 +26,12 @@ enum FDAProbe {
     }
 
     static func openSettings() {
+        // Reveal the running bundle so Privacy UI can resolve name/icon (Vole.app),
+        // instead of a stale DerivedData `vole-macos.app` TCC entry.
+        NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
         NSWorkspace.shared.open(settingsURL)
     }
+
+    /// User-facing product name for FDA / privacy prompts (matches CFBundleDisplayName).
+    static let displayAppName = "Vole"
 }
