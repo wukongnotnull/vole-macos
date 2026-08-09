@@ -189,6 +189,11 @@ struct PlanModuleCandidatesView: View {
             .scrollContentBackground(.hidden)
             .background(Color.clear)
 
+            if session.kind.supportsPermanentDelete {
+                Toggle("永久删除（不进废纸篓）", isOn: $session.permanentDelete)
+                    .font(VoleTheme.TypeScale.caption())
+            }
+
             HStack(spacing: VoleTheme.Spacing.md) {
                 Button("重新扫描") { session.startScan() }
                 Button(session.kind.primaryActionTitle) { confirm = true }
@@ -202,7 +207,7 @@ struct PlanModuleCandidatesView: View {
         .padding(VoleTheme.Spacing.xl)
         .background(VoleTheme.Colors.contentBackground)
         .confirmationDialog(
-            session.kind.confirmTitle,
+            session.kind.confirmTitle(permanentDelete: session.permanentDelete),
             isPresented: $confirm,
             titleVisibility: .visible
         ) {

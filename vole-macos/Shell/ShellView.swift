@@ -31,11 +31,16 @@ struct ShellView: View {
     @ObservedObject var helperStatus: HelperStatusModel
     @StateObject private var uninstallSession = PlanModuleSession(kind: .uninstall)
     @StateObject private var optimizeSession = PlanModuleSession(kind: .optimize)
+    @StateObject private var purgeSession = PlanModuleSession(kind: .purge)
+    @StateObject private var installerSession = PlanModuleSession(kind: .installer)
+    @StateObject private var analyzeSession = AnalyzeSession()
+    @StateObject private var historySession = HistorySession()
     @StateObject private var statusSession = StatusSession()
+    @StateObject private var settingsTools = SettingsToolsModel()
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
 
-    private let sidebarWidth: CGFloat = 132
+    private let sidebarWidth: CGFloat = 148
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
     private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
@@ -66,6 +71,7 @@ struct ShellView: View {
         .sheet(isPresented: $showSettings) {
             SettingsSheet(
                 helperStatus: helperStatus,
+                tools: settingsTools,
                 voleVersion: session.voleVersion,
                 onRefreshVersion: { session.refreshVersion() }
             )
@@ -82,6 +88,14 @@ struct ShellView: View {
                 PlanModuleRootView(session: uninstallSession, helperStatus: helperStatus)
             case .optimize:
                 PlanModuleRootView(session: optimizeSession, helperStatus: helperStatus)
+            case .purge:
+                PlanModuleRootView(session: purgeSession, helperStatus: helperStatus)
+            case .installer:
+                PlanModuleRootView(session: installerSession, helperStatus: helperStatus)
+            case .analyze:
+                AnalyzeRootView(session: analyzeSession)
+            case .history:
+                HistoryRootView(session: historySession)
             case .status:
                 StatusRootView(session: statusSession)
             }

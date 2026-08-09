@@ -1,6 +1,6 @@
 # vole-macos
 
-Vole 的 macOS SwiftUI 桌面端（GPL-3.0）。内嵌 `vole-cli` sidecar，侧栏提供 **清理 / 卸载 / 优化 / 状态**；设置面板归位特权助手、完全磁盘访问与 sidecar 版本。Clean / Uninstall / Optimize 均为 plan → 勾选 → apply（用户域默认废纸篓；系统路径经 SMAppService 特权助手永久删除，未就绪则跳过）。
+Vole 的 macOS SwiftUI 桌面端（GPL-3.0）。内嵌 `vole-cli` sidecar，侧栏提供 **清理 / 卸载 / 优化 / 净化 / 安装包 / 分析 / 历史 / 状态**；设置面板归位特权助手、完全磁盘访问、Touch ID、自更新、自卸载与 sidecar 版本。Clean / Uninstall / Optimize / Purge / Installer 均为 plan → 勾选 → apply（用户域默认废纸篓；系统路径经 SMAppService 特权助手永久删除，未就绪则跳过；净化/安装包可选永久删除）。
 
 ## 前置
 
@@ -28,6 +28,7 @@ Documents/vole-macos
 
 - Clean MVP：[`docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md`](docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md)
 - 特权助手（SMAppService）：[`docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md`](docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md)
+- 侧栏 CLI 能力面：[`docs/wukong-code/specs/2026-08-09-1454-app-nav-cli-parity-design.md`](docs/wukong-code/specs/2026-08-09-1454-app-nav-cli-parity-design.md)
 
 ## 特权助手（可用通道）
 
@@ -37,9 +38,11 @@ Documents/vole-macos
 - 注册：`HelperRegistration` → `SMAppService.daemon`
 - Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
 - 白名单 fail-closed：见 `PathAuthorization`（永不含 `/Library/Updates`、`/macOS Install Data`）
-- Clean / Uninstall / Optimize UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
+- Clean / Uninstall / Optimize / Purge / Installer UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
+- Analyze UI：`vole analyze --json` 目录钻取与大文件区
+- History UI：`vole history --json` 会话与删除审计
 - Status UI：`vole status --json` 仪表盘（健康分 / CPU / 内存 / 磁盘），支持手动刷新与短轮询「实时」
-- 设置：侧栏齿轮打开 Helper / FDA / 关于
+- 设置：侧栏齿轮打开 Helper / FDA / Touch ID / 更新 / 自卸载 / 关于
 
 ### Hardened Runtime / 公证
 
