@@ -24,6 +24,7 @@ final class PlanModuleSession: ObservableObject {
     @Published var voleVersion: String = ""
     @Published var coverageNote: String?
     @Published var helperDegradeNote: String?
+    @Published var permanentDelete: Bool = false
 
     private var process = VoleProcess()
     private var fullPlanURL: URL?
@@ -31,6 +32,14 @@ final class PlanModuleSession: ObservableObject {
 
     init(kind: PlanModuleKind) {
         self.kind = kind
+    }
+
+    nonisolated static func applyArguments(command: String, planPath: String, permanent: Bool) -> [String] {
+        var args = [command, "--apply", planPath, "--json-stream"]
+        if permanent {
+            args.append("--permanent")
+        }
+        return args
     }
 
     func refreshVersion() {
@@ -131,9 +140,12 @@ final class PlanModuleSession: ObservableObject {
                     defer { try? FileManager.default.removeItem(at: applyURL) }
 
                     let reportBox = ReportBox()
-                    let exit = await process.run(arguments: [
-                        kind.command, "--apply", applyURL.path, "--json-stream",
-                    ]) { [weak self] line in
+                    let permanent = permanentDelete && kind.supportsPermanentDelete
+                    let exit = await process.run(arguments: Self.applyArguments(
+                        command: kind.command,
+                        planPath: applyURL.path,
+                        permanent: permanent
+                    )) { [weak self] line in
                         guard let event = try? VoleStreamEvent.decodeNDJSONLine(line) else { return }
                         if case let .done(report) = event {
                             reportBox.set(report)

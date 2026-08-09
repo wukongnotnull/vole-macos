@@ -31,6 +31,8 @@ struct ShellView: View {
     @ObservedObject var helperStatus: HelperStatusModel
     @StateObject private var uninstallSession = PlanModuleSession(kind: .uninstall)
     @StateObject private var optimizeSession = PlanModuleSession(kind: .optimize)
+    @StateObject private var purgeSession = PlanModuleSession(kind: .purge)
+    @StateObject private var installerSession = PlanModuleSession(kind: .installer)
     @StateObject private var statusSession = StatusSession()
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
@@ -83,9 +85,9 @@ struct ShellView: View {
             case .optimize:
                 PlanModuleRootView(session: optimizeSession, helperStatus: helperStatus)
             case .purge:
-                ModulePlaceholderView(title: "净化")
+                PlanModuleRootView(session: purgeSession, helperStatus: helperStatus)
             case .installer:
-                ModulePlaceholderView(title: "安装包")
+                PlanModuleRootView(session: installerSession, helperStatus: helperStatus)
             case .analyze:
                 ModulePlaceholderView(title: "分析")
             case .history:
