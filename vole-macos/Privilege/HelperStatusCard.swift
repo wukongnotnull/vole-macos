@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Compact system-path helper strip — status by icon, action by short verb.
+/// Compact system-path helper strip — status by icon, on/off by toggle.
 struct HelperStatusCard: View {
     @ObservedObject var model: HelperStatusModel
 
@@ -11,7 +11,7 @@ struct HelperStatusCard: View {
                 .foregroundStyle(iconColor)
                 .frame(width: 20)
 
-            Text("系统路径")
+            Text("系统级清理")
                 .font(VoleTheme.TypeScale.body())
                 .foregroundStyle(VoleTheme.Colors.text)
 
@@ -31,30 +31,42 @@ struct HelperStatusCard: View {
                     .controlSize(.small)
             }
 
-            Button(primaryTitle) {
-                if model.isReady {
-                    Task { await model.ping() }
-                } else {
-                    model.registerAndGuide()
-                }
-            }
-            .buttonStyle(.bordered)
-            .tint(VoleTheme.Colors.soil)
-            .controlSize(.small)
-            .disabled(model.isBusy)
-            .help(primaryHelp)
-
             if model.isReady {
-                Button {
-                    model.unregister()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 10, weight: .bold))
+                Button("检测状态") {
+                    Task { await model.ping() }
                 }
-                .buttonStyle(.borderless)
-                .foregroundStyle(.secondary)
-                .help("注销助手")
+                .buttonStyle(.bordered)
+                .tint(VoleTheme.Colors.soil)
+                .controlSize(.small)
+                .disabled(model.isBusy)
+                .help("检测 root权限助手是否在线")
             }
+
+            Toggle(
+                "root权限助手",
+                isOn: Binding(
+                    get: { model.isReady },
+                    set: { on in
+                        if on {
+                            model.registerAndGuide()
+                        } else {
+                            model.unregister()
+                        }
+                    }
+                )
+            )
+            .labelsHidden()
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .tint(VoleTheme.Colors.sage)
+            .disabled(model.isBusy)
+            .help(
+                model.isReady
+                    ? "关闭 root权限助手"
+                    : "启用 root权限助手，以便清理需要管理员权限的文件"
+            )
+            .accessibilityLabel("root权限助手")
+            .accessibilityValue(model.isReady ? "已开启" : "已关闭")
         }
         .padding(.horizontal, VoleTheme.Spacing.md)
         .padding(.vertical, VoleTheme.Spacing.sm)
@@ -85,17 +97,6 @@ struct HelperStatusCard: View {
     private var iconColor: Color {
         if model.isReady { return VoleTheme.Colors.sage }
         return VoleTheme.Colors.soil
-    }
-
-    private var primaryTitle: String {
-        model.isReady ? "检查" : "启用"
-    }
-
-    private var primaryHelp: String {
-        if model.isReady {
-            return "检查特权助手是否在线"
-        }
-        return "启用特权助手以清理系统路径"
     }
 
     /// Only show a one-line hint when something needs attention.

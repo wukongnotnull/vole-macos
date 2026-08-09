@@ -22,7 +22,7 @@ struct CleanApplyingView: View {
                     value: breathingOpacity
                 )
 
-            Text("用户域移到废纸篓；系统路径经特权助手永久删除。")
+            Text("个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除。")
                 .font(VoleTheme.TypeScale.body())
                 .foregroundStyle(.secondary)
 

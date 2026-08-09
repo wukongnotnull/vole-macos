@@ -57,11 +57,11 @@ struct CleanCandidatesView: View {
             )
 
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {
-                Text("已选 \(selectedPrivilegedCount) 项系统路径：特权助手未就绪，清理时将跳过这些项（不会假装成功）。")
+                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件：root权限助手未就绪，清理时将跳过这些项（不会假装成功）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.orange)
             } else if selectedPrivilegedCount > 0 {
-                Text("已选 \(selectedPrivilegedCount) 项系统路径将经特权助手永久删除（非废纸篓）。")
+                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件将经 root权限助手永久删除（非废纸篓）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
             }
@@ -98,7 +98,7 @@ struct CleanCandidatesView: View {
         .background(VoleTheme.Colors.contentBackground)
         .confirmationDialog(
             selectedPrivilegedCount > 0
-                ? "用户域移到废纸篓；系统路径经特权助手永久删除（助手未就绪则跳过）"
+                ? "个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除（未就绪则跳过）"
                 : "将把已选项目移到废纸篓",
             isPresented: $confirm,
             titleVisibility: .visible
@@ -124,7 +124,7 @@ struct CleanCandidatesView: View {
                     Text(entry.label)
                         .font(VoleTheme.TypeScale.body().weight(.semibold))
                     if isPrivileged {
-                        Text("需助手")
+                        Text("需 root")
                             .font(.system(size: 10, weight: .bold, design: .rounded))
                             .foregroundStyle(VoleTheme.Colors.soil)
                             .padding(.horizontal, 6)
@@ -147,6 +147,6 @@ struct CleanCandidatesView: View {
         .toggleStyle(.checkbox)
         .accessibilityLabel("\(entry.label)，\(ByteFormat.string(entry.size))")
         .accessibilityValue(session.selectedIDs.contains(entry.id) ? "已选" : "未选")
-        .accessibilityHint(isPrivileged ? "系统路径，需特权助手永久删除" : "移动到废纸篓")
+        .accessibilityHint(isPrivileged ? "需管理员权限，将经 root权限助手永久删除" : "移动到废纸篓")
     }
 }

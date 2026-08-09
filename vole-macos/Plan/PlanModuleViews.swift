@@ -159,11 +159,11 @@ struct PlanModuleCandidatesView: View {
             }
 
             if selectedPrivilegedCount > 0 && !helperStatus.isReady {
-                Text("已选 \(selectedPrivilegedCount) 项系统路径：特权助手未就绪，执行时将跳过这些项（不会假装成功）。")
+                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件：root权限助手未就绪，执行时将跳过这些项（不会假装成功）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.orange)
             } else if selectedPrivilegedCount > 0 {
-                Text("已选 \(selectedPrivilegedCount) 项系统路径将经特权助手永久删除（非废纸篓）。")
+                Text("已选 \(selectedPrivilegedCount) 项需管理员权限的文件将经 root权限助手永久删除（非废纸篓）。")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
             }
@@ -227,7 +227,7 @@ struct PlanModuleCandidatesView: View {
                     Text(entry.label)
                         .font(VoleTheme.TypeScale.body().weight(.semibold))
                     if isPrivileged {
-                        Text("需助手")
+                        Text("需 root")
                             .font(.system(size: 10, weight: .bold, design: .rounded))
                             .foregroundStyle(VoleTheme.Colors.soil)
                             .padding(.horizontal, 6)

@@ -168,7 +168,7 @@ final class PlanModuleSession: ObservableObject {
                 var privilegedFailed: UInt64 = 0
                 if !parts.privilegedEntries.isEmpty {
                     if helperReady {
-                        progressCurrent = "特权助手删除系统路径…"
+                        progressCurrent = "root权限助手正在删除需管理员权限的文件…"
                         do {
                             try await PrivilegedApply.applyPrivilegedPaths(
                                 parts.privilegedEntries.map(\.path)
@@ -176,11 +176,11 @@ final class PlanModuleSession: ObservableObject {
                             privilegedDeleted = UInt64(parts.privilegedEntries.count)
                         } catch {
                             privilegedFailed = UInt64(parts.privilegedEntries.count)
-                            errorMessage = "特权助手：\(error.localizedDescription)"
+                            errorMessage = "root权限助手：\(error.localizedDescription)"
                         }
                     } else {
                         helperDegradeNote =
-                            "已跳过 \(parts.privilegedEntries.count) 项系统路径（特权助手未启用）。用户域操作不受影响。"
+                            "已跳过 \(parts.privilegedEntries.count) 项需管理员权限的文件（root权限助手未启用）。个人文件操作不受影响。"
                     }
                 }
 

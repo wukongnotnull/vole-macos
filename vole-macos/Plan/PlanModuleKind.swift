@@ -57,9 +57,9 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
     var applyHint: String {
         switch self {
         case .uninstall:
-            return "用户域移到废纸篓；系统路径经特权助手永久删除。"
+            return "个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除。"
         case .optimize:
-            return "删除类进废纸篓；动作类直接执行；系统路径经特权助手。"
+            return "删除类进废纸篓；动作类直接执行；需管理员权限的文件经 root权限助手。"
         }
     }
 
@@ -73,9 +73,9 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
     var confirmTitle: String {
         switch self {
         case .uninstall:
-            return "用户域移到废纸篓；系统路径经特权助手永久删除（助手未就绪则跳过）"
+            return "个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除（未就绪则跳过）"
         case .optimize:
-            return "将执行已选优化任务（删除类进废纸篓；助手未就绪则跳过系统路径）"
+            return "将执行已选优化任务（删除类进废纸篓；root权限助手未就绪则跳过需管理员权限的文件）"
         }
     }
 

@@ -23,7 +23,7 @@ struct SettingsSheet: View {
             }
 
             Group {
-                Text("特权助手")
+                Text("root权限助手")
                     .font(VoleTheme.TypeScale.body().weight(.semibold))
                 HelperStatusCard(model: helperStatus)
             }
