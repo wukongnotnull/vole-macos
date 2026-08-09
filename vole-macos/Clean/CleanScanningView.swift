@@ -2,7 +2,6 @@ import SwiftUI
 
 struct CleanScanningView: View {
     @ObservedObject var session: CleanSession
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.lg) {
@@ -16,19 +15,15 @@ struct CleanScanningView: View {
                         .font(VoleTheme.TypeScale.title())
                 }
                 Spacer()
-                Image("VoleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .accessibilityLabel("Vole 田鼠")
+                VoleMascotView(state: .scanning, size: 44)
             }
 
-            SoilPanel(fraction: nil, valueText: "\(session.progressScanned)", caption: "已扫条目")
-                .opacity(breathingOpacity)
-                .animation(
-                    reduceMotion ? nil : .easeInOut(duration: 1.2).repeatForever(autoreverses: true),
-                    value: breathingOpacity
-                )
+            SoilPanel(
+                fraction: nil,
+                indeterminate: true,
+                valueText: "\(session.progressScanned)",
+                caption: "已扫条目"
+            )
 
             Text(session.progressCurrent)
                 .font(.system(.caption, design: .monospaced))
@@ -55,9 +50,5 @@ struct CleanScanningView: View {
         .padding(VoleTheme.Spacing.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.contentBackground)
-        .onAppear { breathingOpacity = 0.55 }
-        .onDisappear { breathingOpacity = 1 }
     }
-
-    @State private var breathingOpacity: Double = 1
 }

@@ -19,11 +19,7 @@ struct CleanResultView: View {
                         .font(VoleTheme.TypeScale.title())
                 }
                 Spacer()
-                Image("VoleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .accessibilityLabel("Vole 田鼠")
+                VoleMascotView(state: .success, size: 44)
             }
 
             if let report = session.report {

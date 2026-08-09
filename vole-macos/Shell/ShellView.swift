@@ -44,9 +44,25 @@ struct ShellView: View {
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
     private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
+    private var sidebarMascotActivity: MascotActivity {
+        MascotActivity.resolve(
+            clean: session.phase.mascotSessionPhase,
+            plans: [
+                uninstallSession.phase.mascotSessionPhase,
+                optimizeSession.phase.mascotSessionPhase,
+                purgeSession.phase.mascotSessionPhase,
+                installerSession.phase.mascotSessionPhase,
+            ]
+        )
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            SidebarView(selection: $selection, showSettings: $showSettings)
+            SidebarView(
+                selection: $selection,
+                showSettings: $showSettings,
+                mascotActivity: sidebarMascotActivity
+            )
                 .frame(width: sidebarWidth)
                 .padding(.leading, sidebarGutter)
                 .padding(.trailing, sidebarGutter)

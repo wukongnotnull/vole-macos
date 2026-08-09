@@ -3,6 +3,7 @@ import SwiftUI
 struct SidebarView: View {
     @Binding var selection: ShellModule
     @Binding var showSettings: Bool
+    var mascotActivity: MascotActivity = .idle
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
@@ -69,13 +70,9 @@ struct SidebarView: View {
 
             // Slightly larger than the disk so the vole peeks out of the burrow.
             // Asset bbox is ~1.6pt right / 0.7pt down at this size — nudge back to optical center.
-            Image("VoleLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 124, height: 124)
+            VoleMascotView(state: mascotActivity, size: 124)
                 .offset(x: -1.6, y: -0.7)
                 .shadow(color: Color(hex: 0x2C211C, alpha: 0.22), radius: 3, x: 0, y: 2)
-                .accessibilityLabel("Vole 标志")
         }
         .frame(width: 132, height: 132)
         .frame(maxWidth: .infinity, alignment: .center)

@@ -118,6 +118,8 @@ final class PlanModuleSession: ObservableObject {
         let parts = PrivilegedApply.partition(filtered.entries)
         let helperReady = HelperRegistration.currentStatus().isReadyForXPC
         phase = .applying
+        progressScanned = 0
+        progressCurrent = ""
         errorMessage = nil
         helperDegradeNote = nil
 

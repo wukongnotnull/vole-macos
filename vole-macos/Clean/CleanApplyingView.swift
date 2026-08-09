@@ -2,25 +2,55 @@ import SwiftUI
 
 struct CleanApplyingView: View {
     @ObservedObject var session: CleanSession
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var applyTotal: Int { session.selectedIDs.count }
+
+    private var usesIndeterminate: Bool {
+        applyUsesIndeterminateProgress(
+            scanned: session.progressScanned,
+            total: applyTotal,
+            progressCurrent: session.progressCurrent
+        )
+    }
+
+    private var applyFraction: Double? {
+        usesIndeterminate
+            ? nil
+            : applyProgressFraction(scanned: session.progressScanned, total: applyTotal)
+    }
+
+    private var valueText: String {
+        if usesIndeterminate {
+            return "…"
+        }
+        return applyProgressValueText(scanned: session.progressScanned, total: applyTotal)
+    }
+
+    private var caption: String {
+        usesIndeterminate ? "移动中" : "已处理"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.lg) {
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
-                Text("Applying · 清理中")
-                    .font(VoleTheme.TypeScale.eyebrow())
-                    .tracking(1.5)
-                    .foregroundStyle(.secondary)
-                Text("正在清理")
-                    .font(VoleTheme.TypeScale.title())
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+                    Text("Applying · 清理中")
+                        .font(VoleTheme.TypeScale.eyebrow())
+                        .tracking(1.5)
+                        .foregroundStyle(.secondary)
+                    Text("正在清理")
+                        .font(VoleTheme.TypeScale.title())
+                }
+                Spacer()
+                VoleMascotView(state: .applying, size: 44)
             }
 
-            SoilPanel(fraction: nil, valueText: "…", caption: "移动中")
-                .opacity(breathingOpacity)
-                .animation(
-                    reduceMotion ? nil : .easeInOut(duration: 1.2).repeatForever(autoreverses: true),
-                    value: breathingOpacity
-                )
+            SoilPanel(
+                fraction: applyFraction,
+                indeterminate: usesIndeterminate,
+                valueText: valueText,
+                caption: caption
+            )
 
             Text("个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除。")
                 .font(VoleTheme.TypeScale.body())
@@ -53,9 +83,5 @@ struct CleanApplyingView: View {
         .padding(VoleTheme.Spacing.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.contentBackground)
-        .onAppear { breathingOpacity = 0.55 }
-        .onDisappear { breathingOpacity = 1 }
     }
-
-    @State private var breathingOpacity: Double = 1
 }

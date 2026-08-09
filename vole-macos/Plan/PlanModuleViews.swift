@@ -47,8 +47,6 @@ struct PlanModuleIdleView: View {
 
 struct PlanModuleScanningView: View {
     @ObservedObject var session: PlanModuleSession
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var breathingOpacity: Double = 1
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.lg) {
@@ -62,19 +60,15 @@ struct PlanModuleScanningView: View {
                         .font(VoleTheme.TypeScale.title())
                 }
                 Spacer()
-                Image("VoleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .accessibilityLabel("Vole 田鼠")
+                VoleMascotView(state: .scanning, size: 44)
             }
 
-            SoilPanel(fraction: nil, valueText: "\(session.progressScanned)", caption: "已扫条目")
-                .opacity(breathingOpacity)
-                .animation(
-                    reduceMotion ? nil : .easeInOut(duration: 1.2).repeatForever(autoreverses: true),
-                    value: breathingOpacity
-                )
+            SoilPanel(
+                fraction: nil,
+                indeterminate: true,
+                valueText: "\(session.progressScanned)",
+                caption: "已扫条目"
+            )
 
             Text(session.progressCurrent)
                 .font(.system(.caption, design: .monospaced))
@@ -101,8 +95,6 @@ struct PlanModuleScanningView: View {
         .padding(VoleTheme.Spacing.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.contentBackground)
-        .onAppear { breathingOpacity = 0.55 }
-        .onDisappear { breathingOpacity = 1 }
     }
 }
 
@@ -263,26 +255,55 @@ struct PlanModuleCandidatesView: View {
 
 struct PlanModuleApplyingView: View {
     @ObservedObject var session: PlanModuleSession
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var breathingOpacity: Double = 1
+
+    private var applyTotal: Int { session.selectedIDs.count }
+
+    private var usesIndeterminate: Bool {
+        applyUsesIndeterminateProgress(
+            scanned: session.progressScanned,
+            total: applyTotal,
+            progressCurrent: session.progressCurrent
+        )
+    }
+
+    private var applyFraction: Double? {
+        usesIndeterminate
+            ? nil
+            : applyProgressFraction(scanned: session.progressScanned, total: applyTotal)
+    }
+
+    private var valueText: String {
+        if usesIndeterminate {
+            return "…"
+        }
+        return applyProgressValueText(scanned: session.progressScanned, total: applyTotal)
+    }
+
+    private var caption: String {
+        usesIndeterminate ? "执行中" : "已处理"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.lg) {
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
-                Text(session.kind.applyEyebrow)
-                    .font(VoleTheme.TypeScale.eyebrow())
-                    .tracking(1.5)
-                    .foregroundStyle(.secondary)
-                Text(session.kind.applyTitle)
-                    .font(VoleTheme.TypeScale.title())
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+                    Text(session.kind.applyEyebrow)
+                        .font(VoleTheme.TypeScale.eyebrow())
+                        .tracking(1.5)
+                        .foregroundStyle(.secondary)
+                    Text(session.kind.applyTitle)
+                        .font(VoleTheme.TypeScale.title())
+                }
+                Spacer()
+                VoleMascotView(state: .applying, size: 44)
             }
 
-            SoilPanel(fraction: nil, valueText: "…", caption: "执行中")
-                .opacity(breathingOpacity)
-                .animation(
-                    reduceMotion ? nil : .easeInOut(duration: 1.2).repeatForever(autoreverses: true),
-                    value: breathingOpacity
-                )
+            SoilPanel(
+                fraction: applyFraction,
+                indeterminate: usesIndeterminate,
+                valueText: valueText,
+                caption: caption
+            )
 
             Text(session.kind.applyHint)
                 .font(VoleTheme.TypeScale.body())
@@ -315,8 +336,6 @@ struct PlanModuleApplyingView: View {
         .padding(VoleTheme.Spacing.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.contentBackground)
-        .onAppear { breathingOpacity = 0.55 }
-        .onDisappear { breathingOpacity = 1 }
     }
 }
 
@@ -335,11 +354,7 @@ struct PlanModuleResultView: View {
                         .font(VoleTheme.TypeScale.title())
                 }
                 Spacer()
-                Image("VoleLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 44, height: 44)
-                    .accessibilityLabel("Vole 田鼠")
+                VoleMascotView(state: .success, size: 44)
             }
 
             if let report = session.report {
