@@ -33,6 +33,7 @@ struct ShellView: View {
     @StateObject private var optimizeSession = PlanModuleSession(kind: .optimize)
     @StateObject private var purgeSession = PlanModuleSession(kind: .purge)
     @StateObject private var installerSession = PlanModuleSession(kind: .installer)
+    @StateObject private var analyzeSession = AnalyzeSession()
     @StateObject private var statusSession = StatusSession()
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
@@ -89,7 +90,7 @@ struct ShellView: View {
             case .installer:
                 PlanModuleRootView(session: installerSession, helperStatus: helperStatus)
             case .analyze:
-                ModulePlaceholderView(title: "分析")
+                AnalyzeRootView(session: analyzeSession)
             case .history:
                 ModulePlaceholderView(title: "历史")
             case .status:
