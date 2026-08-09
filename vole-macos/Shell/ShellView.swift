@@ -29,7 +29,11 @@ struct WindowAccessor: NSViewRepresentable {
 struct ShellView: View {
     @ObservedObject var session: CleanSession
     @ObservedObject var helperStatus: HelperStatusModel
+    @StateObject private var uninstallSession = PlanModuleSession(kind: .uninstall)
+    @StateObject private var optimizeSession = PlanModuleSession(kind: .optimize)
+    @StateObject private var statusSession = StatusSession()
     @State private var selection: ShellModule = .clean
+    @State private var showSettings = false
 
     private let sidebarWidth: CGFloat = 132
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
@@ -37,7 +41,7 @@ struct ShellView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            SidebarView(selection: $selection)
+            SidebarView(selection: $selection, showSettings: $showSettings)
                 .frame(width: sidebarWidth)
                 .padding(.leading, sidebarGutter)
                 .padding(.trailing, sidebarGutter)
@@ -59,6 +63,13 @@ struct ShellView: View {
         .background(WindowAccessor())
         // Draw under the transparent titlebar; traffic lights float on the sidebar.
         .ignoresSafeArea(.container, edges: .top)
+        .sheet(isPresented: $showSettings) {
+            SettingsSheet(
+                helperStatus: helperStatus,
+                voleVersion: session.voleVersion,
+                onRefreshVersion: { session.refreshVersion() }
+            )
+        }
     }
 
     @ViewBuilder
@@ -67,27 +78,16 @@ struct ShellView: View {
             switch selection {
             case .clean:
                 CleanRootView(session: session, helperStatus: helperStatus)
-            case .uninstall, .optimize, .status:
-                ComingSoonView(module: selection)
+            case .uninstall:
+                PlanModuleRootView(session: uninstallSession, helperStatus: helperStatus)
+            case .optimize:
+                PlanModuleRootView(session: optimizeSession, helperStatus: helperStatus)
+            case .status:
+                StatusRootView(session: statusSession)
             }
         }
         .background(VoleTheme.Colors.card)
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
         .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)
-    }
-}
-
-private struct ComingSoonView: View {
-    let module: ShellModule
-
-    var body: some View {
-        VStack(spacing: VoleTheme.Spacing.md) {
-            Text(module.title)
-                .font(VoleTheme.TypeScale.title())
-            Text("即将推出")
-                .font(VoleTheme.TypeScale.body())
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

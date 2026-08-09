@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 @MainActor
-final class CleanSession: ObservableObject {
+final class PlanModuleSession: ObservableObject {
     enum Phase: Equatable {
         case idle
         case scanning
@@ -10,6 +10,8 @@ final class CleanSession: ObservableObject {
         case applying
         case result
     }
+
+    let kind: PlanModuleKind
 
     @Published var phase: Phase = .idle
     @Published var progressScanned: UInt64 = 0
@@ -26,6 +28,10 @@ final class CleanSession: ObservableObject {
     private var process = VoleProcess()
     private var fullPlanURL: URL?
     private var fullPlan: VolePlan?
+
+    init(kind: PlanModuleKind) {
+        self.kind = kind
+    }
 
     func refreshVersion() {
         Task {
@@ -58,10 +64,10 @@ final class CleanSession: ObservableObject {
         Task {
             do {
                 let dir = try PlanIO.cachesDirectory()
-                let planURL = dir.appendingPathComponent("clean-full-\(UUID().uuidString).json")
+                let planURL = dir.appendingPathComponent("\(kind.planFilePrefix)-\(UUID().uuidString).json")
                 fullPlanURL = planURL
                 let exit = await process.run(arguments: [
-                    "clean", "--plan", "--json-stream", "--plan-out", planURL.path,
+                    kind.command, "--plan", "--json-stream", "--plan-out", planURL.path,
                 ]) { [weak self] line in
                     Task { @MainActor in
                         self?.handleStreamLine(line)
@@ -118,13 +124,15 @@ final class CleanSession: ObservableObject {
                         coverageNote: filtered.coverageNote
                     )
                     let dir = try PlanIO.cachesDirectory()
-                    let applyURL = dir.appendingPathComponent("clean-apply-\(UUID().uuidString).json")
+                    let applyURL = dir.appendingPathComponent(
+                        "\(kind.applyFilePrefix)-\(UUID().uuidString).json"
+                    )
                     try PlanIO.write(userPlan, to: applyURL)
                     defer { try? FileManager.default.removeItem(at: applyURL) }
 
                     let reportBox = ReportBox()
                     let exit = await process.run(arguments: [
-                        "clean", "--apply", applyURL.path, "--json-stream",
+                        kind.command, "--apply", applyURL.path, "--json-stream",
                     ]) { [weak self] line in
                         guard let event = try? VoleStreamEvent.decodeNDJSONLine(line) else { return }
                         if case let .done(report) = event {
@@ -148,7 +156,7 @@ final class CleanSession: ObservableObject {
                         return
                     }
                     if case .cancelled = exit {
-                        errorMessage = "已取消（可能已部分清理）"
+                        errorMessage = "已取消（可能已部分执行）"
                         report = sidecarReport
                         cleanupFullPlan()
                         phase = .result
@@ -172,7 +180,7 @@ final class CleanSession: ObservableObject {
                         }
                     } else {
                         helperDegradeNote =
-                            "已跳过 \(parts.privilegedEntries.count) 项系统路径（特权助手未启用）。用户域清理不受影响。"
+                            "已跳过 \(parts.privilegedEntries.count) 项系统路径（特权助手未启用）。用户域操作不受影响。"
                     }
                 }
 

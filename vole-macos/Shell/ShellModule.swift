@@ -14,7 +14,7 @@ enum ShellModule: String, CaseIterable, Identifiable {
         }
     }
 
-    var isAvailable: Bool { self == .clean }
+    var isAvailable: Bool { true }
 
     var systemImage: String {
         switch self {
