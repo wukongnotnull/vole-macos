@@ -8,11 +8,9 @@ struct AnalyzeRootView: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("Analyze · 分析")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text("目录体积")
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 if session.canGoUp {

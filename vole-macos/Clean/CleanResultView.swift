@@ -12,11 +12,9 @@ struct CleanResultView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("Result · 完成")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text("翻土完成")
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 VoleMascotView(state: .success, size: 44)

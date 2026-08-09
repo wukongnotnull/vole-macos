@@ -44,8 +44,11 @@ enum VoleTheme {
     enum TypeScale {
         /// Module title (e.g. "翻土找缓存").
         static func title() -> Font { .system(size: 22, weight: .bold, design: .rounded) }
-        /// Eyebrow / overline (e.g. "CLEAN · 清理").
+        /// ~-0.02em at 22pt — tightens rounded display titles.
+        static let titleTracking: CGFloat = -0.44
+        /// Eyebrow / overline (e.g. "Clean · 清理").
         static func eyebrow() -> Font { .system(size: 11, weight: .bold, design: .rounded) }
+        static let eyebrowTracking: CGFloat = 1.5
         /// Section heading.
         static func headline() -> Font { .system(size: 14, weight: .semibold, design: .rounded) }
         /// Body copy.
@@ -121,5 +124,22 @@ extension NSColor {
             blue: CGFloat(hex & 0xFF) / 255,
             alpha: 1
         )
+    }
+}
+
+// MARK: - Type styles
+
+extension View {
+    /// Bilingual overline used above module titles.
+    func voleEyebrowStyle() -> some View {
+        font(VoleTheme.TypeScale.eyebrow())
+            .tracking(VoleTheme.TypeScale.eyebrowTracking)
+            .foregroundStyle(.secondary)
+    }
+
+    /// Rounded module / page title with design-spec tracking.
+    func voleTitleStyle() -> some View {
+        font(VoleTheme.TypeScale.title())
+            .tracking(VoleTheme.TypeScale.titleTracking)
     }
 }

@@ -8,11 +8,9 @@ struct CleanScanningView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("Scanning · 扫描中")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text("正在翻找")
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 VoleMascotView(state: .scanning, size: 44)

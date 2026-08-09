@@ -8,11 +8,9 @@ struct HistoryRootView: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("History · 历史")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text("操作历史")
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 Stepper(

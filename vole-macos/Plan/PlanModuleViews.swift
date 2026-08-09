@@ -5,9 +5,13 @@ struct PlanModuleIdleView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.xl) {
-            Text(session.kind.idleHeadline)
-                .font(VoleTheme.TypeScale.title())
-                .foregroundStyle(VoleTheme.Colors.text)
+            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+                Text(session.kind.idleEyebrow)
+                    .voleEyebrowStyle()
+                Text(session.kind.idleHeadline)
+                    .voleTitleStyle()
+                    .foregroundStyle(VoleTheme.Colors.text)
+            }
 
             SoilPanel(valueText: "—", caption: session.kind.idleCaption)
 
@@ -50,11 +54,9 @@ struct PlanModuleScanningView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text(session.kind.scanEyebrow)
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text(session.kind.scanTitle)
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 VoleMascotView(state: .scanning, size: 44)
@@ -122,11 +124,9 @@ struct PlanModuleCandidatesView: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text(session.kind.candidatesEyebrow)
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text(session.kind.candidatesTitle)
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 Button("全选") { session.selectedIDs = Set(session.entries.map(\.id)) }
@@ -276,11 +276,9 @@ struct PlanModuleApplyingView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text(session.kind.applyEyebrow)
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text(session.kind.applyTitle)
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 VoleMascotView(state: .applying, size: 44)
@@ -333,11 +331,9 @@ struct PlanModuleResultView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("Result · 完成")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text(session.kind.resultTitle)
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 VoleMascotView(state: .success, size: 44)

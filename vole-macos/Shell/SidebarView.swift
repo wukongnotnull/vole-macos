@@ -95,69 +95,103 @@ struct SidebarView: View {
     private var moduleList: some View {
         VStack(alignment: .leading, spacing: 2) {
             ForEach(ShellModule.allCases) { module in
-                Button {
+                SidebarNavRow(
+                    title: module.title,
+                    systemImage: module.systemImage,
+                    isSelected: selection == module,
+                    isEnabled: module.isAvailable,
+                    help: module.isAvailable ? module.title : "\(module.title) · 即将推出"
+                ) {
                     selection = module
-                } label: {
-                    HStack(spacing: VoleTheme.Spacing.sm) {
-                        Image(systemName: module.systemImage)
-                            .font(.system(size: 13, weight: .semibold))
-                            .frame(width: 18, alignment: .center)
-                        Text(module.title)
-                            .font(VoleTheme.TypeScale.body())
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal, VoleTheme.Spacing.sm)
-                    .padding(.vertical, 9)
-                    .foregroundStyle(foreground(for: module))
-                    .background(background(for: module))
-                    .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
                 }
-                .buttonStyle(.plain)
-                .disabled(!module.isAvailable)
-                .help(module.isAvailable ? module.title : "\(module.title) · 即将推出")
             }
         }
     }
 
     private var moreRow: some View {
-        Button {
+        SidebarNavRow(
+            title: "设置",
+            systemImage: "gearshape",
+            isSelected: false,
+            isEnabled: true,
+            font: VoleTheme.TypeScale.caption(),
+            iconWeight: .semibold,
+            iconSize: 12,
+            verticalPadding: VoleTheme.Spacing.sm,
+            idleForegroundOpacity: 0.55,
+            help: "设置"
+        ) {
             showSettings = true
-        } label: {
-            HStack(spacing: VoleTheme.Spacing.sm) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 12, weight: .semibold))
-                    .frame(width: 18, alignment: .center)
-                Text("设置")
-                    .font(VoleTheme.TypeScale.caption())
-                Spacer(minLength: 0)
-            }
-            .foregroundStyle(VoleTheme.Colors.onInk.opacity(0.55))
-            .padding(.horizontal, VoleTheme.Spacing.sm)
-            .padding(.vertical, VoleTheme.Spacing.sm)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .buttonStyle(.plain)
-        .help("设置")
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(VoleTheme.Colors.onInk.opacity(0.08))
                 .frame(height: 1)
         }
     }
+}
 
-    private func foreground(for module: ShellModule) -> Color {
-        if selection == module {
-            return VoleTheme.Colors.onFur
+/// Sidebar nav / settings row with full-width hit target and hover wash.
+private struct SidebarNavRow: View {
+    let title: String
+    let systemImage: String
+    var isSelected: Bool = false
+    var isEnabled: Bool = true
+    var font: Font = VoleTheme.TypeScale.body()
+    var iconWeight: Font.Weight = .semibold
+    var iconSize: CGFloat = 13
+    var verticalPadding: CGFloat = 9
+    var idleForegroundOpacity: Double = 0.92
+    var help: String = ""
+    let action: () -> Void
+
+    @State private var isHovered = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: VoleTheme.Spacing.sm) {
+                Image(systemName: systemImage)
+                    .font(.system(size: iconSize, weight: iconWeight))
+                    .frame(width: 18, alignment: .center)
+                Text(title)
+                    .font(font)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, VoleTheme.Spacing.sm)
+            .padding(.vertical, verticalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(foreground)
+            .background(background)
+            .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+            .contentShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
         }
-        return VoleTheme.Colors.onInk.opacity(module.isAvailable ? 0.92 : 0.45)
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .help(help)
+        .onHover { hovering in
+            guard isEnabled else { return }
+            withAnimation(.easeOut(duration: VoleTheme.Motion.quick)) {
+                isHovered = hovering
+            }
+        }
     }
 
-    @ViewBuilder
-    private func background(for module: ShellModule) -> some View {
-        if selection == module {
-            VoleTheme.Colors.fur
-        } else {
-            Color.clear
+    private var foreground: Color {
+        if isSelected {
+            return VoleTheme.Colors.onFur
         }
+        let base = isEnabled ? idleForegroundOpacity : 0.45
+        let boosted = min(base + 0.06, 1)
+        return VoleTheme.Colors.onInk.opacity(isHovered ? boosted : base)
+    }
+
+    private var background: Color {
+        if isSelected {
+            return VoleTheme.Colors.fur
+        }
+        if isHovered && isEnabled {
+            return VoleTheme.Colors.onInk.opacity(0.10)
+        }
+        return .clear
     }
 }

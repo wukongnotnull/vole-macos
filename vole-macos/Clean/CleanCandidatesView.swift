@@ -39,11 +39,9 @@ struct CleanCandidatesView: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
                     Text("Candidates · 候选")
-                        .font(VoleTheme.TypeScale.eyebrow())
-                        .tracking(1.5)
-                        .foregroundStyle(.secondary)
+                        .voleEyebrowStyle()
                     Text("挑要清掉的")
-                        .font(VoleTheme.TypeScale.title())
+                        .voleTitleStyle()
                 }
                 Spacer()
                 Button("全选") { session.selectedIDs = Set(session.entries.map(\.id)) }

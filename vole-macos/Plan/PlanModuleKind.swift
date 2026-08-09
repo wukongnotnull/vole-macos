@@ -26,6 +26,15 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         }
     }
 
+    var idleEyebrow: String {
+        switch self {
+        case .uninstall: return "Uninstall · 卸载"
+        case .optimize: return "Optimize · 优化"
+        case .purge: return "Purge · 净化"
+        case .installer: return "Installer · 安装包"
+        }
+    }
+
     var idleHeadline: String {
         switch self {
         case .uninstall: return "挖出残留应用"

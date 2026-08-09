@@ -5,9 +5,13 @@ struct CleanIdleView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.xl) {
-            Text("翻土找缓存")
-                .font(VoleTheme.TypeScale.title())
-                .foregroundStyle(VoleTheme.Colors.text)
+            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+                Text("Clean · 清理")
+                    .voleEyebrowStyle()
+                Text("翻土找缓存")
+                    .voleTitleStyle()
+                    .foregroundStyle(VoleTheme.Colors.text)
+            }
 
             SoilPanel(valueText: "—", caption: "待扫描")
 

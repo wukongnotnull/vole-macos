@@ -6,12 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
-
 /* Begin PBXBuildFile section */
 		A1HELPPROD301BA00200E0AFC2 /* VolePrivilegedHelper in Embed Privileged Helper */ = {isa = PBXBuildFile; fileRef = A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A1PLIST02301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist in Embed LaunchDaemons */ = {isa = PBXBuildFile; fileRef = A1PLIST01301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist */; };
 /* End PBXBuildFile section */
-
 
 /* Begin PBXContainerItemProxy section */
 		67FB4F97301BA00200E0AFC2 /* PBXContainerItemProxy */ = {
@@ -28,7 +26,6 @@
 			remoteGlobalIDString = 67FB4F88301BA00000E0AFC2;
 			remoteInfo = "vole-macos";
 		};
-
 		A1HELPPX1301BA00200E0AFC2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 67FB4F81301BA00000E0AFC2 /* Project object */;
@@ -38,11 +35,35 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A1COPYH01301BA00200E0AFC2 /* Embed Privileged Helper */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				A1HELPPROD301BA00200E0AFC2 /* VolePrivilegedHelper in Embed Privileged Helper */,
+			);
+			name = "Embed Privileged Helper";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1COPYP01301BA00200E0AFC2 /* Embed LaunchDaemons */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LaunchDaemons;
+			dstSubfolderSpec = 1;
+			files = (
+				A1PLIST02301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist in Embed LaunchDaemons */,
+			);
+			name = "Embed LaunchDaemons";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		67FB4F89301BA00000E0AFC2 /* Vole.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vole.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67FB4F96301BA00200E0AFC2 /* vole-macosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vole-macosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		67FB4FA0301BA00200E0AFC2 /* vole-macosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "vole-macosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-
 		A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VolePrivilegedHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1PLIST01301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "cn.waytoai.vole-macos.helper.plist"; path = "LaunchDaemons/cn.waytoai.vole-macos.helper.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -63,7 +84,6 @@
 			path = "vole-macosUITests";
 			sourceTree = "<group>";
 		};
-
 		A1HELP8B301BA00200E0AFC2 /* PrivilegedHelper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PrivilegedHelper;
@@ -93,7 +113,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-
 		A1HELP86301BA00200E0AFC2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -104,6 +123,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		678BB27330284CC3000A2BDA /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A1HELP89301BA00200E0AFC2 /* VolePrivilegedHelper */,
+				A1PLIST01301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist */,
+				A1HELP8B301BA00200E0AFC2 /* PrivilegedHelper */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		67FB4F80301BA00000E0AFC2 = {
 			isa = PBXGroup;
 			children = (
@@ -111,6 +140,7 @@
 				67FB4F99301BA00200E0AFC2 /* vole-macosTests */,
 				67FB4FA3301BA00200E0AFC2 /* vole-macosUITests */,
 				67FB4F8A301BA00000E0AFC2 /* Products */,
+				678BB27330284CC3000A2BDA /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,32 +155,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
-
-
-/* Begin PBXCopyFilesBuildPhase section */
-		A1COPYH01301BA00200E0AFC2 /* Embed Privileged Helper */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 6;
-			files = (
-				A1HELPPROD301BA00200E0AFC2 /* VolePrivilegedHelper in Embed Privileged Helper */,
-			);
-			name = "Embed Privileged Helper";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A1COPYP01301BA00200E0AFC2 /* Embed LaunchDaemons */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "Contents/Library/LaunchDaemons";
-			dstSubfolderSpec = 1;
-			files = (
-				A1PLIST02301BA00200E0AFC2 /* cn.waytoai.vole-macos.helper.plist in Embed LaunchDaemons */,
-			);
-			name = "Embed LaunchDaemons";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		67FB4F88301BA00000E0AFC2 /* vole-macos */ = {
@@ -225,7 +229,6 @@
 			productReference = 67FB4FA0301BA00200E0AFC2 /* vole-macosUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-
 		A1HELP88301BA00200E0AFC2 /* VolePrivilegedHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1HELPAA301BA00200E0AFC2 /* Build configuration list for PBXNativeTarget "VolePrivilegedHelper" */;
@@ -260,9 +263,6 @@
 					67FB4F88301BA00000E0AFC2 = {
 						CreatedOnToolsVersion = 26.6;
 					};
-					A1HELP88301BA00200E0AFC2 = {
-						CreatedOnToolsVersion = 26.6;
-					};
 					67FB4F95301BA00200E0AFC2 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 67FB4F88301BA00000E0AFC2;
@@ -270,6 +270,9 @@
 					67FB4F9F301BA00200E0AFC2 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 67FB4F88301BA00000E0AFC2;
+					};
+					A1HELP88301BA00200E0AFC2 = {
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
@@ -363,7 +366,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-
 		A1HELP85301BA00200E0AFC2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -384,7 +386,6 @@
 			target = 67FB4F88301BA00000E0AFC2 /* vole-macos */;
 			targetProxy = 67FB4FA1301BA00200E0AFC2 /* PBXContainerItemProxy */;
 		};
-
 		A1HELPTD1301BA00200E0AFC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A1HELP88301BA00200E0AFC2 /* VolePrivilegedHelper */;
@@ -663,7 +664,6 @@
 			};
 			name = Release;
 		};
-
 		A1HELPAB301BA00200E0AFC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -741,7 +741,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-
 		A1HELPAA301BA00200E0AFC2 /* Build configuration list for PBXNativeTarget "VolePrivilegedHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
