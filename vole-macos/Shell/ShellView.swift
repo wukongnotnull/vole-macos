@@ -41,8 +41,8 @@ struct ShellView: View {
     @State private var showSettings = false
 
     private let sidebarWidth: CGFloat = 148
-    private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
-    private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
+    /// Uniform outer margin around sidebar + detail cards.
+    private let shellGutter: CGFloat = VoleTheme.Spacing.sm
 
     private var sidebarMascotActivity: MascotActivity {
         MascotActivity.resolve(
@@ -57,29 +57,20 @@ struct ShellView: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
+        HStack(alignment: .center, spacing: shellGutter) {
             SidebarView(
                 selection: $selection,
                 showSettings: $showSettings,
                 helperStatus: helperStatus,
                 mascotActivity: sidebarMascotActivity
             )
-                .frame(width: sidebarWidth)
-                .padding(.leading, sidebarGutter)
-                .padding(.trailing, sidebarGutter)
-                .padding(.top, sidebarGutter)
-                .padding(.bottom, sidebarGutter)
-                .frame(width: sidebarColumnWidth)
-                .frame(maxHeight: .infinity, alignment: .top)
-                .background(VoleTheme.Colors.canvas)
+            .frame(width: sidebarWidth)
+            .frame(maxHeight: .infinity)
 
             detailView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.trailing, sidebarGutter)
-                .padding(.top, sidebarGutter)
-                .padding(.bottom, sidebarGutter)
-                .background(VoleTheme.Colors.canvas)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
+        .padding(shellGutter)
         .frame(minWidth: 720, minHeight: 480)
         .background(VoleTheme.Colors.canvas)
         .background(WindowAccessor())
@@ -116,6 +107,8 @@ struct ShellView: View {
                 StatusRootView(session: statusSession)
             }
         }
+        // Fill the detail column so top/bottom canvas gutters stay equal.
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.card)
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.card))
         .shadow(color: VoleTheme.Shadow.card, radius: 3, x: 0, y: 1)

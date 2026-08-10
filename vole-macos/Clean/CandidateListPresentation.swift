@@ -59,10 +59,6 @@ struct CandidateGroup: Identifiable, Equatable {
         }
         return total
     }
-
-    var iconLookup: CandidateAppIconLookup {
-        CandidateListPresentation.iconLookup(for: app, entries: entries)
-    }
 }
 
 struct CandidatePageSlice: Equatable {

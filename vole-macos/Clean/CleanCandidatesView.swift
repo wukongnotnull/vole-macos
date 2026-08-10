@@ -10,6 +10,30 @@ func strataFraction(entries: [VolePlanEntry], selectedIDs: Set<String>) -> Doubl
     return Double(selectedTotalBytes(entries: entries, selectedIDs: selectedIDs)) / Double(total)
 }
 
+/// Coarsened viewport breakpoints for Clean candidates chrome.
+struct CleanCandidatesLayoutMetrics: Equatable {
+    var isWide: Bool
+    var isTall: Bool
+
+    var contentPadding: CGFloat {
+        isTall ? VoleTheme.Spacing.xl : VoleTheme.Spacing.md
+    }
+
+    var sectionSpacing: CGFloat {
+        isTall ? VoleTheme.Spacing.md : VoleTheme.Spacing.sm
+    }
+
+    /// Brand eyebrow stays visible in dense short layouts; only caption densifies.
+    var showsEyebrow: Bool { true }
+
+    static func resolve(width: CGFloat, height: CGFloat) -> CleanCandidatesLayoutMetrics {
+        CleanCandidatesLayoutMetrics(
+            isWide: width >= 680,
+            isTall: height >= 540
+        )
+    }
+}
+
 private enum CandidateSizeFilter: UInt64, CaseIterable, Identifiable {
     case any = 0
     case tenMB = 10_485_760
@@ -38,6 +62,7 @@ struct CleanCandidatesView: View {
     @State private var page = 1
     @State private var pageSize = 50
     @State private var expandedCategories: Set<String> = []
+    @State private var layout = CleanCandidatesLayoutMetrics(isWide: true, isTall: true)
 
     private var selectedPrivilegedCount: Int {
         session.entries
@@ -67,61 +92,91 @@ struct CleanCandidatesView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VoleTheme.Spacing.md) {
-            CleanCandidatesHeader(
-                selectedCount: session.selectedIDs.count,
-                totalCount: session.entries.count,
-                selectedBytes: selectedBytes,
-                onSelectAll: { session.selectedIDs = Set(session.entries.map(\.id)) },
-                onSelectNone: { session.selectedIDs = [] }
-            )
+        VStack(alignment: .leading, spacing: layout.sectionSpacing) {
+            // Top chrome keeps intrinsic height — never compress when the list wants space.
+            VStack(alignment: .leading, spacing: layout.sectionSpacing) {
+                CleanCandidatesHeader(
+                    selectedCount: session.selectedIDs.count,
+                    totalCount: session.entries.count,
+                    selectedBytes: selectedBytes,
+                    showsEyebrow: layout.showsEyebrow,
+                    onSelectAll: { session.selectedIDs = Set(session.entries.map(\.id)) },
+                    onSelectNone: { session.selectedIDs = [] }
+                )
 
-            CleanCandidatesFilterBar(
-                searchText: $searchText,
-                sizeFilter: $sizeFilter,
-                rootOnly: $rootOnly
-            )
-            .onChange(of: searchText) { _, _ in page = 1 }
-            .onChange(of: sizeFilter) { _, _ in page = 1 }
-            .onChange(of: rootOnly) { _, _ in page = 1 }
+                CleanCandidatesFilterBar(
+                    searchText: $searchText,
+                    sizeFilter: $sizeFilter,
+                    rootOnly: $rootOnly,
+                    isWide: layout.isWide
+                )
+                .onChange(of: searchText) { _, _ in page = 1 }
+                .onChange(of: sizeFilter) { _, _ in page = 1 }
+                .onChange(of: rootOnly) { _, _ in page = 1 }
 
-            if selectedPrivilegedCount > 0 && !helperStatus.isReady {
-                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，需开启 Root 权限才能永久删除，否则将跳过。")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.orange)
-            } else if selectedPrivilegedCount > 0 {
-                Text("已选含 \(selectedPrivilegedCount) 项系统级文件，将经 Root 权限永久删除（不进废纸篓）。")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                if selectedPrivilegedCount > 0 && !helperStatus.isReady {
+                    Text("已选含 \(selectedPrivilegedCount) 项系统级文件，需开启 Root 权限才能永久删除，否则将跳过。")
+                        .font(VoleTheme.TypeScale.caption())
+                        .foregroundStyle(.orange)
+                        .lineLimit(layout.isTall ? 3 : 2)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if selectedPrivilegedCount > 0 {
+                    Text("已选含 \(selectedPrivilegedCount) 项系统级文件，将经 Root 权限永久删除（不进废纸篓）。")
+                        .font(VoleTheme.TypeScale.caption())
+                        .foregroundStyle(.secondary)
+                        .lineLimit(layout.isTall ? 3 : 2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let error = session.errorMessage {
+                    Text(error)
+                        .font(VoleTheme.TypeScale.caption())
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1)
 
-            if let error = session.errorMessage {
-                Text(error)
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.orange)
-            }
-
+            // List is the only flexible region; minHeight 0 lets it shrink with the window.
             CleanCandidatesOutlineList(
                 groups: presented.groups,
                 selectedIDs: $session.selectedIDs,
                 expandedCategories: $expandedCategories
             )
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+            .layoutPriority(0)
 
-            CleanCandidatesPaginationBar(
-                page: presented.page,
-                pageSize: $pageSize,
-                onPageChange: { page = $0 }
-            )
-            .onChange(of: pageSize) { _, _ in page = 1 }
+            VStack(alignment: .leading, spacing: layout.sectionSpacing) {
+                CleanCandidatesPaginationBar(
+                    page: presented.page,
+                    pageSize: $pageSize,
+                    isWide: layout.isWide,
+                    onPageChange: { page = $0 }
+                )
+                .onChange(of: pageSize) { _, _ in page = 1 }
 
-            CleanCandidatesFooter(
-                canClean: !session.selectedIDs.isEmpty,
-                onRescan: { session.startScan() },
-                onClean: { confirm = true }
-            )
+                CleanCandidatesFooter(
+                    canClean: !session.selectedIDs.isEmpty,
+                    isWide: layout.isWide,
+                    onRescan: { session.startScan() },
+                    onClean: { confirm = true }
+                )
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1)
         }
-        .padding(VoleTheme.Spacing.xl)
+        .padding(layout.contentPadding)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         .background(VoleTheme.Colors.contentBackground)
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { size in
+            let next = CleanCandidatesLayoutMetrics.resolve(width: size.width, height: size.height)
+            if next != layout {
+                layout = next
+            }
+        }
         .confirmationDialog(
             selectedPrivilegedCount > 0
                 ? "个人文件移到废纸篓；需管理员权限的文件经 root权限助手永久删除（未就绪则跳过）"
@@ -146,41 +201,174 @@ private struct CleanCandidatesHeader: View {
     let selectedCount: Int
     let totalCount: Int
     let selectedBytes: UInt64
+    let showsEyebrow: Bool
     let onSelectAll: () -> Void
     let onSelectNone: () -> Void
 
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+        // Command-strip (option 3): top = eyebrow + actions; bottom = title/count + size.
+        ViewThatFits(in: .horizontal) {
+            CleanCandidatesHeaderCommandStrip(
+                selectedCount: selectedCount,
+                totalCount: totalCount,
+                selectedBytes: selectedBytes,
+                showsEyebrow: showsEyebrow,
+                sizeTrailing: true,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+
+            CleanCandidatesHeaderCommandStrip(
+                selectedCount: selectedCount,
+                totalCount: totalCount,
+                selectedBytes: selectedBytes,
+                showsEyebrow: showsEyebrow,
+                sizeTrailing: false,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderCommandStrip: View {
+    let selectedCount: Int
+    let totalCount: Int
+    let selectedBytes: UInt64
+    let showsEyebrow: Bool
+    let sizeTrailing: Bool
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerCommandStripSpacing) {
+            CleanCandidatesHeaderTopRow(
+                showsEyebrow: showsEyebrow,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+
+            if sizeTrailing {
+                HStack(alignment: .firstTextBaseline, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                    CleanCandidatesHeaderTitle(
+                        selectedCount: selectedCount,
+                        totalCount: totalCount
+                    )
+                    Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
+                    CleanCandidatesHeaderSizeMetric(
+                        selectedBytes: selectedBytes,
+                        alignTrailing: true
+                    )
+                }
+            } else {
+                VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerCommandStripSpacing) {
+                    CleanCandidatesHeaderTitle(
+                        selectedCount: selectedCount,
+                        totalCount: totalCount
+                    )
+                    CleanCandidatesHeaderSizeMetric(
+                        selectedBytes: selectedBytes,
+                        alignTrailing: false
+                    )
+                }
+            }
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderTopRow: View {
+    let showsEyebrow: Bool
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        HStack(alignment: .center, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            if showsEyebrow {
                 Text("Candidates · 候选")
-                    .font(VoleTheme.TypeScale.eyebrow())
-                    .tracking(1.5)
-                    .foregroundStyle(.secondary)
-                Text("挑要清掉的")
-                    .font(VoleTheme.TypeScale.title())
-                    .foregroundStyle(VoleTheme.Colors.text)
-                Text("\(CandidateListPresentation.selectionCountCaption(selected: selectedCount, total: totalCount)) 项")
-                    .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(VoleTheme.Colors.text)
-                Text("已选 / 总计")
-                    .font(VoleTheme.TypeScale.caption())
+                    .font(CleanCandidatesListStyle.headerEyebrowFont())
                     .foregroundStyle(.secondary)
             }
-            Spacer(minLength: VoleTheme.Spacing.md)
-            VStack(alignment: .trailing, spacing: VoleTheme.Spacing.xs) {
-                HStack(spacing: VoleTheme.Spacing.sm) {
-                    Button("全选", action: onSelectAll)
-                    Button("全不选", action: onSelectNone)
-                }
-                Text(ByteFormat.string(selectedBytes))
-                    .font(VoleTheme.TypeScale.metricLarge())
-                    .foregroundStyle(VoleTheme.Colors.text)
-                    .monospacedDigit()
+            Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
+            CleanCandidatesHeaderActions(
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderActions: View {
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            CleanCandidatesHeaderActionButton(title: "全选", action: onSelectAll)
+            CleanCandidatesHeaderActionButton(title: "全不选", action: onSelectNone)
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderActionButton: View {
+    let title: LocalizedStringKey
+    let action: () -> Void
+
+    var body: some View {
+        Button(title, action: action)
+            .font(VoleTheme.TypeScale.caption())
+            .foregroundStyle(VoleTheme.Colors.text)
+            .padding(.horizontal, VoleTheme.Spacing.sm)
+            .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: CleanCandidatesListStyle.headerActionCornerRadius, style: .continuous)
+                    .strokeBorder(
+                        VoleTheme.Colors.molehill,
+                        lineWidth: CleanCandidatesListStyle.headerActionBorderWidth
+                    )
+            )
+            .buttonStyle(.plain)
+            .controlSize(.small)
+    }
+}
+
+private struct CleanCandidatesHeaderTitle: View {
+    let selectedCount: Int
+    let totalCount: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
+            Text("挑要清掉的")
+                .font(CleanCandidatesListStyle.headerTitleFont())
+                .foregroundStyle(VoleTheme.Colors.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+            Text("\(CandidateListPresentation.selectionCountCaption(selected: selectedCount, total: totalCount)) 项")
+                .font(CleanCandidatesListStyle.rowMetricFont())
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderSizeMetric: View {
+    let selectedBytes: UInt64
+    let alignTrailing: Bool
+
+    var body: some View {
+        VStack(alignment: alignTrailing ? .trailing : .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
+            Text(ByteFormat.string(selectedBytes))
+                .font(CleanCandidatesListStyle.headerMetricFont())
+                .foregroundStyle(VoleTheme.Colors.text)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            if CleanCandidatesListStyle.headerAlwaysShowsSizeCaption {
                 Text("已选大小")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
             }
         }
+        .fixedSize(horizontal: true, vertical: false)
     }
 }
 
@@ -188,43 +376,126 @@ private struct CleanCandidatesFilterBar: View {
     @Binding var searchText: String
     @Binding var sizeFilter: CandidateSizeFilter
     @Binding var rootOnly: Bool
+    let isWide: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
-            HStack(spacing: VoleTheme.Spacing.sm) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("搜索文件或路径", text: $searchText)
-                    .textFieldStyle(.plain)
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                CleanCandidatesSearchField(text: $searchText)
+                    .frame(minWidth: 120, maxWidth: .infinity)
+                CleanCandidatesFilterControls(
+                    sizeFilter: $sizeFilter,
+                    rootOnly: $rootOnly,
+                    compactSizePicker: !isWide
+                )
             }
-            .padding(.horizontal, VoleTheme.Spacing.md)
-            .padding(.vertical, VoleTheme.Spacing.sm)
-            .background(VoleTheme.Colors.molehill.opacity(0.35))
-            .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
 
-            HStack(spacing: VoleTheme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                CleanCandidatesSearchField(text: $searchText)
+                CleanCandidatesFilterControls(
+                    sizeFilter: $sizeFilter,
+                    rootOnly: $rootOnly,
+                    compactSizePicker: true
+                )
+            }
+        }
+        .controlSize(.regular)
+    }
+}
+
+private struct CleanCandidatesSearchField: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+            TextField("搜索文件或路径", text: $text)
+                .font(CleanCandidatesListStyle.filterBarFont())
+                .textFieldStyle(.plain)
+        }
+        .padding(.horizontal, CleanCandidatesListStyle.searchFieldHorizontalPadding)
+        .padding(.vertical, CleanCandidatesListStyle.searchFieldVerticalPadding)
+        .background(CleanCandidatesListStyle.searchFieldFill)
+        .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+    }
+}
+
+private struct CleanCandidatesFilterControls: View {
+    @Binding var sizeFilter: CandidateSizeFilter
+    @Binding var rootOnly: Bool
+    let compactSizePicker: Bool
+
+    var body: some View {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            if compactSizePicker {
                 Picker("大小", selection: $sizeFilter) {
                     ForEach(CandidateSizeFilter.allCases) { filter in
                         Text(filter.title).tag(filter)
                     }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
                 .labelsHidden()
-
-                Toggle("仅需 root", isOn: $rootOnly)
-                    .toggleStyle(.switch)
-                    .font(VoleTheme.TypeScale.caption())
-                    .fixedSize()
-
-                Text("按大小 ↓")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, VoleTheme.Spacing.sm)
-                    .padding(.vertical, 6)
-                    .background(VoleTheme.Colors.molehill.opacity(0.45))
-                    .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+                .tint(CleanCandidatesListStyle.selectionFill)
+                .fixedSize()
+            } else {
+                HStack(spacing: VoleTheme.Spacing.xs) {
+                    ForEach(CandidateSizeFilter.allCases) { filter in
+                        CleanCandidatesSizeChip(
+                            title: filter.title,
+                            isSelected: sizeFilter == filter
+                        ) {
+                            sizeFilter = filter
+                        }
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: false)
             }
+
+            Toggle("仅需 root", isOn: $rootOnly)
+                .toggleStyle(.switch)
+                .tint(CleanCandidatesListStyle.selectionFill)
+                .font(CleanCandidatesListStyle.filterBarFont())
+                .fixedSize()
+
+            Text("按大小 ↓")
+                .font(CleanCandidatesListStyle.filterBarFont())
+                .foregroundStyle(CleanCandidatesListStyle.filterChipIdleLabel)
+                .padding(.horizontal, VoleTheme.Spacing.sm)
+                .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
+                .background(CleanCandidatesListStyle.sortChipFill)
+                .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+                .fixedSize()
         }
+    }
+}
+
+private struct CleanCandidatesSizeChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(CleanCandidatesListStyle.filterBarFont(weight: isSelected ? .medium : .regular))
+                .foregroundStyle(
+                    isSelected
+                        ? CleanCandidatesListStyle.filterChipSelectedLabel
+                        : CleanCandidatesListStyle.filterChipIdleLabel
+                )
+                .padding(.horizontal, VoleTheme.Spacing.sm)
+                .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
+                .background(
+                    isSelected
+                        ? CleanCandidatesListStyle.filterChipSelectedFill
+                        : CleanCandidatesListStyle.filterChipIdleFill
+                )
+                .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -238,14 +509,22 @@ private struct CleanCandidatesOutlineList: View {
             HStack {
                 Text("名称")
                     .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
                 Spacer()
                 Text("大小")
                     .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
             }
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
+            .listRowInsets(
+                EdgeInsets(
+                    top: CleanCandidatesListStyle.rowVerticalPadding,
+                    leading: VoleTheme.Spacing.sm,
+                    bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                    trailing: VoleTheme.Spacing.sm
+                )
+            )
 
             ForEach(groups) { group in
                 CleanCandidateGroupRow(
@@ -266,7 +545,10 @@ private struct CleanCandidatesOutlineList: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .listRowSeparatorTint(CleanCandidatesListStyle.rowSeparator)
+        .environment(\.defaultMinListRowHeight, 22)
         .background(Color.clear)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
     }
 }
 
@@ -300,49 +582,35 @@ private struct CleanCandidateGroupRow: View {
                 CleanCandidateLeafRow(entry: entry, selectedIDs: $selectedIDs)
             }
         } label: {
-            HStack(spacing: VoleTheme.Spacing.sm) {
-                Toggle("", isOn: groupBinding)
-                    .toggleStyle(.checkbox)
-                    .labelsHidden()
-
-                // 应用 logo + 名称 + 标签
-                CandidateAppLogoView(lookup: group.iconLookup, size: 22)
+            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                Toggle(isOn: groupBinding) {
+                    EmptyView()
+                }
+                .toggleStyle(VoleCircularCheckboxStyle())
 
                 Text(group.app.title)
-                    .font(VoleTheme.TypeScale.body().weight(.semibold))
+                    .font(CleanCandidatesListStyle.rowTitleFont())
                     .foregroundStyle(VoleTheme.Colors.text)
                     .lineLimit(1)
-
-                CandidateAppTagBadge(
-                    count: group.entries.count,
-                    selectedCount: selectedInGroup
-                )
 
                 Spacer(minLength: 0)
 
                 Text(group.sizeCaption(selectedIDs: selectedIDs))
-                    .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(.secondary)
+                    .font(CleanCandidatesListStyle.rowMetricFont())
+                    .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
                     .monospacedDigit()
+                    .layoutPriority(1)
             }
         }
         .listRowBackground(Color.clear)
-    }
-}
-
-private struct CandidateAppTagBadge: View {
-    let count: Int
-    let selectedCount: Int
-
-    var body: some View {
-        Text("\(selectedCount)/\(count)")
-            .font(VoleTheme.TypeScale.caption().weight(.semibold))
-            .foregroundStyle(VoleTheme.Colors.onFur)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(VoleTheme.Colors.sage.opacity(0.85))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .accessibilityLabel("已选 \(selectedCount)，共 \(count) 项")
+        .listRowInsets(
+            EdgeInsets(
+                top: CleanCandidatesListStyle.rowVerticalPadding,
+                leading: VoleTheme.Spacing.sm,
+                bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                trailing: VoleTheme.Spacing.sm
+            )
+        )
     }
 }
 
@@ -367,102 +635,143 @@ private struct CleanCandidateLeafRow: View {
 
     var body: some View {
         Toggle(isOn: binding) {
-            HStack(alignment: .firstTextBaseline, spacing: VoleTheme.Spacing.sm) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: VoleTheme.Spacing.sm) {
+            HStack(alignment: .firstTextBaseline, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                         Text(entry.label)
-                            .font(VoleTheme.TypeScale.body().weight(.semibold))
+                            .font(CleanCandidatesListStyle.rowTitleFont())
                             .foregroundStyle(VoleTheme.Colors.text)
+                            .lineLimit(1)
                         if isPrivileged {
                             Text("需 root")
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .font(.system(size: 9, weight: .medium, design: .rounded))
                                 .foregroundStyle(VoleTheme.Colors.soil)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
                                 .background(VoleTheme.Colors.molehill.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.strata))
                         }
                     }
                     Text(entry.path)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.tertiary)
+                        .font(CleanCandidatesListStyle.rowPathFont())
+                        .foregroundStyle(CleanCandidatesListStyle.pathLabel)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
-                Spacer(minLength: VoleTheme.Spacing.sm)
+                Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
                 Text(ByteFormat.string(entry.size))
-                    .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(.secondary)
+                    .font(CleanCandidatesListStyle.rowMetricFont())
+                    .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
+                    .layoutPriority(1)
             }
         }
-        .toggleStyle(.checkbox)
+        .toggleStyle(VoleCircularCheckboxStyle())
         .accessibilityLabel("\(entry.label)，\(ByteFormat.string(entry.size))")
         .accessibilityValue(selectedIDs.contains(entry.id) ? "已选" : "未选")
         .accessibilityHint(isPrivileged ? "需管理员权限，将经 root权限助手永久删除" : "移动到废纸篓")
         .listRowBackground(Color.clear)
+        .listRowInsets(
+            EdgeInsets(
+                top: CleanCandidatesListStyle.rowVerticalPadding,
+                leading: VoleTheme.Spacing.sm,
+                bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                trailing: VoleTheme.Spacing.sm
+            )
+        )
     }
 }
 
 private struct CleanCandidatesPaginationBar: View {
     let page: CandidatePageSlice
     @Binding var pageSize: Int
+    let isWide: Bool
     let onPageChange: (Int) -> Void
 
     private let pageSizeOptions = [20, 50, 100]
 
     var body: some View {
-        HStack(spacing: VoleTheme.Spacing.sm) {
-            Button {
-                onPageChange(1)
-            } label: {
-                Image(systemName: "chevron.backward.to.line")
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                pageControls
+                pageSizePicker
+                Spacer(minLength: 0)
+                rangeLabel
             }
-            .disabled(page.page <= 1)
 
-            Button {
-                onPageChange(page.page - 1)
-            } label: {
-                Image(systemName: "chevron.backward")
-            }
-            .disabled(page.page <= 1)
-
-            ForEach(visiblePageNumbers, id: \.self) { number in
-                Button("\(number)") {
-                    onPageChange(number)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                    pageControls
+                    pageSizePicker
                 }
-                .buttonStyle(.bordered)
-                .tint(number == page.page ? VoleTheme.Colors.fur : nil)
-                .disabled(number == page.page)
+                rangeLabel
             }
-
-            Button {
-                onPageChange(page.page + 1)
-            } label: {
-                Image(systemName: "chevron.forward")
-            }
-            .disabled(page.page >= page.pageCount)
-
-            Button {
-                onPageChange(page.pageCount)
-            } label: {
-                Image(systemName: "chevron.forward.to.line")
-            }
-            .disabled(page.page >= page.pageCount)
-
-            Picker("每页", selection: $pageSize) {
-                ForEach(pageSizeOptions, id: \.self) { size in
-                    Text("\(size) 项").tag(size)
-                }
-            }
-            .labelsHidden()
-            .frame(width: 96)
-
-            Spacer(minLength: 0)
-
-            Text(page.rangeDescription)
-                .font(VoleTheme.TypeScale.caption())
-                .foregroundStyle(.secondary)
         }
+        .controlSize(.small)
+    }
+
+    private var pageControls: some View {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            pageNavButton(systemName: "chevron.backward.to.line", disabled: page.page <= 1) {
+                onPageChange(1)
+            }
+            pageNavButton(systemName: "chevron.backward", disabled: page.page <= 1) {
+                onPageChange(page.page - 1)
+            }
+
+            if isWide {
+                ForEach(visiblePageNumbers, id: \.self) { number in
+                    Button("\(number)") {
+                        onPageChange(number)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(number == page.page ? CleanCandidatesListStyle.selectionFill : nil)
+                    .disabled(number == page.page)
+                }
+            } else {
+                Text("\(page.page) / \(max(page.pageCount, 1))")
+                    .font(VoleTheme.TypeScale.caption())
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
+                    .monospacedDigit()
+                    .frame(minWidth: 40)
+            }
+
+            pageNavButton(systemName: "chevron.forward", disabled: page.page >= page.pageCount) {
+                onPageChange(page.page + 1)
+            }
+            pageNavButton(systemName: "chevron.forward.to.line", disabled: page.page >= page.pageCount) {
+                onPageChange(page.pageCount)
+            }
+        }
+    }
+
+    private func pageNavButton(
+        systemName: String,
+        disabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+        }
+        .buttonStyle(.bordered)
+        .disabled(disabled)
+    }
+
+    private var pageSizePicker: some View {
+        Picker("每页", selection: $pageSize) {
+            ForEach(pageSizeOptions, id: \.self) { size in
+                Text("\(size) 项").tag(size)
+            }
+        }
+        .labelsHidden()
+        .frame(width: 88)
+    }
+
+    private var rangeLabel: some View {
+        Text(page.rangeDescription)
+            .font(VoleTheme.TypeScale.caption())
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.85)
     }
 
     private var visiblePageNumbers: [Int] {
@@ -476,10 +785,30 @@ private struct CleanCandidatesPaginationBar: View {
 
 private struct CleanCandidatesFooter: View {
     let canClean: Bool
+    let isWide: Bool
     let onRescan: () -> Void
     let onClean: () -> Void
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: VoleTheme.Spacing.md) {
+                actionButtons
+                Spacer(minLength: 0)
+                if isWide {
+                    hintLabel
+                }
+            }
+
+            VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+                actionButtons
+                if isWide {
+                    hintLabel
+                }
+            }
+        }
+    }
+
+    private var actionButtons: some View {
         HStack(spacing: VoleTheme.Spacing.md) {
             Button("重新扫描", action: onRescan)
             Button("清理到废纸篓", action: onClean)
@@ -487,10 +816,12 @@ private struct CleanCandidatesFooter: View {
                 .tint(VoleTheme.Colors.soil)
                 .keyboardShortcut(.defaultAction)
                 .disabled(!canClean)
-            Spacer()
-            Text("Enter · 默认动作")
-                .font(VoleTheme.TypeScale.caption())
-                .foregroundStyle(.tertiary)
         }
+    }
+
+    private var hintLabel: some View {
+        Text("Enter · 默认动作")
+            .font(VoleTheme.TypeScale.caption())
+            .foregroundStyle(.tertiary)
     }
 }
