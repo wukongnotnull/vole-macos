@@ -45,3 +45,94 @@ notary_profile_ok() {
   fi
   return 1
 }
+
+
+# Nested Mach-Os must have Hardened Runtime for notarization (Apple common issue #3087724).
+# Xcode exportArchive signs Contents/MacOS/vole-cli (copied sidecar) without --options runtime.
+macho_has_hardened_runtime() {
+  local bin="$1"
+  local out
+  # Capture first: with pipefail, `grep -q` closing the pipe early makes codesign SIGPIPE (141).
+  out="$(codesign -dv --verbose=4 "$bin" 2>&1 || true)"
+  printf '%s
+' "$out" | grep -Eq 'flags=0x[0-9a-f]+\([^)]*runtime'
+}
+
+list_app_machos() {
+  local app="$1"
+  local macos="$app/Contents/MacOS"
+  [[ -d "$macos" ]] || return 0
+  find "$macos" -type f -perm +111 2>/dev/null || true
+}
+
+# Re-sign vole-cli with hardened runtime, then re-seal the outer .app (preserve entitlements).
+ensure_nested_hardened_runtime() {
+  local app="$1"
+  local sidecar="$app/Contents/MacOS/vole-cli"
+  local ent
+  local bin
+
+  [[ -d "$app" ]] || { echo "ensure_nested_hardened_runtime: missing app: $app" >&2; return 2; }
+  [[ -x "$sidecar" ]] || { echo "ensure_nested_hardened_runtime: missing sidecar: $sidecar" >&2; return 2; }
+
+  local resigned=0
+  if ! macho_has_hardened_runtime "$sidecar"; then
+    echo "==> codesign sidecar with hardened runtime: $sidecar"
+    codesign --force --options runtime --timestamp --sign "$IDENTITY" "$sidecar"
+    resigned=1
+  else
+    echo "OK: sidecar already has hardened runtime"
+  fi
+
+  if [[ "$resigned" -eq 0 ]] && codesign --verify --deep --strict "$app" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Outer app seal must be refreshed after nested re-sign.
+  # Export as XML (`:-`); raw blob path form is not accepted by codesign --entitlements on re-sign.
+  ent="$(mktemp -t vole-macos-ent.XXXXXX).plist"
+  if ! codesign -d --entitlements :- "$app" >"$ent" 2>/dev/null; then
+    rm -f "$ent"
+    echo "ensure_nested_hardened_runtime: failed to read entitlements from $app" >&2
+    return 1
+  fi
+  if [[ ! -s "$ent" ]]; then
+    # No entitlements blob — still re-seal without --entitlements.
+    rm -f "$ent"
+    ent=""
+  fi
+  echo "==> re-seal app with hardened runtime: $app"
+  if [[ -n "$ent" ]]; then
+    codesign --force --options runtime --timestamp --entitlements "$ent" --sign "$IDENTITY" "$app"
+    rm -f "$ent"
+  else
+    codesign --force --options runtime --timestamp --sign "$IDENTITY" "$app"
+  fi
+
+  codesign --verify --deep --strict --verbose=2 "$app"
+}
+
+require_app_hardened_runtime() {
+  local app="$1"
+  local bin
+  local failed=0
+
+  [[ -d "$app" ]] || { echo "require_app_hardened_runtime: missing $app" >&2; return 2; }
+
+  while IFS= read -r bin; do
+    [[ -n "$bin" ]] || continue
+    if macho_has_hardened_runtime "$bin"; then
+      echo "OK: hardened runtime — $bin"
+    else
+      echo "FAIL: missing hardened runtime — $bin" >&2
+      failed=1
+    fi
+  done < <(list_app_machos "$app")
+
+  if [[ "$failed" -ne 0 ]]; then
+    echo "公证前须对嵌套可执行文件启用 Hardened Runtime（codesign --options runtime）。" >&2
+    echo "  重新导出: bash scripts/archive-and-export.sh" >&2
+    return 1
+  fi
+  return 0
+}

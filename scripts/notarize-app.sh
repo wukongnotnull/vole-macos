@@ -70,8 +70,11 @@ if [[ "$CAN_NOTARY" -eq 0 ]]; then
   exit 3
 fi
 
+echo "==> require hardened runtime on all nested Mach-Os"
+require_app_hardened_runtime "$APP"
+
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
-  echo "OK: --check-only (app present + notary credentials usable)"
+  echo "OK: --check-only (app present + notary credentials + hardened runtime)"
   exit 0
 fi
 

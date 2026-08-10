@@ -65,6 +65,14 @@ bash scripts/archive-and-export.sh
 bash scripts/notarize-app.sh
 ```
 
+## 5.1 Hardened Runtime（`vole-cli` sidecar）
+
+Apple 公证要求 bundle 内**每个**可执行文件启用 Hardened Runtime。App / Helper 由 Xcode `ENABLE_HARDENED_RUNTIME=YES` 覆盖；`Contents/MacOS/vole-cli` 由 `embed-vole.sh` 拷贝进来，`exportArchive` 对其签名时**不会**自动带 `--options runtime`，会导致 notary `Invalid`：
+
+> The executable does not have the hardened runtime enabled. (`…/Contents/MacOS/vole-cli`)
+
+缓解：`archive-and-export.sh` 在 export 后调用 `ensure_nested_hardened_runtime`（sidecar → 再密封外层 `.app`）；`notarize-app.sh` 在 submit 前 `require_app_hardened_runtime` 失败即退出。
+
 ## 6. 沙箱与失败语义
 
 - `HOME` 落在 `/var/folders/…`（Cursor 沙箱）时打印 WARN，指引改用终端.app。

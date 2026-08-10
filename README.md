@@ -49,6 +49,7 @@ Documents/vole-macos
 | 项 | 状态 |
 |---|---|
 | Hardened Runtime（App + Helper） | 已启用（`ENABLE_HARDENED_RUNTIME=YES`） |
+| Hardened Runtime（`vole-cli` sidecar） | `archive-and-export.sh` 在 export 后以 `--options runtime` 重签；`notarize-app.sh` 提交前校验 |
 | Developer ID Application 签名 | `Developer ID Application: Kong Wu (WCYC8XY4V2)`（Team `WCYC8XY4V2`） |
 | 公证（notarytool） | 复用兄弟仓 `vole` 的 keychain profile **`vole-notary`**（一次配置，两仓共用） |
 
