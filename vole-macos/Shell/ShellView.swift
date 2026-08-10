@@ -42,6 +42,8 @@ struct ShellView: View {
 
     private let sidebarWidth: CGFloat = 148
     private let sidebarGutter: CGFloat = VoleTheme.Spacing.xs
+    /// Keep detail chrome below the transparent titlebar (sidebar still draws under traffic lights).
+    private let titlebarClearance: CGFloat = 28
     private var sidebarColumnWidth: CGFloat { sidebarWidth + sidebarGutter * 2 }
 
     private var sidebarMascotActivity: MascotActivity {
@@ -74,9 +76,9 @@ struct ShellView: View {
                 .background(VoleTheme.Colors.canvas)
 
             detailView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .padding(.trailing, sidebarGutter)
-                .padding(.top, sidebarGutter)
+                .padding(.top, titlebarClearance)
                 .padding(.bottom, sidebarGutter)
                 .background(VoleTheme.Colors.canvas)
         }

@@ -21,4 +21,17 @@ final class CleanCandidatesViewTests: XCTestCase {
         XCTAssertEqual(strataFraction(entries: [a, b], selectedIDs: []), 0.0, accuracy: 0.001)
         XCTAssertEqual(strataFraction(entries: [], selectedIDs: []), 0.0, accuracy: 0.001)
     }
+
+    func test_layoutMetrics_resolveBreakpoints() {
+        let wideTall = CleanCandidatesLayoutMetrics.resolve(width: 800, height: 700)
+        XCTAssertTrue(wideTall.isWide)
+        XCTAssertTrue(wideTall.isTall)
+        XCTAssertEqual(wideTall.contentPadding, VoleTheme.Spacing.xl)
+
+        let narrowShort = CleanCandidatesLayoutMetrics.resolve(width: 500, height: 400)
+        XCTAssertFalse(narrowShort.isWide)
+        XCTAssertFalse(narrowShort.isTall)
+        XCTAssertEqual(narrowShort.contentPadding, VoleTheme.Spacing.md)
+        XCTAssertEqual(narrowShort.sectionSpacing, VoleTheme.Spacing.sm)
+    }
 }
