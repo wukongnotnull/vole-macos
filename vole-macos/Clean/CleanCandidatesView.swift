@@ -337,7 +337,7 @@ private struct CleanCandidatesFilterBar: View {
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: VoleTheme.Spacing.sm) {
+            HStack(alignment: .center, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 CleanCandidatesSearchField(text: $searchText)
                     .frame(minWidth: 120, maxWidth: .infinity)
                 CleanCandidatesFilterControls(
@@ -347,7 +347,7 @@ private struct CleanCandidatesFilterBar: View {
                 )
             }
 
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 CleanCandidatesSearchField(text: $searchText)
                 CleanCandidatesFilterControls(
                     sizeFilter: $sizeFilter,
@@ -356,6 +356,7 @@ private struct CleanCandidatesFilterBar: View {
                 )
             }
         }
+        .controlSize(.small)
     }
 }
 
@@ -363,14 +364,16 @@ private struct CleanCandidatesSearchField: View {
     @Binding var text: String
 
     var body: some View {
-        HStack(spacing: VoleTheme.Spacing.sm) {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
             Image(systemName: "magnifyingglass")
+                .font(.system(size: 11))
                 .foregroundStyle(.secondary)
             TextField("搜索文件或路径", text: $text)
+                .font(VoleTheme.TypeScale.caption())
                 .textFieldStyle(.plain)
         }
-        .padding(.horizontal, VoleTheme.Spacing.md)
-        .padding(.vertical, VoleTheme.Spacing.sm)
+        .padding(.horizontal, CleanCandidatesListStyle.searchFieldHorizontalPadding)
+        .padding(.vertical, CleanCandidatesListStyle.searchFieldVerticalPadding)
         .background(CleanCandidatesListStyle.searchFieldFill)
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
     }
@@ -382,7 +385,7 @@ private struct CleanCandidatesFilterControls: View {
     let compactSizePicker: Bool
 
     var body: some View {
-        HStack(spacing: VoleTheme.Spacing.sm) {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
             if compactSizePicker {
                 Picker("大小", selection: $sizeFilter) {
                     ForEach(CandidateSizeFilter.allCases) { filter in
@@ -417,7 +420,7 @@ private struct CleanCandidatesFilterControls: View {
                 .font(VoleTheme.TypeScale.caption())
                 .foregroundStyle(CleanCandidatesListStyle.filterChipIdleLabel)
                 .padding(.horizontal, VoleTheme.Spacing.sm)
-                .padding(.vertical, 6)
+                .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
                 .background(CleanCandidatesListStyle.sortChipFill)
                 .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
                 .fixedSize()
@@ -433,14 +436,14 @@ private struct CleanCandidatesSizeChip: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(VoleTheme.TypeScale.caption().weight(isSelected ? .semibold : .regular))
+                .font(VoleTheme.TypeScale.caption().weight(isSelected ? .medium : .regular))
                 .foregroundStyle(
                     isSelected
                         ? CleanCandidatesListStyle.filterChipSelectedLabel
                         : CleanCandidatesListStyle.filterChipIdleLabel
                 )
                 .padding(.horizontal, VoleTheme.Spacing.sm)
-                .padding(.vertical, 6)
+                .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
                 .background(
                     isSelected
                         ? CleanCandidatesListStyle.filterChipSelectedFill
@@ -500,6 +503,7 @@ private struct CleanCandidatesOutlineList: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .listRowSeparatorTint(CleanCandidatesListStyle.rowSeparator)
+        .environment(\.defaultMinListRowHeight, 22)
         .background(Color.clear)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
     }
@@ -535,21 +539,21 @@ private struct CleanCandidateGroupRow: View {
                 CleanCandidateLeafRow(entry: entry, selectedIDs: $selectedIDs)
             }
         } label: {
-            HStack(spacing: VoleTheme.Spacing.sm) {
+            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 Toggle(isOn: groupBinding) {
                     EmptyView()
                 }
                 .toggleStyle(VoleCircularCheckboxStyle())
 
                 Text(group.app.title)
-                    .font(VoleTheme.TypeScale.body().weight(.semibold))
+                    .font(CleanCandidatesListStyle.rowTitleFont())
                     .foregroundStyle(VoleTheme.Colors.text)
                     .lineLimit(1)
 
                 Spacer(minLength: 0)
 
                 Text(group.sizeCaption(selectedIDs: selectedIDs))
-                    .font(VoleTheme.TypeScale.metric())
+                    .font(CleanCandidatesListStyle.rowMetricFont())
                     .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
                     .monospacedDigit()
                     .layoutPriority(1)
@@ -588,32 +592,32 @@ private struct CleanCandidateLeafRow: View {
 
     var body: some View {
         Toggle(isOn: binding) {
-            HStack(alignment: .firstTextBaseline, spacing: VoleTheme.Spacing.sm) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: VoleTheme.Spacing.sm) {
+            HStack(alignment: .firstTextBaseline, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                         Text(entry.label)
-                            .font(VoleTheme.TypeScale.body().weight(.semibold))
+                            .font(CleanCandidatesListStyle.rowTitleFont())
                             .foregroundStyle(VoleTheme.Colors.text)
                             .lineLimit(1)
                         if isPrivileged {
                             Text("需 root")
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .font(.system(size: 9, weight: .medium, design: .rounded))
                                 .foregroundStyle(VoleTheme.Colors.soil)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
                                 .background(VoleTheme.Colors.molehill.opacity(0.5))
                                 .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.strata))
                         }
                     }
                     Text(entry.path)
-                        .font(VoleTheme.TypeScale.caption().monospaced())
+                        .font(CleanCandidatesListStyle.rowPathFont())
                         .foregroundStyle(CleanCandidatesListStyle.pathLabel)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
-                Spacer(minLength: VoleTheme.Spacing.sm)
+                Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
                 Text(ByteFormat.string(entry.size))
-                    .font(VoleTheme.TypeScale.metric())
+                    .font(CleanCandidatesListStyle.rowMetricFont())
                     .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
                     .layoutPriority(1)
             }
@@ -644,25 +648,26 @@ private struct CleanCandidatesPaginationBar: View {
 
     var body: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(spacing: VoleTheme.Spacing.sm) {
+            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 pageControls
                 pageSizePicker
                 Spacer(minLength: 0)
                 rangeLabel
             }
 
-            VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
-                HStack(spacing: VoleTheme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                     pageControls
                     pageSizePicker
                 }
                 rangeLabel
             }
         }
+        .controlSize(.small)
     }
 
     private var pageControls: some View {
-        HStack(spacing: VoleTheme.Spacing.sm) {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
             pageNavButton(systemName: "chevron.backward.to.line", disabled: page.page <= 1) {
                 onPageChange(1)
             }
@@ -684,7 +689,7 @@ private struct CleanCandidatesPaginationBar: View {
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
                     .monospacedDigit()
-                    .frame(minWidth: 44)
+                    .frame(minWidth: 40)
             }
 
             pageNavButton(systemName: "chevron.forward", disabled: page.page >= page.pageCount) {
@@ -715,7 +720,7 @@ private struct CleanCandidatesPaginationBar: View {
             }
         }
         .labelsHidden()
-        .frame(width: 96)
+        .frame(width: 88)
     }
 
     private var rangeLabel: some View {

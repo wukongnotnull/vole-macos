@@ -14,6 +14,13 @@ final class CleanCandidatesViewTests: XCTestCase {
         VolePlanEntry(id: id, path: "/p/\(id)", label: id.uppercased(), size: size, ruleID: "r", skipReason: nil, dev: 0, ino: 0, mtime: 0)
     }
 
+    func test_listStyle_denseRowChrome() {
+        XCTAssertEqual(CleanCandidatesListStyle.rowVerticalPadding, 3)
+        XCTAssertEqual(CleanCandidatesListStyle.checkboxSize, 14)
+        XCTAssertEqual(CleanCandidatesListStyle.chromeControlSpacing, VoleTheme.Spacing.xs)
+        XCTAssertEqual(CleanCandidatesListStyle.chipVerticalPadding, 4)
+    }
+
     func test_listStyle_selectionAndFilterUseFurBrandAccent() {
         let selection = components(CleanCandidatesListStyle.selectionFill)
         let filterSelected = components(CleanCandidatesListStyle.filterChipSelectedFill)

@@ -13,8 +13,19 @@ enum CleanCandidatesListStyle {
     static var columnHeaderLabel: some ShapeStyle { .secondary }
     static var sizeLabel: some ShapeStyle { .secondary }
     static var pathLabel: some ShapeStyle { .tertiary }
-    static let checkboxSize: CGFloat = 16
-    static let rowVerticalPadding: CGFloat = VoleTheme.Spacing.sm
+    static let checkboxSize: CGFloat = 14
+    /// Dense list row insets (vertical).
+    static let rowVerticalPadding: CGFloat = 3
+    /// Row primary label — regular, smaller than body.
+    static func rowTitleFont() -> Font { .system(size: 12, weight: .regular, design: .default) }
+    /// Row size column — regular tabular.
+    static func rowMetricFont() -> Font { .system(size: 11, weight: .regular, design: .monospaced) }
+    /// Secondary path under leaf title.
+    static func rowPathFont() -> Font { .system(size: 10, weight: .regular, design: .monospaced) }
+    static let chromeControlSpacing: CGFloat = VoleTheme.Spacing.xs
+    static let searchFieldHorizontalPadding: CGFloat = VoleTheme.Spacing.sm
+    static let searchFieldVerticalPadding: CGFloat = VoleTheme.Spacing.xs
+    static let chipVerticalPadding: CGFloat = 4
 }
 
 /// Circular checkbox using Fur brand accent (not system blue).
@@ -23,7 +34,7 @@ struct VoleCircularCheckboxStyle: ToggleStyle {
         Button {
             configuration.isOn.toggle()
         } label: {
-            HStack(alignment: .firstTextBaseline, spacing: VoleTheme.Spacing.sm) {
+            HStack(alignment: .firstTextBaseline, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 ZStack {
                     Circle()
                         .strokeBorder(
@@ -46,11 +57,11 @@ struct VoleCircularCheckboxStyle: ToggleStyle {
 
                     if configuration.isOn {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.system(size: 8, weight: .bold))
                             .foregroundStyle(CleanCandidatesListStyle.filterChipSelectedLabel)
                     }
                 }
-                .frame(width: 22, height: 22)
+                .frame(width: 18, height: 18)
 
                 configuration.label
             }
