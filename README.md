@@ -68,15 +68,16 @@ bash scripts/check-signing.sh   # 应见 OK: notary profile 'vole-notary'
 
 细节见 [`../vole/docs/findings/2026-07-phase5-signing.md`](../vole/docs/findings/2026-07-phase5-signing.md)。可选：`cp scripts/signing.env.example scripts/signing.env`（本仓 gitignore）。
 
-#### 本机 Archive → Notarize → Staple
+#### 本机 Archive → Notarize → Staple → DMG
 
-无凭据时脚本会清晰退出，**不会**向 Apple submit（CI 也不应要求真实公证）。
+无凭据时本机脚本会清晰退出，**不会**向 Apple submit。`dist/` 已 gitignore，勿提交构建产物。
 
 ```bash
 # 在终端.app 中，于 vole-macos 根目录：
 bash scripts/check-signing.sh
 bash scripts/archive-and-export.sh          # → dist/Vole.app
 bash scripts/notarize-app.sh                # zip → notarytool → staple → spctl
+bash scripts/package-dmg.sh                 # → dist/Vole-<version>.dmg（须已 staple）
 ```
 
 仅检查、不提交：
@@ -86,6 +87,40 @@ bash scripts/archive-and-export.sh --check-only
 bash scripts/notarize-app.sh --check-only   # 无 profile 时 exit 3
 ```
 
+未 staple 时 `package-dmg.sh` 默认失败；调试可设 `VOLE_DMG_ALLOW_UNSTAPLED=1`（勿用于正式发布）。
+
+设计说明：[`docs/wukong-code/specs/2026-08-10-2315-macos-dmg-ci-release-design.md`](docs/wukong-code/specs/2026-08-10-2315-macos-dmg-ci-release-design.md)。
+
+#### CI Release（tag → GitHub Release）
+
+标签约定与兄弟仓 `vole` 相同：`v0.1.0`（`v` + semver）。Push tag 后 `.github/workflows/release.yml` 会：
+
+1. Checkout 本仓 + `wukongnotnull/vole`（sidecar）
+2. 导入 Developer ID 证书
+3. `archive-and-export` → `notarize-app` → `package-dmg`
+4. 上传 `Vole-<version>.dmg`、`Vole-<version>.zip`、`SHA256SUMS`
+
+```bash
+# 先配置 GitHub secrets（终端.app，勿提交证书）：
+bash scripts/setup-ci-secrets.sh
+
+# 确认 MARKETING_VERSION 与 tag 一致后：
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+所需 GitHub Secrets：
+
+| Secret | 说明 |
+|---|---|
+| `VOLE_CODESIGN_IDENTITY` | 如 `Developer ID Application: Kong Wu (WCYC8XY4V2)` |
+| `APPLE_CERTIFICATE_BASE64` | Developer ID `.p12` 的 base64 |
+| `APPLE_CERTIFICATE_PASSWORD` | p12 导出密码 |
+| `APPLE_API_KEY_BASE64` | App Store Connect API `.p8` 的 base64（与 `vole-notary` 同源） |
+| `APPLE_API_KEY_ID` | Key ID |
+| `APPLE_API_ISSUER_ID` | Issuer UUID |
+
+缺任一 secret 时 release job **失败**（不上传半成品）。勿提交：`dist/`、`scripts/signing.env`、`*.p12`、`AuthKey_*.p8`。
 ### 真机批准流验收（人工）
 
 1. `VOLE_SRC=…/vole xcodebuild -scheme vole-macos -configuration Debug build`
