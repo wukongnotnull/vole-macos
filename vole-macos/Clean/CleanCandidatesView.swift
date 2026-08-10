@@ -305,18 +305,10 @@ private struct CleanCandidateGroupRow: View {
                     .toggleStyle(.checkbox)
                     .labelsHidden()
 
-                // 应用 logo + 名称 + 标签
-                CandidateAppLogoView(lookup: group.iconLookup, size: 22)
-
                 Text(group.app.title)
                     .font(VoleTheme.TypeScale.body().weight(.semibold))
                     .foregroundStyle(VoleTheme.Colors.text)
                     .lineLimit(1)
-
-                CandidateAppTagBadge(
-                    count: group.entries.count,
-                    selectedCount: selectedInGroup
-                )
 
                 Spacer(minLength: 0)
 
@@ -327,22 +319,6 @@ private struct CleanCandidateGroupRow: View {
             }
         }
         .listRowBackground(Color.clear)
-    }
-}
-
-private struct CandidateAppTagBadge: View {
-    let count: Int
-    let selectedCount: Int
-
-    var body: some View {
-        Text("\(selectedCount)/\(count)")
-            .font(VoleTheme.TypeScale.caption().weight(.semibold))
-            .foregroundStyle(VoleTheme.Colors.onFur)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(VoleTheme.Colors.sage.opacity(0.85))
-            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            .accessibilityLabel("已选 \(selectedCount)，共 \(count) 项")
     }
 }
 
