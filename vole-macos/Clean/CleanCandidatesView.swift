@@ -99,8 +99,6 @@ struct CleanCandidatesView: View {
                     selectedCount: session.selectedIDs.count,
                     totalCount: session.entries.count,
                     selectedBytes: selectedBytes,
-                    isWide: layout.isWide,
-                    isTall: layout.isTall,
                     showsEyebrow: layout.showsEyebrow,
                     onSelectAll: { session.selectedIDs = Set(session.entries.map(\.id)) },
                     onSelectNone: { session.selectedIDs = [] }
@@ -203,80 +201,142 @@ private struct CleanCandidatesHeader: View {
     let selectedCount: Int
     let totalCount: Int
     let selectedBytes: UInt64
-    let isWide: Bool
-    let isTall: Bool
     let showsEyebrow: Bool
     let onSelectAll: () -> Void
     let onSelectNone: () -> Void
 
     var body: some View {
-        if isTall {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+        // Command-strip (option 3): top = eyebrow + actions; bottom = title/count + size.
+        ViewThatFits(in: .horizontal) {
+            CleanCandidatesHeaderCommandStrip(
+                selectedCount: selectedCount,
+                totalCount: totalCount,
+                selectedBytes: selectedBytes,
+                showsEyebrow: showsEyebrow,
+                sizeTrailing: true,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+
+            CleanCandidatesHeaderCommandStrip(
+                selectedCount: selectedCount,
+                totalCount: totalCount,
+                selectedBytes: selectedBytes,
+                showsEyebrow: showsEyebrow,
+                sizeTrailing: false,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderCommandStrip: View {
+    let selectedCount: Int
+    let totalCount: Int
+    let selectedBytes: UInt64
+    let showsEyebrow: Bool
+    let sizeTrailing: Bool
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerCommandStripSpacing) {
+            CleanCandidatesHeaderTopRow(
+                showsEyebrow: showsEyebrow,
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+
+            if sizeTrailing {
+                HStack(alignment: .firstTextBaseline, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
-                        totalCount: totalCount,
-                        showEyebrow: showsEyebrow
+                        totalCount: totalCount
                     )
                     Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
-                    CleanCandidatesHeaderMetrics(
+                    CleanCandidatesHeaderSizeMetric(
                         selectedBytes: selectedBytes,
-                        alignTrailing: true,
-                        showSizeCaption: true,
-                        onSelectAll: onSelectAll,
-                        onSelectNone: onSelectNone
+                        alignTrailing: true
                     )
                 }
-
-                VStack(alignment: .leading, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            } else {
+                VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerCommandStripSpacing) {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
-                        totalCount: totalCount,
-                        showEyebrow: showsEyebrow
+                        totalCount: totalCount
                     )
-                    CleanCandidatesHeaderMetrics(
+                    CleanCandidatesHeaderSizeMetric(
                         selectedBytes: selectedBytes,
-                        alignTrailing: false,
-                        showSizeCaption: true,
-                        onSelectAll: onSelectAll,
-                        onSelectNone: onSelectNone
+                        alignTrailing: false
                     )
-                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-        } else {
-            // Short window: keep brand eyebrow; drop size caption only.
-            HStack(alignment: .top, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
-                CleanCandidatesHeaderTitle(
-                    selectedCount: selectedCount,
-                    totalCount: totalCount,
-                    showEyebrow: showsEyebrow
-                )
-                Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
-                CleanCandidatesHeaderMetrics(
-                    selectedBytes: selectedBytes,
-                    alignTrailing: isWide,
-                    showSizeCaption: false,
-                    onSelectAll: onSelectAll,
-                    onSelectNone: onSelectNone
-                )
-            }
         }
+    }
+}
+
+private struct CleanCandidatesHeaderTopRow: View {
+    let showsEyebrow: Bool
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        HStack(alignment: .center, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            if showsEyebrow {
+                Text("Candidates · 候选")
+                    .font(CleanCandidatesListStyle.headerEyebrowFont())
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
+            CleanCandidatesHeaderActions(
+                onSelectAll: onSelectAll,
+                onSelectNone: onSelectNone
+            )
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderActions: View {
+    let onSelectAll: () -> Void
+    let onSelectNone: () -> Void
+
+    var body: some View {
+        HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
+            CleanCandidatesHeaderActionButton(title: "全选", action: onSelectAll)
+            CleanCandidatesHeaderActionButton(title: "全不选", action: onSelectNone)
+        }
+    }
+}
+
+private struct CleanCandidatesHeaderActionButton: View {
+    let title: LocalizedStringKey
+    let action: () -> Void
+
+    var body: some View {
+        Button(title, action: action)
+            .font(VoleTheme.TypeScale.caption())
+            .foregroundStyle(VoleTheme.Colors.text)
+            .padding(.horizontal, VoleTheme.Spacing.sm)
+            .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: CleanCandidatesListStyle.headerActionCornerRadius, style: .continuous)
+                    .strokeBorder(
+                        VoleTheme.Colors.molehill,
+                        lineWidth: CleanCandidatesListStyle.headerActionBorderWidth
+                    )
+            )
+            .buttonStyle(.plain)
+            .controlSize(.small)
     }
 }
 
 private struct CleanCandidatesHeaderTitle: View {
     let selectedCount: Int
     let totalCount: Int
-    let showEyebrow: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
-            if showEyebrow {
-                Text("Candidates · 候选")
-                    .font(CleanCandidatesListStyle.headerEyebrowFont())
-                    .foregroundStyle(.secondary)
-            }
             Text("挑要清掉的")
                 .font(CleanCandidatesListStyle.headerTitleFont())
                 .foregroundStyle(VoleTheme.Colors.text)
@@ -290,27 +350,19 @@ private struct CleanCandidatesHeaderTitle: View {
     }
 }
 
-private struct CleanCandidatesHeaderMetrics: View {
+private struct CleanCandidatesHeaderSizeMetric: View {
     let selectedBytes: UInt64
     let alignTrailing: Bool
-    let showSizeCaption: Bool
-    let onSelectAll: () -> Void
-    let onSelectNone: () -> Void
 
     var body: some View {
         VStack(alignment: alignTrailing ? .trailing : .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
-            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
-                Button("全选", action: onSelectAll)
-                Button("全不选", action: onSelectNone)
-            }
-            .controlSize(.small)
             Text(ByteFormat.string(selectedBytes))
                 .font(CleanCandidatesListStyle.headerMetricFont())
                 .foregroundStyle(VoleTheme.Colors.text)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-            if showSizeCaption {
+            if CleanCandidatesListStyle.headerAlwaysShowsSizeCaption {
                 Text("已选大小")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)

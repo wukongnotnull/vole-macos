@@ -22,6 +22,16 @@ final class CleanCandidatesViewTests: XCTestCase {
         XCTAssertEqual(CleanCandidatesListStyle.headerStackSpacing, 2)
     }
 
+    /// Command-strip header (option 3): eyebrow+actions on top row; title/count + size on bottom.
+    func test_listStyle_commandStripHeaderChrome() {
+        XCTAssertEqual(CleanCandidatesListStyle.headerCommandStripSpacing, VoleTheme.Spacing.sm)
+        XCTAssertEqual(CleanCandidatesListStyle.headerTitleSize, 15)
+        XCTAssertEqual(CleanCandidatesListStyle.headerMetricSize, 15)
+        XCTAssertEqual(CleanCandidatesListStyle.headerActionBorderWidth, 1)
+        XCTAssertEqual(CleanCandidatesListStyle.headerActionCornerRadius, VoleTheme.Radius.control)
+        XCTAssertTrue(CleanCandidatesListStyle.headerAlwaysShowsSizeCaption)
+    }
+
     func test_listStyle_selectionAndFilterUseFurBrandAccent() {
         let selection = components(CleanCandidatesListStyle.selectionFill)
         let filterSelected = components(CleanCandidatesListStyle.filterChipSelectedFill)

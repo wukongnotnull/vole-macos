@@ -24,11 +24,25 @@ enum CleanCandidatesListStyle {
     static func rowPathFont() -> Font { .system(size: 10, weight: .regular, design: .monospaced) }
     /// Header eyebrow — matches caption density.
     static func headerEyebrowFont() -> Font { .system(size: 10, weight: .regular, design: .rounded) }
-    /// Header title — slightly above row title, regular weight.
-    static func headerTitleFont() -> Font { .system(size: 13, weight: .regular, design: .rounded) }
-    /// Header selected-bytes figure — same weight family as row metrics.
-    static func headerMetricFont() -> Font { .system(size: 13, weight: .regular, design: .monospaced) }
+    /// Command-strip title size (stronger than dense row title).
+    static let headerTitleSize: CGFloat = 15
+    /// Command-strip selected-bytes figure size.
+    static let headerMetricSize: CGFloat = 15
+    /// Header title — semibold rounded, baseline-paired with size metric.
+    static func headerTitleFont() -> Font {
+        .system(size: headerTitleSize, weight: .semibold, design: .rounded)
+    }
+    /// Header selected-bytes figure — tabular monospace, matches title weight.
+    static func headerMetricFont() -> Font {
+        .system(size: headerMetricSize, weight: .semibold, design: .monospaced)
+    }
     static let headerStackSpacing: CGFloat = 2
+    /// Vertical gap between command-strip top row (eyebrow/actions) and bottom row (title/size).
+    static let headerCommandStripSpacing: CGFloat = VoleTheme.Spacing.sm
+    static let headerActionBorderWidth: CGFloat = 1
+    static let headerActionCornerRadius: CGFloat = VoleTheme.Radius.control
+    /// Option 3 always keeps the "已选大小" caption under the figure.
+    static let headerAlwaysShowsSizeCaption = true
     static let chromeControlSpacing: CGFloat = VoleTheme.Spacing.xs
     static let searchFieldHorizontalPadding: CGFloat = VoleTheme.Spacing.sm
     static let searchFieldVerticalPadding: CGFloat = VoleTheme.Spacing.xs
