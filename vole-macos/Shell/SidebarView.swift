@@ -9,22 +9,32 @@ struct SidebarView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
             brandHeader
-            moduleList
-                .padding(.horizontal, VoleTheme.Spacing.sm)
-            Spacer(minLength: VoleTheme.Spacing.md)
-            SidebarRootHelperRow(model: helperStatus)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(VoleTheme.Colors.onInk.opacity(0.08))
-                        .frame(height: 1)
-                }
-            moreRow
-                .padding(.horizontal, VoleTheme.Spacing.sm)
+
+            // Nav scrolls when the window is short; footer (root + 设置) stays pinned.
+            ScrollView(.vertical, showsIndicators: false) {
+                moduleList
+                    .padding(.horizontal, VoleTheme.Spacing.sm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(minHeight: 0, maxHeight: .infinity)
+
+            VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+                SidebarRootHelperRow(model: helperStatus)
+                    .overlay(alignment: .top) {
+                        Rectangle()
+                            .fill(VoleTheme.Colors.onInk.opacity(0.08))
+                            .frame(height: 1)
+                    }
+                moreRow
+                    .padding(.horizontal, VoleTheme.Spacing.sm)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1)
         }
         // Top inset clears floating traffic lights.
         .padding(.top, 36)
         .padding(.bottom, VoleTheme.Spacing.md)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         .background(
             LinearGradient(
                 colors: [VoleTheme.Colors.inkSun, VoleTheme.Colors.ink],
