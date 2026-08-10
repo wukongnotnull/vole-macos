@@ -97,6 +97,10 @@ if [[ ! -d "$APP" ]]; then
   exit 2
 fi
 
+echo "==> ensure nested hardened runtime (vole-cli sidecar)"
+ensure_nested_hardened_runtime "$APP"
+require_app_hardened_runtime "$APP"
+
 echo "==> codesign verify"
 codesign --verify --deep --strict --verbose=2 "$APP"
 echo "OK: exported $APP"
