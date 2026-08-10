@@ -27,11 +27,36 @@ Options:
 
 Env:
   VOLE_SRC                  Sibling vole source (for embed build phase)
+  VOLE_CODESIGN_IDENTITY    Developer ID Application identity
+                            (default: Developer ID Application: Kong Wu (WCYC8XY4V2))
   VOLE_ARCHIVE_PATH         Default: build/Vole.xcarchive
   VOLE_EXPORT_PATH          Default: dist
   VOLE_MACOS_SCHEME         Default: vole-macos
   VOLE_MACOS_CONFIGURATION  Default: Release
 EOF
+}
+
+identity_available() {
+  if security find-identity -v -p codesigning 2>/dev/null | grep -qF "$IDENTITY"; then
+    return 0
+  fi
+  if [[ -f "${LOGIN_KEYCHAIN:-}" ]] \
+    && security find-identity -v -p codesigning "$LOGIN_KEYCHAIN" 2>/dev/null \
+      | grep -qF "$IDENTITY"; then
+    return 0
+  fi
+  return 1
+}
+
+require_identity() {
+  if identity_available; then
+    return 0
+  fi
+  echo "FAIL: signing identity not found: $IDENTITY" >&2
+  echo "      Archive/export requires Developer ID Application (not Mac Development)." >&2
+  echo "      Import the cert into the keychain, or set VOLE_CODESIGN_IDENTITY." >&2
+  echo "      Run: bash scripts/check-signing.sh  (use Terminal.app)" >&2
+  exit 1
 }
 
 CHECK_ONLY=0
@@ -50,28 +75,23 @@ PROJECT="$ROOT/vole-macos.xcodeproj"
 echo "==> archive-and-export"
 echo "    project: $PROJECT"
 echo "    scheme: $SCHEME ($CONFIGURATION)"
-echo "    identity (expected): $IDENTITY"
+echo "    identity: $IDENTITY"
 echo "    export options: $EXPORT_OPTIONS"
 
-# Soft-check identity (export will fail hard if missing).
-if ! security find-identity -v -p codesigning 2>/dev/null | grep -qF "$IDENTITY"; then
-  if [[ -f "$LOGIN_KEYCHAIN" ]] && security find-identity -v -p codesigning "$LOGIN_KEYCHAIN" 2>/dev/null | grep -qF "$IDENTITY"; then
-    :
-  else
-    echo "WARN: identity not visible to security CLI — export may fail." >&2
-    echo "      Run: bash scripts/check-signing.sh  (use Terminal.app)" >&2
-  fi
-fi
+require_identity
 
 if [[ "$CHECK_ONLY" -eq 1 ]]; then
-  echo "OK: --check-only passed (project + ExportOptions present)"
+  echo "OK: --check-only passed (project + ExportOptions + identity)"
   exit 0
 fi
 
 mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH" "$DERIVED_DATA"
 rm -rf "$ARCHIVE_PATH"
 
-echo "==> xcodebuild archive"
+# Force Developer ID for all targets in the scheme (app + VolePrivilegedHelper).
+# Project defaults are CODE_SIGN_STYLE=Automatic → "Mac Development", which CI
+# does not import and which is wrong for the notarize/distribution path.
+echo "==> xcodebuild archive (Developer ID, manual)"
 xcodebuild \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
@@ -79,7 +99,10 @@ xcodebuild \
   -archivePath "$ARCHIVE_PATH" \
   -derivedDataPath "$DERIVED_DATA" \
   -destination "generic/platform=macOS" \
+  CODE_SIGN_STYLE=Manual \
+  CODE_SIGN_IDENTITY="$IDENTITY" \
   DEVELOPMENT_TEAM="$TEAM_ID" \
+  OTHER_CODE_SIGN_FLAGS="--timestamp" \
   archive
 
 echo "==> xcodebuild -exportArchive"
