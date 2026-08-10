@@ -19,6 +19,7 @@ final class CleanCandidatesViewTests: XCTestCase {
         XCTAssertEqual(CleanCandidatesListStyle.checkboxSize, 14)
         XCTAssertEqual(CleanCandidatesListStyle.chromeControlSpacing, VoleTheme.Spacing.xs)
         XCTAssertEqual(CleanCandidatesListStyle.chipVerticalPadding, 4)
+        XCTAssertEqual(CleanCandidatesListStyle.headerStackSpacing, 2)
     }
 
     func test_listStyle_selectionAndFilterUseFurBrandAccent() {

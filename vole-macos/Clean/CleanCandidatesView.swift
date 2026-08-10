@@ -212,34 +212,32 @@ private struct CleanCandidatesHeader: View {
     var body: some View {
         if isTall {
             ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: VoleTheme.Spacing.md) {
+                HStack(alignment: .top, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
                         totalCount: totalCount,
-                        showEyebrow: showsEyebrow,
-                        showCaption: true
+                        showEyebrow: showsEyebrow
                     )
-                    Spacer(minLength: VoleTheme.Spacing.sm)
+                    Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
                     CleanCandidatesHeaderMetrics(
                         selectedBytes: selectedBytes,
                         alignTrailing: true,
-                        compact: false,
+                        showSizeCaption: true,
                         onSelectAll: onSelectAll,
                         onSelectNone: onSelectNone
                     )
                 }
 
-                VStack(alignment: .leading, spacing: VoleTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
                         totalCount: totalCount,
-                        showEyebrow: showsEyebrow,
-                        showCaption: true
+                        showEyebrow: showsEyebrow
                     )
                     CleanCandidatesHeaderMetrics(
                         selectedBytes: selectedBytes,
                         alignTrailing: false,
-                        compact: false,
+                        showSizeCaption: true,
                         onSelectAll: onSelectAll,
                         onSelectNone: onSelectNone
                     )
@@ -247,19 +245,18 @@ private struct CleanCandidatesHeader: View {
                 }
             }
         } else {
-            // Short window: keep brand eyebrow; densify caption/metrics only.
-            HStack(alignment: .top, spacing: VoleTheme.Spacing.md) {
+            // Short window: keep brand eyebrow; drop size caption only.
+            HStack(alignment: .top, spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 CleanCandidatesHeaderTitle(
                     selectedCount: selectedCount,
                     totalCount: totalCount,
-                    showEyebrow: showsEyebrow,
-                    showCaption: false
+                    showEyebrow: showsEyebrow
                 )
-                Spacer(minLength: VoleTheme.Spacing.sm)
+                Spacer(minLength: CleanCandidatesListStyle.chromeControlSpacing)
                 CleanCandidatesHeaderMetrics(
                     selectedBytes: selectedBytes,
                     alignTrailing: isWide,
-                    compact: true,
+                    showSizeCaption: false,
                     onSelectAll: onSelectAll,
                     onSelectNone: onSelectNone
                 )
@@ -272,30 +269,23 @@ private struct CleanCandidatesHeaderTitle: View {
     let selectedCount: Int
     let totalCount: Int
     let showEyebrow: Bool
-    let showCaption: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: VoleTheme.Spacing.xs) {
+        VStack(alignment: .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
             if showEyebrow {
                 Text("Candidates · 候选")
-                    .font(VoleTheme.TypeScale.eyebrow())
-                    .tracking(VoleTheme.TypeScale.eyebrowTracking)
+                    .font(CleanCandidatesListStyle.headerEyebrowFont())
                     .foregroundStyle(.secondary)
             }
             Text("挑要清掉的")
-                .font(showEyebrow ? VoleTheme.TypeScale.title() : VoleTheme.TypeScale.headline())
-                .tracking(showEyebrow ? VoleTheme.TypeScale.titleTracking : 0)
+                .font(CleanCandidatesListStyle.headerTitleFont())
                 .foregroundStyle(VoleTheme.Colors.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)
             Text("\(CandidateListPresentation.selectionCountCaption(selected: selectedCount, total: totalCount)) 项")
-                .font(VoleTheme.TypeScale.metric())
-                .foregroundStyle(VoleTheme.Colors.text)
-            if showCaption {
-                Text("已选 / 总计")
-                    .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
-            }
+                .font(CleanCandidatesListStyle.rowMetricFont())
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
     }
 }
@@ -303,23 +293,24 @@ private struct CleanCandidatesHeaderTitle: View {
 private struct CleanCandidatesHeaderMetrics: View {
     let selectedBytes: UInt64
     let alignTrailing: Bool
-    let compact: Bool
+    let showSizeCaption: Bool
     let onSelectAll: () -> Void
     let onSelectNone: () -> Void
 
     var body: some View {
-        VStack(alignment: alignTrailing ? .trailing : .leading, spacing: VoleTheme.Spacing.xs) {
-            HStack(spacing: VoleTheme.Spacing.sm) {
+        VStack(alignment: alignTrailing ? .trailing : .leading, spacing: CleanCandidatesListStyle.headerStackSpacing) {
+            HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
                 Button("全选", action: onSelectAll)
                 Button("全不选", action: onSelectNone)
             }
+            .controlSize(.small)
             Text(ByteFormat.string(selectedBytes))
-                .font(compact ? VoleTheme.TypeScale.metric() : VoleTheme.TypeScale.metricLarge())
+                .font(CleanCandidatesListStyle.headerMetricFont())
                 .foregroundStyle(VoleTheme.Colors.text)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-            if !compact {
+            if showSizeCaption {
                 Text("已选大小")
                     .font(VoleTheme.TypeScale.caption())
                     .foregroundStyle(.secondary)
