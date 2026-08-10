@@ -49,8 +49,41 @@ Documents/vole-macos
 | 项 | 状态 |
 |---|---|
 | Hardened Runtime（App + Helper） | 已启用（`ENABLE_HARDENED_RUNTIME=YES`） |
-| Developer ID Application 签名 | 本机存在 `Developer ID Application: Kong Wu (WCYC8XY4V2)` |
-| 公证（notarytool） | **阻塞**：Keychain 中无 `notarytool` 凭据（无 `AC_PASSWORD` / keychain-profile）。需人工执行一次 `xcrun notarytool store-credentials` 后才能自动化提交 |
+| Developer ID Application 签名 | `Developer ID Application: Kong Wu (WCYC8XY4V2)`（Team `WCYC8XY4V2`） |
+| 公证（notarytool） | 复用兄弟仓 `vole` 的 keychain profile **`vole-notary`**（一次配置，两仓共用） |
+
+设计说明：[`docs/wukong-code/specs/2026-08-10-2223-macos-notarize-pipeline-design.md`](docs/wukong-code/specs/2026-08-10-2223-macos-notarize-pipeline-design.md)。
+
+#### 一次性凭据（终端.app）
+
+须在 **终端.app / iTerm** 运行（Cursor 内置终端常为沙箱 HOME，读不到 login keychain 私钥）。不要在本仓重复造 auth；直接用 vole：
+
+```bash
+cd ../vole
+bash scripts/setup-notary-profile.sh
+# 或 API Key：bash scripts/setup-notary-profile.sh --api-key ~/Downloads/AuthKey_XXXX.p8
+bash scripts/check-signing.sh   # 应见 OK: notary profile 'vole-notary'
+```
+
+细节见 [`../vole/docs/findings/2026-07-phase5-signing.md`](../vole/docs/findings/2026-07-phase5-signing.md)。可选：`cp scripts/signing.env.example scripts/signing.env`（本仓 gitignore）。
+
+#### 本机 Archive → Notarize → Staple
+
+无凭据时脚本会清晰退出，**不会**向 Apple submit（CI 也不应要求真实公证）。
+
+```bash
+# 在终端.app 中，于 vole-macos 根目录：
+bash scripts/check-signing.sh
+bash scripts/archive-and-export.sh          # → dist/Vole.app
+bash scripts/notarize-app.sh                # zip → notarytool → staple → spctl
+```
+
+仅检查、不提交：
+
+```bash
+bash scripts/archive-and-export.sh --check-only
+bash scripts/notarize-app.sh --check-only   # 无 profile 时 exit 3
+```
 
 ### 真机批准流验收（人工）
 

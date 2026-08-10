@@ -68,3 +68,7 @@ fastlane/test_output
 # wukong-code brainstorm / local agent state
 .wukong-code/
 build/
+dist/
+
+# Local Apple signing / notary env (never commit secrets)
+scripts/signing.env
