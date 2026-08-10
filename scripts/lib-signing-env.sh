@@ -34,7 +34,9 @@ warn_sandbox_home() {
 
 notary_profile_ok() {
   local profile="$1"
-  if xcrun notarytool history --keychain-profile "$profile" --limit 1 >/dev/null 2>&1; then
+  # Do not pass --limit: older notarytool builds reject it and false-negative
+  # a valid keychain profile as "missing credentials".
+  if xcrun notarytool history --keychain-profile "$profile" >/dev/null 2>&1; then
     return 0
   fi
   # API-key profiles may not respond to history; keychain entry is enough.
