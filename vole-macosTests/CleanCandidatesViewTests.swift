@@ -57,4 +57,11 @@ final class CleanCandidatesViewTests: XCTestCase {
         XCTAssertEqual(narrowShort.contentPadding, VoleTheme.Spacing.md)
         XCTAssertEqual(narrowShort.sectionSpacing, VoleTheme.Spacing.sm)
     }
+
+    func test_layoutMetrics_alwaysShowsEyebrow() {
+        let tall = CleanCandidatesLayoutMetrics.resolve(width: 800, height: 700)
+        let short = CleanCandidatesLayoutMetrics.resolve(width: 500, height: 400)
+        XCTAssertTrue(tall.showsEyebrow)
+        XCTAssertTrue(short.showsEyebrow)
+    }
 }

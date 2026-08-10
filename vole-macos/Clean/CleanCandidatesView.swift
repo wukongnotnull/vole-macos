@@ -23,6 +23,9 @@ struct CleanCandidatesLayoutMetrics: Equatable {
         isTall ? VoleTheme.Spacing.md : VoleTheme.Spacing.sm
     }
 
+    /// Brand eyebrow stays visible in dense short layouts; only caption densifies.
+    var showsEyebrow: Bool { true }
+
     static func resolve(width: CGFloat, height: CGFloat) -> CleanCandidatesLayoutMetrics {
         CleanCandidatesLayoutMetrics(
             isWide: width >= 680,
@@ -98,6 +101,7 @@ struct CleanCandidatesView: View {
                     selectedBytes: selectedBytes,
                     isWide: layout.isWide,
                     isTall: layout.isTall,
+                    showsEyebrow: layout.showsEyebrow,
                     onSelectAll: { session.selectedIDs = Set(session.entries.map(\.id)) },
                     onSelectNone: { session.selectedIDs = [] }
                 )
@@ -201,6 +205,7 @@ private struct CleanCandidatesHeader: View {
     let selectedBytes: UInt64
     let isWide: Bool
     let isTall: Bool
+    let showsEyebrow: Bool
     let onSelectAll: () -> Void
     let onSelectNone: () -> Void
 
@@ -211,7 +216,7 @@ private struct CleanCandidatesHeader: View {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
                         totalCount: totalCount,
-                        showEyebrow: true,
+                        showEyebrow: showsEyebrow,
                         showCaption: true
                     )
                     Spacer(minLength: VoleTheme.Spacing.sm)
@@ -228,7 +233,7 @@ private struct CleanCandidatesHeader: View {
                     CleanCandidatesHeaderTitle(
                         selectedCount: selectedCount,
                         totalCount: totalCount,
-                        showEyebrow: true,
+                        showEyebrow: showsEyebrow,
                         showCaption: true
                     )
                     CleanCandidatesHeaderMetrics(
@@ -242,12 +247,12 @@ private struct CleanCandidatesHeader: View {
                 }
             }
         } else {
-            // Short window: one dense row so title/actions stay visible.
-            HStack(alignment: .center, spacing: VoleTheme.Spacing.md) {
+            // Short window: keep brand eyebrow; densify caption/metrics only.
+            HStack(alignment: .top, spacing: VoleTheme.Spacing.md) {
                 CleanCandidatesHeaderTitle(
                     selectedCount: selectedCount,
                     totalCount: totalCount,
-                    showEyebrow: false,
+                    showEyebrow: showsEyebrow,
                     showCaption: false
                 )
                 Spacer(minLength: VoleTheme.Spacing.sm)
