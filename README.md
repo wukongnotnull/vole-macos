@@ -1,136 +1,181 @@
-# vole-macos
+<div align="center">
 
-Vole 的 macOS SwiftUI 桌面端（GPL-3.0）。内嵌 `vole-cli` sidecar，侧栏提供 **清理 / 卸载 / 优化 / 净化 / 安装包 / 分析 / 历史 / 状态**；设置面板归位特权助手、完全磁盘访问、Touch ID、自更新、自卸载与 sidecar 版本。Clean / Uninstall / Optimize / Purge / Installer 均为 plan → 勾选 → apply（用户域默认废纸篓；系统路径经 SMAppService 特权助手永久删除，未就绪则跳过；净化/安装包可选永久删除）。
+<img src="images/vole.webp" alt="Vole mascot" width="180" />
 
-## 前置
+# Vole for macOS
 
-- macOS + Xcode（工程模板部署目标以 `.xcodeproj` 为准）
-- Rust toolchain（与兄弟仓 `vole` 的 `rust-toolchain.toml` 一致；默认 `~/.cargo/bin/cargo`）
-- 兄弟仓：本仓与 `vole` 并列，例如：
+**A cleanup app for your Mac**  
+Preview first · Trash by default · Find what’s eating your disk
 
-```text
-Documents/vole
-Documents/vole-macos
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/github/v/tag/wukongnotnull/vole-macos?label=version)](https://github.com/wukongnotnull/vole-macos/releases)
+[![Platform](https://img.shields.io/badge/platform-macOS-black.svg)](https://github.com/wukongnotnull/vole-macos)
+[![Download](https://img.shields.io/github/downloads/wukongnotnull/vole-macos/total.svg)](https://github.com/wukongnotnull/vole-macos/releases/latest)
+[![Stars](https://img.shields.io/github/stars/wukongnotnull/vole-macos?style=social)](https://github.com/wukongnotnull/vole-macos/stargazers)
+
+</div>
+
+**Languages:** [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
+
+> Caches, logs, leftover files, installers, build junk… Vole finds them so you can **select what to remove**. Items go to Trash by default—easy to undo if you change your mind.
+
+---
+
+**Quick nav**
+[Screenshots](#screenshots) · [Features](#features) · [Download](#download--install) · [First run](#first-run) · [Safety](#safety) · [FAQ](#faq) · [CLI](#prefer-the-command-line) · [About](#about) · [Credits](#credits) · [License](#license)
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="images/clean-idle.png" alt="Clean home" width="48%" />
+  <img src="images/candidates.png" alt="Cleanup candidates" width="48%" />
+</p>
+
+---
+
+## Features
+
+| Feature | What you get |
+|------|-------------|
+| **Clean** | Find caches, logs, and leftovers—then clean what you select |
+| **Uninstall** | Remove apps and as much user-domain leftover data as possible |
+| **Optimize** | Run a bounded set of system maintenance tasks (e.g. cache rebuilds) |
+| **Purge** | Clear bulky items like stale project build artifacts |
+| **Installer** | Find forgotten `.dmg` / `.pkg` installers on disk |
+| **Analyze** | See which folders and large files use the most space |
+| **History** | Review past cleanups and deletions |
+| **Status** | Health score, CPU, memory, and disk at a glance |
+
+For anyone who wants a GUI to clean their Mac—without “one-click delete everything” regret.
+
+---
+
+## Download & install
+
+1. Open the [latest Release](https://github.com/wukongnotnull/vole-macos/releases/latest)
+2. Download **`Vole-*.dmg`** (a `.zip` is also available)
+3. Open the DMG and drag **Vole** into Applications
+4. Launch Vole from Launchpad or Applications
+
+Current version: **[v0.1.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.1.0)** (Developer ID signed and notarized by Apple).
+
+If macOS says the developer cannot be verified: allow it under **System Settings → Privacy & Security**, or right-click the app → Open.
+
+---
+
+## First run
+
+Do these two steps for a more complete cleanup:
+
+### 1. Enable Full Disk Access
+
+Without this, many user folders cannot be scanned fully, so results look sparse.
+
+1. Open **System Settings → Privacy & Security → Full Disk Access**
+2. Turn it on and check **Vole**
+
+### 2. (Optional) Enable the Root privileged helper
+
+Only needed to clean some **system paths**. Personal files work fine without it.
+
+1. On the home screen, tap **Enable Root privileged helper**
+2. Approve the background item in System Settings
+3. Wait until status shows **Enabled**
+
+If it’s not enabled, system paths are **skipped with a clear message**—Vole will not pretend they were deleted.
+
+---
+
+## Safety
+
+```
+You        ❯ Choose Clean → Scan → Select items → Confirm
+
+Vole       ❯ ✓ Lists candidates first—nothing is deleted yet
+             ✓ Trash by default (recoverable)
+             ✓ System paths use the privileged helper; skipped if not approved
+             ✓ Dangerous paths outside the whitelist are never removed
 ```
 
-可用环境变量 `VOLE_SRC` 覆盖默认路径 `$(SRCROOT)/../vole`。在 git worktree 下构建时务必设置 `VOLE_SRC`。
+| Principle | Meaning |
+|------|------|
+| **Preview before act** | You always see candidates and choose what to remove |
+| **Recoverable by default** | Personal files go to Trash, not permanent delete |
+| **Skip when unauthorized** | Without the Root helper, system paths are skipped and explained |
+| **Auditable** | History shows what was done |
 
-## 运行
+---
 
-1. 用 Xcode 打开 `vole-macos.xcodeproj`
-2. 确认 Build Settings：`ENABLE_APP_SANDBOX=NO`、`ENABLE_USER_SCRIPT_SANDBOXING=NO`；App 与 Helper 已启用 **Hardened Runtime**
-3. Product → Run（首次会 `cargo build -p vole-cli --release`，较慢）
-4. 若报 `cargo not found`：确认已装 rustup，且 `~/.cargo/bin/cargo` 存在；或在 Build Phase「Embed vole sidecar」里设环境变量 `CARGO=/绝对路径/cargo`
-5. 若清理扫描结果异常少：系统设置 → 隐私与安全性 → 完全磁盘访问，勾选 **Vole**（勿勾选旧的 `vole-macos.app` 占位项；可先删掉再点「+」添加当前 `Vole.app`）
-6. 系统路径清理：首页「启用特权助手」→ 系统设置批准后台项 → 状态「已启用」且 ping `uid=0`
+## FAQ
 
-## 设计
+**Q: Scan results look too small?**  
+A: Enable **Full Disk Access** for **Vole** under System Settings → Privacy & Security, then scan again.
 
-- Clean MVP：[`docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md`](docs/wukong-code/specs/2026-07-30-2328-desktop-clean-mvp-design.md)
-- 特权助手（SMAppService）：[`docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md`](docs/wukong-code/specs/2026-08-08-1822-smappservice-privileged-helper-design.md)
-- 侧栏 CLI 能力面：[`docs/wukong-code/specs/2026-08-09-1454-app-nav-cli-parity-design.md`](docs/wukong-code/specs/2026-08-09-1454-app-nav-cli-parity-design.md)
+**Q: System paths were skipped?**  
+A: Expected. Enable the Root privileged helper on the home screen and approve the background item in System Settings.
 
-## 特权助手（可用通道）
+**Q: I deleted the wrong thing?**  
+A: Default is Trash—open Trash and restore. Permanent delete (if you chose it) cannot be restored from Trash.
 
-当前目标档位：**可用通道**（相对骨架的增量）：
+**Q: Does it upload my files?**  
+A: Everyday cleanup stays on your Mac. Network features like self-update only run when you use them in Settings—nothing is uploaded in the background.
 
-- Target：`VolePrivilegedHelper`（特权 XPC：`ping` / `removeAuthorizedPaths` / `bootoutLaunchdLabel`）
-- 注册：`HelperRegistration` → `SMAppService.daemon`
-- Bundle：`Contents/MacOS/VolePrivilegedHelper` + `Contents/Library/LaunchDaemons/cn.waytoai.vole-macos.helper.plist`
-- 白名单 fail-closed：见 `PathAuthorization`（永不含 `/Library/Updates`、`/macOS Install Data`）
-- Clean / Uninstall / Optimize / Purge / Installer UI：首页启用/状态卡；候选页提示；apply 时用户域走 sidecar，系统路径走 Helper；无 Helper 时**跳过**系统路径并明示，不假装成功
-- Analyze UI：`vole analyze --json` 目录钻取与大文件区
-- History UI：`vole history --json` 会话与删除审计
-- Status UI：`vole status --json` 仪表盘（健康分 / CPU / 内存 / 磁盘），支持手动刷新与短轮询「实时」
-- 设置：侧栏齿轮打开 Helper / FDA / Touch ID / 更新 / 自卸载 / 关于
+**Q: What’s the relationship to Mole?**  
+A: Cleanup rules and safety ideas were inspired by [Mole](https://github.com/tw93/Mole). Vole is an independent open-source project and is not affiliated with Mole.
 
-### Hardened Runtime / 公证
+---
 
-| 项 | 状态 |
-|---|---|
-| Hardened Runtime（App + Helper） | 已启用（`ENABLE_HARDENED_RUNTIME=YES`） |
-| Hardened Runtime（`vole-cli` sidecar） | `archive-and-export.sh` 在 export 后以 `--options runtime` 重签；`notarize-app.sh` 提交前校验 |
-| Developer ID Application 签名 | `Developer ID Application: Kong Wu (WCYC8XY4V2)`（Team `WCYC8XY4V2`） |
-| 公证（notarytool） | 复用兄弟仓 `vole` 的 keychain profile **`vole-notary`**（一次配置，两仓共用） |
+## Prefer the command line?
 
-设计说明：[`docs/wukong-code/specs/2026-08-10-2223-macos-notarize-pipeline-design.md`](docs/wukong-code/specs/2026-08-10-2223-macos-notarize-pipeline-design.md)。
-
-#### 一次性凭据（终端.app）
-
-须在 **终端.app / iTerm** 运行（Cursor 内置终端常为沙箱 HOME，读不到 login keychain 私钥）。不要在本仓重复造 auth；直接用 vole：
+The same engine is available as a CLI: [vole](https://github.com/wukongnotnull/vole).
 
 ```bash
-cd ../vole
-bash scripts/setup-notary-profile.sh
-# 或 API Key：bash scripts/setup-notary-profile.sh --api-key ~/Downloads/AuthKey_XXXX.p8
-bash scripts/check-signing.sh   # 应见 OK: notary profile 'vole-notary'
+brew tap wukongnotnull/vole https://github.com/wukongnotnull/vole
+brew install vole
 ```
 
-细节见 [`../vole/docs/findings/2026-07-phase5-signing.md`](../vole/docs/findings/2026-07-phase5-signing.md)。可选：`cp scripts/signing.env.example scripts/signing.env`（本仓 gitignore）。
+Desktop and CLI share the same cleanup engine and safety model.
 
-#### 本机 Archive → Notarize → Staple → DMG
+---
 
-无凭据时本机脚本会清晰退出，**不会**向 Apple submit。`dist/` 已 gitignore，勿提交构建产物。
+## About
 
-```bash
-# 在终端.app 中，于 vole-macos 根目录：
-bash scripts/check-signing.sh
-bash scripts/archive-and-export.sh          # → dist/Vole.app
-bash scripts/notarize-app.sh                # zip → notarytool → staple → spctl
-bash scripts/package-dmg.sh                 # → dist/Vole-<version>.dmg（须已 staple）
-```
+**悟空非空也 (Wukong)** — Founder of Way to AI, indie developer, content creator.
 
-仅检查、不提交：
+| Platform | Link |
+|------|------|
+| 🌐 Website | [waytoai.cn](https://waytoai.cn) |
+| 𝕏 Twitter | [悟空非空也](https://x.com/wukongnotnull) |
+| 📺 Bilibili | [悟空非空也](https://space.bilibili.com/456634391) |
+| ▶️ YouTube | [悟空非空也](https://www.youtube.com/@wukongnotnull) |
+| 📕 Xiaohongshu | [悟空非空也](https://www.xiaohongshu.com/user/profile/5ca89c2f000000001100952b) |
+| 💬 WeChat | Search「悟空非空也」 |
 
-```bash
-bash scripts/archive-and-export.sh --check-only
-bash scripts/notarize-app.sh --check-only   # 无 profile 时 exit 3
-```
+---
 
-未 staple 时 `package-dmg.sh` 默认失败；调试可设 `VOLE_DMG_ALLOW_UNSTAPLED=1`（勿用于正式发布）。
+## Credits
 
-设计说明：[`docs/wukong-code/specs/2026-08-10-2315-macos-dmg-ci-release-design.md`](docs/wukong-code/specs/2026-08-10-2315-macos-dmg-ci-release-design.md)。
+Thanks to these products and open-source projects for pioneering macOS cleanup UX—Vole learned a lot from them:
 
-#### CI Release（tag → GitHub Release）
+- [Mole](https://github.com/tw93/Mole) — open-source cleaner; major inspiration for rules and safety
+- [CleanMyMac](https://macpaw.com/cleanmymac) — reference for polished desktop cleanup UX
+- [Tencent Lemon](https://lemon.qq.com/) — familiar system-cleaner experience for Chinese users
 
-标签约定与兄弟仓 `vole` 相同：`v0.1.0`（`v` + semver）。Push tag 后 `.github/workflows/release.yml` 会：
+Vole is an independent open-source project and has no affiliation or commercial relationship with the above.
 
-1. Checkout 本仓 + `wukongnotnull/vole`（sidecar）
-2. 导入 Developer ID 证书
-3. `archive-and-export` → `notarize-app` → `package-dmg`
-4. 上传 `Vole-<version>.dmg`、`Vole-<version>.zip`、`SHA256SUMS`
+---
 
-```bash
-# 先配置 GitHub secrets（终端.app，勿提交证书）：
-bash scripts/setup-ci-secrets.sh
+## License
 
-# 确认 MARKETING_VERSION 与 tag 一致后：
-git tag v0.1.0
-git push origin v0.1.0
-```
+Vole for macOS is licensed under [GPL-3.0](LICENSE).  
+If you fork it into your own product, please rename it to avoid confusion and credit Mole / Vole as sources.
 
-所需 GitHub Secrets：
+---
 
-| Secret | 说明 |
-|---|---|
-| `VOLE_CODESIGN_IDENTITY` | 如 `Developer ID Application: Kong Wu (WCYC8XY4V2)` |
-| `APPLE_CERTIFICATE_BASE64` | Developer ID `.p12` 的 base64 |
-| `APPLE_CERTIFICATE_PASSWORD` | p12 导出密码 |
-| `APPLE_API_KEY_BASE64` | App Store Connect API `.p8` 的 base64（与 `vole-notary` 同源） |
-| `APPLE_API_KEY_ID` | Key ID |
-| `APPLE_API_ISSUER_ID` | Issuer UUID |
+<div align="center">
 
-缺任一 secret 时 release job **失败**（不上传半成品）。勿提交：`dist/`、`scripts/signing.env`、`*.p12`、`AuthKey_*.p8`。
-### 真机批准流验收（人工）
+GPL-3.0 license © [悟空非空也](https://github.com/wukongnotnull)
 
-1. `VOLE_SRC=…/vole xcodebuild -scheme vole-macos -configuration Debug build`
-2. 运行 App →「启用特权助手」→ 在系统设置批准
-3. 状态变为「已启用」，点击「重新检查」应显示 `uid=0`
-4. 勾选白名单内系统路径清理，确认永久删除；关闭后台项后系统路径应被跳过
-
-**2026-08-09 本机已通过：** BTM `VolePrivilegedHelper` disposition `[enabled, allowed]`；`launchctl` 显示 `system/cn.waytoai.vole-macos.helper` `state=running` 且进程 `uid=0`；特权 XPC `ping pid=87586 uid=0`（Mach `cn.waytoai.vole-macos.helper`）。Bundle / Mach 标识须保持 design §4.2 带连字符形式，勿改成 `volemacos`（否则与已批准 daemon 失配）。
-
-## 验收
-
-MVP 自动化与人工清单见 [`docs/findings/2026-07-desktop-clean-mvp.md`](docs/findings/2026-07-desktop-clean-mvp.md)。
-特权助手见 design §9.2。
+</div>
