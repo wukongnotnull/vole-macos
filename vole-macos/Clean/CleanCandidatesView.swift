@@ -366,7 +366,7 @@ private struct CleanCandidatesSearchField: View {
         }
         .padding(.horizontal, VoleTheme.Spacing.md)
         .padding(.vertical, VoleTheme.Spacing.sm)
-        .background(VoleTheme.Colors.molehill.opacity(0.35))
+        .background(CleanCandidatesListStyle.searchFieldFill)
         .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
     }
 }
@@ -386,32 +386,65 @@ private struct CleanCandidatesFilterControls: View {
                 }
                 .pickerStyle(.menu)
                 .labelsHidden()
+                .tint(CleanCandidatesListStyle.selectionFill)
                 .fixedSize()
             } else {
-                Picker("大小", selection: $sizeFilter) {
+                HStack(spacing: VoleTheme.Spacing.xs) {
                     ForEach(CandidateSizeFilter.allCases) { filter in
-                        Text(filter.title).tag(filter)
+                        CleanCandidatesSizeChip(
+                            title: filter.title,
+                            isSelected: sizeFilter == filter
+                        ) {
+                            sizeFilter = filter
+                        }
                     }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .frame(maxWidth: 360)
+                .fixedSize(horizontal: true, vertical: false)
             }
 
             Toggle("仅需 root", isOn: $rootOnly)
                 .toggleStyle(.switch)
+                .tint(CleanCandidatesListStyle.selectionFill)
                 .font(VoleTheme.TypeScale.caption())
                 .fixedSize()
 
             Text("按大小 ↓")
                 .font(VoleTheme.TypeScale.caption())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(CleanCandidatesListStyle.filterChipIdleLabel)
                 .padding(.horizontal, VoleTheme.Spacing.sm)
                 .padding(.vertical, 6)
-                .background(VoleTheme.Colors.molehill.opacity(0.45))
+                .background(CleanCandidatesListStyle.sortChipFill)
                 .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
                 .fixedSize()
         }
+    }
+}
+
+private struct CleanCandidatesSizeChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(VoleTheme.TypeScale.caption().weight(isSelected ? .semibold : .regular))
+                .foregroundStyle(
+                    isSelected
+                        ? CleanCandidatesListStyle.filterChipSelectedLabel
+                        : CleanCandidatesListStyle.filterChipIdleLabel
+                )
+                .padding(.horizontal, VoleTheme.Spacing.sm)
+                .padding(.vertical, 6)
+                .background(
+                    isSelected
+                        ? CleanCandidatesListStyle.filterChipSelectedFill
+                        : CleanCandidatesListStyle.filterChipIdleFill
+                )
+                .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.control))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -425,14 +458,22 @@ private struct CleanCandidatesOutlineList: View {
             HStack {
                 Text("名称")
                     .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
                 Spacer()
                 Text("大小")
                     .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
             }
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
+            .listRowInsets(
+                EdgeInsets(
+                    top: CleanCandidatesListStyle.rowVerticalPadding,
+                    leading: VoleTheme.Spacing.sm,
+                    bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                    trailing: VoleTheme.Spacing.sm
+                )
+            )
 
             ForEach(groups) { group in
                 CleanCandidateGroupRow(
@@ -453,6 +494,7 @@ private struct CleanCandidatesOutlineList: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .listRowSeparatorTint(CleanCandidatesListStyle.rowSeparator)
         .background(Color.clear)
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
     }
@@ -489,9 +531,10 @@ private struct CleanCandidateGroupRow: View {
             }
         } label: {
             HStack(spacing: VoleTheme.Spacing.sm) {
-                Toggle("", isOn: groupBinding)
-                    .toggleStyle(.checkbox)
-                    .labelsHidden()
+                Toggle(isOn: groupBinding) {
+                    EmptyView()
+                }
+                .toggleStyle(VoleCircularCheckboxStyle())
 
                 Text(group.app.title)
                     .font(VoleTheme.TypeScale.body().weight(.semibold))
@@ -502,12 +545,20 @@ private struct CleanCandidateGroupRow: View {
 
                 Text(group.sizeCaption(selectedIDs: selectedIDs))
                     .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
                     .monospacedDigit()
                     .layoutPriority(1)
             }
         }
         .listRowBackground(Color.clear)
+        .listRowInsets(
+            EdgeInsets(
+                top: CleanCandidatesListStyle.rowVerticalPadding,
+                leading: VoleTheme.Spacing.sm,
+                bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                trailing: VoleTheme.Spacing.sm
+            )
+        )
     }
 }
 
@@ -546,27 +597,35 @@ private struct CleanCandidateLeafRow: View {
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(VoleTheme.Colors.molehill.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .clipShape(RoundedRectangle(cornerRadius: VoleTheme.Radius.strata))
                         }
                     }
                     Text(entry.path)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(.tertiary)
+                        .font(VoleTheme.TypeScale.caption().monospaced())
+                        .foregroundStyle(CleanCandidatesListStyle.pathLabel)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
                 Spacer(minLength: VoleTheme.Spacing.sm)
                 Text(ByteFormat.string(entry.size))
                     .font(VoleTheme.TypeScale.metric())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.sizeLabel)
                     .layoutPriority(1)
             }
         }
-        .toggleStyle(.checkbox)
+        .toggleStyle(VoleCircularCheckboxStyle())
         .accessibilityLabel("\(entry.label)，\(ByteFormat.string(entry.size))")
         .accessibilityValue(selectedIDs.contains(entry.id) ? "已选" : "未选")
         .accessibilityHint(isPrivileged ? "需管理员权限，将经 root权限助手永久删除" : "移动到废纸篓")
         .listRowBackground(Color.clear)
+        .listRowInsets(
+            EdgeInsets(
+                top: CleanCandidatesListStyle.rowVerticalPadding,
+                leading: VoleTheme.Spacing.sm,
+                bottom: CleanCandidatesListStyle.rowVerticalPadding,
+                trailing: VoleTheme.Spacing.sm
+            )
+        )
     }
 }
 
@@ -599,19 +658,12 @@ private struct CleanCandidatesPaginationBar: View {
 
     private var pageControls: some View {
         HStack(spacing: VoleTheme.Spacing.sm) {
-            Button {
+            pageNavButton(systemName: "chevron.backward.to.line", disabled: page.page <= 1) {
                 onPageChange(1)
-            } label: {
-                Image(systemName: "chevron.backward.to.line")
             }
-            .disabled(page.page <= 1)
-
-            Button {
+            pageNavButton(systemName: "chevron.backward", disabled: page.page <= 1) {
                 onPageChange(page.page - 1)
-            } label: {
-                Image(systemName: "chevron.backward")
             }
-            .disabled(page.page <= 1)
 
             if isWide {
                 ForEach(visiblePageNumbers, id: \.self) { number in
@@ -619,31 +671,36 @@ private struct CleanCandidatesPaginationBar: View {
                         onPageChange(number)
                     }
                     .buttonStyle(.bordered)
-                    .tint(number == page.page ? VoleTheme.Colors.fur : nil)
+                    .tint(number == page.page ? CleanCandidatesListStyle.selectionFill : nil)
                     .disabled(number == page.page)
                 }
             } else {
                 Text("\(page.page) / \(max(page.pageCount, 1))")
                     .font(VoleTheme.TypeScale.caption())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(CleanCandidatesListStyle.columnHeaderLabel)
                     .monospacedDigit()
                     .frame(minWidth: 44)
             }
 
-            Button {
+            pageNavButton(systemName: "chevron.forward", disabled: page.page >= page.pageCount) {
                 onPageChange(page.page + 1)
-            } label: {
-                Image(systemName: "chevron.forward")
             }
-            .disabled(page.page >= page.pageCount)
-
-            Button {
+            pageNavButton(systemName: "chevron.forward.to.line", disabled: page.page >= page.pageCount) {
                 onPageChange(page.pageCount)
-            } label: {
-                Image(systemName: "chevron.forward.to.line")
             }
-            .disabled(page.page >= page.pageCount)
         }
+    }
+
+    private func pageNavButton(
+        systemName: String,
+        disabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+        }
+        .buttonStyle(.bordered)
+        .disabled(disabled)
     }
 
     private var pageSizePicker: some View {
