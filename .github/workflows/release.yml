@@ -69,6 +69,7 @@ jobs:
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          VOLE_CODESIGN_IDENTITY: ${{ secrets.VOLE_CODESIGN_IDENTITY }}
         run: |
           KEYCHAIN="$RUNNER_TEMP/vole-macos-signing.keychain-db"
           security create-keychain -p "" "$KEYCHAIN"
@@ -78,14 +79,23 @@ jobs:
           security import "$RUNNER_TEMP/cert.p12" \
             -P "$APPLE_CERTIFICATE_PASSWORD" \
             -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security default-keychain -s "$KEYCHAIN"
           security list-keychain -d user -s "$KEYCHAIN"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "" "$KEYCHAIN"
           rm -f "$RUNNER_TEMP/cert.p12"
+          echo "Imported codesigning identities:"
+          security find-identity -v -p codesigning "$KEYCHAIN"
+          if ! security find-identity -v -p codesigning "$KEYCHAIN" | grep -qF "$VOLE_CODESIGN_IDENTITY"; then
+            echo "FAIL: VOLE_CODESIGN_IDENTITY not present after import:" >&2
+            echo "      $VOLE_CODESIGN_IDENTITY" >&2
+            exit 1
+          fi
 
       - name: Archive and export
         env:
           VOLE_SRC: ${{ github.workspace }}/vole
           VOLE_CODESIGN_IDENTITY: ${{ secrets.VOLE_CODESIGN_IDENTITY }}
+          APPLE_TEAM_ID: WCYC8XY4V2
         run: bash scripts/archive-and-export.sh
 
       - name: Notarize and staple
