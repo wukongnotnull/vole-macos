@@ -7,7 +7,7 @@ struct CleanRootView: View {
     var body: some View {
         Group {
             switch session.phase {
-            case .idle: CleanIdleView(session: session)
+            case .idle: CleanIdleView(session: session, helperStatus: helperStatus)
             case .scanning: CleanScanningView(session: session)
             case .candidates: CleanCandidatesView(session: session, helperStatus: helperStatus)
             case .applying: CleanApplyingView(session: session)
