@@ -399,7 +399,7 @@ private struct CleanCandidatesFilterBar: View {
                 )
             }
         }
-        .controlSize(.small)
+        .controlSize(.regular)
     }
 }
 
@@ -409,10 +409,10 @@ private struct CleanCandidatesSearchField: View {
     var body: some View {
         HStack(spacing: CleanCandidatesListStyle.chromeControlSpacing) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 11))
+                .font(.system(size: 12))
                 .foregroundStyle(.secondary)
             TextField("搜索文件或路径", text: $text)
-                .font(VoleTheme.TypeScale.caption())
+                .font(CleanCandidatesListStyle.filterBarFont())
                 .textFieldStyle(.plain)
         }
         .padding(.horizontal, CleanCandidatesListStyle.searchFieldHorizontalPadding)
@@ -456,11 +456,11 @@ private struct CleanCandidatesFilterControls: View {
             Toggle("仅需 root", isOn: $rootOnly)
                 .toggleStyle(.switch)
                 .tint(CleanCandidatesListStyle.selectionFill)
-                .font(VoleTheme.TypeScale.caption())
+                .font(CleanCandidatesListStyle.filterBarFont())
                 .fixedSize()
 
             Text("按大小 ↓")
-                .font(VoleTheme.TypeScale.caption())
+                .font(CleanCandidatesListStyle.filterBarFont())
                 .foregroundStyle(CleanCandidatesListStyle.filterChipIdleLabel)
                 .padding(.horizontal, VoleTheme.Spacing.sm)
                 .padding(.vertical, CleanCandidatesListStyle.chipVerticalPadding)
@@ -479,7 +479,7 @@ private struct CleanCandidatesSizeChip: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(VoleTheme.TypeScale.caption().weight(isSelected ? .medium : .regular))
+                .font(CleanCandidatesListStyle.filterBarFont(weight: isSelected ? .medium : .regular))
                 .foregroundStyle(
                     isSelected
                         ? CleanCandidatesListStyle.filterChipSelectedLabel

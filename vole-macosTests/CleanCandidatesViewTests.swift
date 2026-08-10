@@ -18,7 +18,9 @@ final class CleanCandidatesViewTests: XCTestCase {
         XCTAssertEqual(CleanCandidatesListStyle.rowVerticalPadding, 3)
         XCTAssertEqual(CleanCandidatesListStyle.checkboxSize, 14)
         XCTAssertEqual(CleanCandidatesListStyle.chromeControlSpacing, VoleTheme.Spacing.xs)
-        XCTAssertEqual(CleanCandidatesListStyle.chipVerticalPadding, 4)
+        XCTAssertEqual(CleanCandidatesListStyle.chipVerticalPadding, 6)
+        XCTAssertEqual(CleanCandidatesListStyle.searchFieldVerticalPadding, 6)
+        XCTAssertEqual(CleanCandidatesListStyle.filterBarFontSize, 13)
         XCTAssertEqual(CleanCandidatesListStyle.headerStackSpacing, 2)
     }
 

@@ -45,8 +45,14 @@ enum CleanCandidatesListStyle {
     static let headerAlwaysShowsSizeCaption = true
     static let chromeControlSpacing: CGFloat = VoleTheme.Spacing.xs
     static let searchFieldHorizontalPadding: CGFloat = VoleTheme.Spacing.sm
-    static let searchFieldVerticalPadding: CGFloat = VoleTheme.Spacing.xs
-    static let chipVerticalPadding: CGFloat = 4
+    /// Filter-bar search / chip vertical inset — slightly taller than dense xs.
+    static let searchFieldVerticalPadding: CGFloat = 6
+    static let chipVerticalPadding: CGFloat = 6
+    /// Filter-bar label size (search, chips, sort, root toggle).
+    static let filterBarFontSize: CGFloat = 13
+    static func filterBarFont(weight: Font.Weight = .regular) -> Font {
+        .system(size: filterBarFontSize, weight: weight, design: .default)
+    }
 }
 
 /// Circular checkbox using Fur brand accent (not system blue).

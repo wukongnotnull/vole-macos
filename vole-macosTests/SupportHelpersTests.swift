@@ -14,8 +14,8 @@ struct SupportHelpersTests {
     }
 
     @Test func byteFormatUsesBinaryUnits() {
-        let zero = ByteFormat.string(0)
-        #expect(zero == "0 B" || zero.lowercased().contains("zero") || zero.contains("0"))
+        // Zero must stay compact and locale-stable (never "Zero bytes").
+        #expect(ByteFormat.string(0) == "0 B")
         let kb = ByteFormat.string(1024)
         #expect(kb.contains("1"))
         #expect(kb.uppercased().contains("K"))
