@@ -59,7 +59,8 @@ For anyone who wants a GUI to clean their Mac—without “one-click delete ever
 3. Open the DMG and drag **Vole** into Applications
 4. Launch Vole from Launchpad or Applications
 
-Current version: **[v0.1.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.1.0)** (Developer ID signed and notarized by Apple).
+Current version: **[v0.1.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.1.0)** (Developer ID signed and notarized by Apple).  
+The DMG is a **Universal** build (Apple Silicon and Intel).
 
 If macOS says the developer cannot be verified: allow it under **System Settings → Privacy & Security**, or right-click the app → Open.
 

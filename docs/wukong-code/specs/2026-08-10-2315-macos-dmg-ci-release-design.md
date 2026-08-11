@@ -35,6 +35,16 @@
 | 工具 | `hdiutil create -volname Vole -srcfolder <stage> -ov -format UDZO` |
 | 禁止 | 提交 `dist/`、`.dmg`、证书、`.p8`、`signing.env` |
 
+### 3.1 Universal binary
+
+Release / CI 产出的 `Vole.app`（及 DMG/zip）内以下 Mach-O 必须同时包含 `arm64` 与 `x86_64`：
+
+- `Contents/MacOS/Vole`
+- `Contents/MacOS/vole-cli`
+- `Contents/MacOS/VolePrivilegedHelper`
+
+实现：`archive-and-export.sh` 设 `ARCHS=arm64 x86_64` + `ONLY_ACTIVE_ARCH=NO`；`embed-vole.sh` 在 Release（或 `VOLE_UNIVERSAL=1`）双 target cargo + `lipo`；export 后 `require_app_universal` 门禁。Debug 本机构建不强制 Universal。仍发**一个** Universal DMG（不拆双资产）。
+
 ## 4. CI Release 工作流
 
 路径：`.github/workflows/release.yml`
@@ -57,7 +67,7 @@ Runner：`macos-latest`。权限：`contents: write`。
 
 ### 4.1 兄弟仓 checkout
 
-`embed-vole.sh` 需要 `VOLE_SRC`（默认 `../vole`）。CI 用第二次 `actions/checkout` 把 `wukongnotnull/vole` 放到 `../vole`（相对 workspace），或显式 `VOLE_SRC`。Rust：`dtolnay/rust-toolchain` 或 runner 自带 + 读 `vole/rust-toolchain.toml`。
+`embed-vole.sh` 需要 `VOLE_SRC`（默认 `../vole`）。CI 用第二次 `actions/checkout` 把 `wukongnotnull/vole` 放到 `../vole`（相对 workspace），或显式 `VOLE_SRC`。Rust：`dtolnay/rust-toolchain` 安装 `1.97.1` 及 targets `aarch64-apple-darwin`、`x86_64-apple-darwin`（与 `vole/rust-toolchain.toml` 对齐）。
 
 ### 4.2 Secrets（与 vole 对齐）
 
@@ -107,9 +117,9 @@ git push origin v0.1.0
 ## 8. 非目标
 
 - Sparkle / 自动更新频道
-- Universal binary 双架构强制（跟随当前 archive 架构）
 - 修改 App Store 分发路径
 - 在无 Xcode 的 Linux CI 上跑本工作流
+- 按架构拆成两个 DMG / 两个 Release 资产
 
 ## 9. 验收
 
@@ -119,4 +129,5 @@ git push origin v0.1.0
 | 缺 app / 未 staple | 默认非 0 退出并打印下一步 |
 | CI 缺 secrets | job 失败并指出缺哪个 secret |
 | Tag `v0.1.0` | 在 secrets 齐全时产出 Release 三件套 |
+| Universal | `lipo -archs` 对 `Vole` / `vole-cli` / `VolePrivilegedHelper` 均含 arm64 与 x86_64 |
 | README | 本地 + CI + secrets 列表 |

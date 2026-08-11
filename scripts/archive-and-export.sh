@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck source=lib-signing-env.sh
 source "$ROOT/scripts/lib-signing-env.sh"
+# shellcheck source=lib-universal.sh
+source "$ROOT/scripts/lib-universal.sh"
 
 warn_sandbox_home
 
@@ -99,6 +101,8 @@ xcodebuild \
   -archivePath "$ARCHIVE_PATH" \
   -derivedDataPath "$DERIVED_DATA" \
   -destination "generic/platform=macOS" \
+  ARCHS="arm64 x86_64" \
+  ONLY_ACTIVE_ARCH=NO \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="$IDENTITY" \
   DEVELOPMENT_TEAM="$TEAM_ID" \
@@ -123,6 +127,9 @@ fi
 echo "==> ensure nested hardened runtime (vole-cli sidecar)"
 ensure_nested_hardened_runtime "$APP"
 require_app_hardened_runtime "$APP"
+
+echo "==> require universal (arm64 + x86_64)"
+require_app_universal "$APP"
 
 echo "==> codesign verify"
 codesign --verify --deep --strict --verbose=2 "$APP"
