@@ -45,23 +45,54 @@ if [[ ! -d "$VOLE_SRC/crates/vole-cli" ]]; then
   exit 1
 fi
 
-echo "note: building vole-cli --release from $VOLE_SRC (cargo=$CARGO)"
+CONFIGURATION="${CONFIGURATION:-Debug}"
+want_universal=0
+if [[ "$CONFIGURATION" == "Release" || "${VOLE_UNIVERSAL:-0}" == "1" ]]; then
+  want_universal=1
+fi
+
+echo "note: building vole-cli --release from $VOLE_SRC (cargo=$CARGO, universal=$want_universal)"
 (
   cd "$VOLE_SRC"
-  "$CARGO" build -p vole-cli --release
+  if [[ "$want_universal" -eq 1 ]]; then
+    if command -v rustup >/dev/null 2>&1; then
+      rustup target add aarch64-apple-darwin x86_64-apple-darwin >/dev/null 2>&1 || true
+    fi
+    "$CARGO" build -p vole-cli --release --target aarch64-apple-darwin
+    "$CARGO" build -p vole-cli --release --target x86_64-apple-darwin
+  else
+    "$CARGO" build -p vole-cli --release
+  fi
 )
-
-VOLE_BIN="$VOLE_SRC/target/release/vole"
-if [[ ! -x "$VOLE_BIN" ]]; then
-  echo "error: expected executable at $VOLE_BIN" >&2
-  exit 1
-fi
 
 mkdir -p "$MACOS_DIR" "$RULES_DST"
 # Drop legacy name that collided with PRODUCT_NAME=Vole.
-rm -f "$MACOS_DIR/vole"
-cp -f "$VOLE_BIN" "$MACOS_DIR/$SIDECAR_NAME"
-chmod 755 "$MACOS_DIR/$SIDECAR_NAME"
+rm -f "$MACOS_DIR/vole" "$MACOS_DIR/$SIDECAR_NAME"
+
+if [[ "$want_universal" -eq 1 ]]; then
+  ARM_BIN="$VOLE_SRC/target/aarch64-apple-darwin/release/vole"
+  X86_BIN="$VOLE_SRC/target/x86_64-apple-darwin/release/vole"
+  if [[ ! -x "$ARM_BIN" || ! -x "$X86_BIN" ]]; then
+    echo "error: missing per-arch vole binaries for lipo" >&2
+    echo "  expected: $ARM_BIN" >&2
+    echo "  expected: $X86_BIN" >&2
+    exit 1
+  fi
+  lipo -create -output "$MACOS_DIR/$SIDECAR_NAME" "$ARM_BIN" "$X86_BIN"
+  chmod 755 "$MACOS_DIR/$SIDECAR_NAME"
+  archs="$(lipo -archs "$MACOS_DIR/$SIDECAR_NAME")"
+  echo "note: lipo vole-cli arches: $archs"
+  echo "$archs" | tr ' ' '\n' | grep -qx arm64
+  echo "$archs" | tr ' ' '\n' | grep -qx x86_64
+else
+  VOLE_BIN="$VOLE_SRC/target/release/vole"
+  if [[ ! -x "$VOLE_BIN" ]]; then
+    echo "error: expected executable at $VOLE_BIN" >&2
+    exit 1
+  fi
+  cp -f "$VOLE_BIN" "$MACOS_DIR/$SIDECAR_NAME"
+  chmod 755 "$MACOS_DIR/$SIDECAR_NAME"
+fi
 
 if [[ -n "$PRODUCT_NAME" && -e "$MACOS_DIR/$PRODUCT_NAME" ]]; then
   sidecar_ino="$(stat -f '%i' "$MACOS_DIR/$SIDECAR_NAME")"
