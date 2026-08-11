@@ -59,7 +59,7 @@ GUI로 Mac을 정리하고 싶지만 “한 번에 전부 삭제” 후 후회�
 3. DMG를 열고 **Vole**을 응용 프로그램으로 드래그
 4. Launchpad 또는 응용 프로그램에서 실행
 
-현재 버전: **[v0.1.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.1.0)** (Developer ID 서명 및 Apple 공증).
+현재 버전: **[v0.2.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.2.0)** (Developer ID 서명 및 Apple 공증).
 
 “확인되지 않은 개발자” 경고가 나오면 **시스템 설정 → 개인정보 보호 및 보안**에서 허용하거나, 앱을 우클릭 → 열기.
 

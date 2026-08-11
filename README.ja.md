@@ -59,7 +59,7 @@
 3. DMG を開き、**Vole** を「アプリケーション」へドラッグ
 4. Launchpad または「アプリケーション」から起動
 
-現在のバージョン：**[v0.1.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.1.0)**（Developer ID 署名＋Apple 公証済み）。
+現在のバージョン：**[v0.2.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.2.0)**（Developer ID 署名＋Apple 公証済み）。
 
 「開発元を確認できない」と出る場合：**システム設定 → プライバシーとセキュリティ** で許可するか、App を右クリック → 開く。
 
