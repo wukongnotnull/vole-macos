@@ -94,6 +94,33 @@ else
   chmod 755 "$MACOS_DIR/$SIDECAR_NAME"
 fi
 
+# lipo strips any thin-binary signature; unsigned nested Mach-Os break
+# Xcode's outer CodeSign of Vole.app during archive. Sign here so archive
+# succeeds; archive-and-export's ensure_nested_hardened_runtime re-seals
+# with Developer ID + hardened runtime after export when needed.
+sign_sidecar() {
+  local bin="$1"
+  local identity="${EXPANDED_CODE_SIGN_IDENTITY:-}"
+  if [[ -z "$identity" || "$identity" == "-" ]]; then
+    identity="${CODE_SIGN_IDENTITY:-}"
+  fi
+  if [[ -z "$identity" || "$identity" == "Sign to Run Locally" || "$identity" == "-" ]]; then
+    identity="${VOLE_CODESIGN_IDENTITY:-}"
+  fi
+  if [[ -n "$identity" && "$identity" != "-" && "$identity" != "Sign to Run Locally" ]]; then
+    echo "note: codesign sidecar with identity: $identity"
+    # Prefer hardened runtime when the identity supports it (Developer ID).
+    if codesign --force --options runtime --timestamp --sign "$identity" "$bin" 2>/dev/null; then
+      return 0
+    fi
+    codesign --force --timestamp --sign "$identity" "$bin"
+    return 0
+  fi
+  echo "note: codesign sidecar ad-hoc (no Developer ID in embed phase)"
+  codesign --force --sign - "$bin"
+}
+sign_sidecar "$MACOS_DIR/$SIDECAR_NAME"
+
 if [[ -n "$PRODUCT_NAME" && -e "$MACOS_DIR/$PRODUCT_NAME" ]]; then
   sidecar_ino="$(stat -f '%i' "$MACOS_DIR/$SIDECAR_NAME")"
   app_ino="$(stat -f '%i' "$MACOS_DIR/$PRODUCT_NAME")"
