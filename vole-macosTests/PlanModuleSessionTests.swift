@@ -161,4 +161,25 @@ final class PlanModuleSessionTests: XCTestCase {
         XCTAssertEqual(session.phase, .idle)
         XCTAssertEqual(session.errorMessage, "需要内嵌 vole 2.20")
     }
+
+    func test_initialSelectedIDsRespectsDefaultFlag() {
+        let entries = [
+            VolePlanEntry(
+                id: "w1", path: "/tmp/wt", label: "wt", size: 0,
+                ruleID: "worktree:linked", skipReason: nil, dev: 1, ino: 2, mtime: 3
+            ),
+            VolePlanEntry(
+                id: "w2", path: "/tmp/wt2", label: "wt2", size: 0,
+                ruleID: "worktree:linked", skipReason: nil, dev: 1, ino: 3, mtime: 3
+            ),
+        ]
+        XCTAssertEqual(
+            PlanModuleSession.initialSelectedIDs(entries: entries, selectsAllByDefault: true),
+            Set(["w1", "w2"])
+        )
+        XCTAssertEqual(
+            PlanModuleSession.initialSelectedIDs(entries: entries, selectsAllByDefault: false),
+            []
+        )
+    }
 }

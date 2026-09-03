@@ -42,6 +42,13 @@ final class PlanModuleSession: ObservableObject {
         return args
     }
 
+    nonisolated static func initialSelectedIDs(
+        entries: [VolePlanEntry],
+        selectsAllByDefault: Bool
+    ) -> Set<String> {
+        selectsAllByDefault ? Set(entries.map(\.id)) : []
+    }
+
     nonisolated static func scanArguments(command: String, planPath: String) -> [String] {
         [command, "--plan", "--json-stream", "--plan-out", planPath]
     }
@@ -274,7 +281,10 @@ final class PlanModuleSession: ObservableObject {
                 fullPlan = plan
                 coverageNote = plan.coverageNote
                 entries = plan.entries.filter { $0.skipReason == nil }
-                selectedIDs = Set(entries.map(\.id))
+                selectedIDs = Self.initialSelectedIDs(
+                    entries: entries,
+                    selectsAllByDefault: kind.selectsAllCandidatesByDefault
+                )
                 phase = .candidates
             } catch {
                 cleanupFullPlan()
