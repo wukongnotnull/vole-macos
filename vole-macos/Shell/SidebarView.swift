@@ -4,6 +4,7 @@ struct SidebarView: View {
     @Binding var selection: ShellModule
     @Binding var showSettings: Bool
     @ObservedObject var helperStatus: HelperStatusModel
+    var sidecarVersion: String
     var mascotActivity: MascotActivity = .idle
 
     var body: some View {
@@ -105,13 +106,15 @@ struct SidebarView: View {
     private var moduleList: some View {
         VStack(alignment: .leading, spacing: 2) {
             ForEach(ShellModule.allCases) { module in
+                let available = module.isAvailable(sidecarVersion: sidecarVersion)
                 SidebarNavRow(
                     title: module.title,
                     systemImage: module.systemImage,
                     isSelected: selection == module,
-                    isEnabled: module.isAvailable,
-                    help: module.isAvailable ? module.title : "\(module.title) · 即将推出"
+                    isEnabled: available,
+                    help: module.sidebarHelp(sidecarVersion: sidecarVersion)
                 ) {
+                    guard module.isAvailable(sidecarVersion: sidecarVersion) else { return }
                     selection = module
                 }
             }

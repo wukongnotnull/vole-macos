@@ -33,6 +33,8 @@ struct ShellView: View {
     @StateObject private var optimizeSession = PlanModuleSession(kind: .optimize)
     @StateObject private var purgeSession = PlanModuleSession(kind: .purge)
     @StateObject private var installerSession = PlanModuleSession(kind: .installer)
+    @StateObject private var worktreeSession = PlanModuleSession(kind: .worktree)
+    @StateObject private var agentSession = PlanModuleSession(kind: .agent)
     @StateObject private var analyzeSession = AnalyzeSession()
     @StateObject private var historySession = HistorySession()
     @StateObject private var statusSession = StatusSession()
@@ -62,6 +64,7 @@ struct ShellView: View {
                 selection: $selection,
                 showSettings: $showSettings,
                 helperStatus: helperStatus,
+                sidecarVersion: session.voleVersion,
                 mascotActivity: sidebarMascotActivity
             )
             .frame(width: sidebarWidth)
@@ -83,6 +86,7 @@ struct ShellView: View {
                 onRefreshVersion: { session.refreshVersion() }
             )
         }
+        .onAppear { session.refreshVersion() }
     }
 
     @ViewBuilder
@@ -99,6 +103,10 @@ struct ShellView: View {
                 PlanModuleRootView(session: purgeSession, helperStatus: helperStatus)
             case .installer:
                 PlanModuleRootView(session: installerSession, helperStatus: helperStatus)
+            case .worktree:
+                PlanModuleRootView(session: worktreeSession, helperStatus: helperStatus)
+            case .agent:
+                PlanModuleRootView(session: agentSession, helperStatus: helperStatus)
             case .analyze:
                 AnalyzeRootView(session: analyzeSession)
             case .history:
