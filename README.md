@@ -33,6 +33,10 @@ Preview first · Trash by default · Find what’s eating your disk
   <img src="images/candidates.png" alt="Cleanup candidates" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="Ten sidebar modules including Worktree and Agent" width="48%" />
+</p>
+
 ---
 
 ## Features

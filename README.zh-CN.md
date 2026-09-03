@@ -33,6 +33,10 @@
   <img src="images/candidates.png" alt="清理候选列表" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="十项侧栏，含 Worktree 与 Agent" width="48%" />
+</p>
+
 ---
 
 ## 能做什么

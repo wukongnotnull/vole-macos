@@ -33,6 +33,10 @@
   <img src="images/candidates.png" alt="정리 후보 목록" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="Worktree와 Agent가 포함된 사이드바 10항목" width="48%" />
+</p>
+
 ---
 
 ## 할 수 있는 일

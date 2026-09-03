@@ -33,6 +33,10 @@
   <img src="images/candidates.png" alt="クリーン候補一覧" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="Worktree と Agent を含む 10 項目サイドバー" width="48%" />
+</p>
+
 ---
 
 ## できること
