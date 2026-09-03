@@ -162,6 +162,23 @@ final class PlanModuleSessionTests: XCTestCase {
         XCTAssertEqual(session.errorMessage, "需要内嵌 vole 2.20")
     }
 
+    func test_riskCopyForbidsSafeDeletePromises() {
+        let blobs = [
+            PlanModuleKind.worktree.idleCaption,
+            PlanModuleKind.agent.idleCaption,
+            PlanModuleKind.worktree.applyHint,
+            PlanModuleKind.agent.applyHint,
+            PlanModuleKind.worktree.confirmTitle(permanentDelete: false),
+            PlanModuleKind.agent.confirmTitle(permanentDelete: false),
+        ]
+        for text in blobs {
+            XCTAssertTrue(text.contains("不宣称可安全删除"), text)
+            XCTAssertFalse(text.contains("放心删"), text)
+            XCTAssertFalse(text.contains("可安全移除"), text)
+            XCTAssertFalse(text.contains("即将推出"), text)
+        }
+    }
+
     func test_initialSelectedIDsRespectsDefaultFlag() {
         let entries = [
             VolePlanEntry(

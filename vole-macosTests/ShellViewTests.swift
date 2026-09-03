@@ -49,6 +49,18 @@ final class ShellViewTests: XCTestCase {
         XCTAssertEqual(ShellModule.clean.sidebarHelp(sidecarVersion: "vole 2.19.0"), "清理")
     }
 
+    func test_worktreeAgentHelpNeverComingSoon() {
+        let versions = ["", "vole 2.19.0", "vole 2.20.0", "garbage"]
+        for raw in versions {
+            XCTAssertFalse(
+                ShellModule.worktree.sidebarHelp(sidecarVersion: raw).contains("即将推出")
+            )
+            XCTAssertFalse(
+                ShellModule.agent.sidebarHelp(sidecarVersion: raw).contains("即将推出")
+            )
+        }
+    }
+
     func test_systemImagesDoNotCollide() {
         XCTAssertEqual(ShellModule.worktree.systemImage, "arrow.triangle.branch")
         XCTAssertEqual(ShellModule.agent.systemImage, "cpu")
