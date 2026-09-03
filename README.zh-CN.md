@@ -65,7 +65,7 @@
 3. 打开 DMG，把 **Vole** 拖进「应用程序」
 4. 从启动台或「应用程序」打开 Vole
 
-当前版本：**[v0.2.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.2.0)**（Developer ID 签名并经 Apple 公证）。  
+当前版本：**[v0.3.0](https://github.com/wukongnotnull/vole-macos/releases/tag/v0.3.0)**（Developer ID 签名并经 Apple 公证）。  
 安装包为 **Universal**（同时支持 Apple Silicon 与 Intel）。
 
 若系统提示「无法验证开发者」：在「系统设置 → 隐私与安全性」里允许打开，或对 App 右键 → 打开。
