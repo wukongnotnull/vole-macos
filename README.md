@@ -33,6 +33,10 @@ Preview first · Trash by default · Find what’s eating your disk
   <img src="images/candidates.png" alt="Cleanup candidates" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="Ten sidebar modules including Worktree and Agent" width="48%" />
+</p>
+
 ---
 
 ## Features
@@ -44,6 +48,8 @@ Preview first · Trash by default · Find what’s eating your disk
 | **Optimize** | Run a bounded set of system maintenance tasks (e.g. cache rebuilds) |
 | **Purge** | Clear bulky items like stale project build artifacts |
 | **Installer** | Find forgotten `.dmg` / `.pkg` installers on disk |
+| **Worktree** | Find leftover Git worktree checkouts (the whole checkout). Not claimed safe to delete. Trash by default. |
+| **Agent** | Find leftover agent containers, sessions, and caches (not Git checkouts). Trash by default. |
 | **Analyze** | See which folders and large files use the most space |
 | **History** | Review past cleanups and deletions |
 | **Status** | Health score, CPU, memory, and disk at a glance |

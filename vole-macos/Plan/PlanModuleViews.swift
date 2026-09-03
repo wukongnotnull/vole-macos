@@ -29,6 +29,12 @@ struct PlanModuleIdleView: View {
                     .tint(VoleTheme.Colors.soil)
                     .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
+                    .disabled(
+                        !PlanModuleSession.canStartScan(
+                            kind: session.kind,
+                            sidecarVersion: session.voleVersion
+                        )
+                    )
 
                 Spacer()
 

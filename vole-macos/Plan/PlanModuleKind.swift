@@ -5,6 +5,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
     case optimize
     case purge
     case installer
+    case worktree
+    case agent
 
     var id: String { rawValue }
 
@@ -12,8 +14,15 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
 
     var supportsPermanentDelete: Bool {
         switch self {
-        case .purge, .installer: return true
+        case .purge, .installer, .worktree, .agent: return true
         case .uninstall, .optimize: return false
+        }
+    }
+
+    var selectsAllCandidatesByDefault: Bool {
+        switch self {
+        case .uninstall, .optimize, .purge, .installer: return true
+        case .worktree, .agent: return false
         }
     }
 
@@ -23,6 +32,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "优化"
         case .purge: return "净化"
         case .installer: return "安装包"
+        case .worktree: return "Worktree"
+        case .agent: return "Agent"
         }
     }
 
@@ -32,6 +43,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "Optimize · 优化"
         case .purge: return "Purge · 净化"
         case .installer: return "Installer · 安装包"
+        case .worktree: return "Worktree · 工作树"
+        case .agent: return "Agent · 代理残留"
         }
     }
 
@@ -41,6 +54,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "松土优化系统"
         case .purge: return "挖出陈旧构建物"
         case .installer: return "找出安装包"
+        case .worktree: return "翻出被遗忘的 checkout"
+        case .agent: return "翻出 Agent 留下的容器"
         }
     }
 
@@ -50,6 +65,10 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "扫描可执行的优化任务"
         case .purge: return "扫描陈旧项目构建物"
         case .installer: return "扫描可清理的安装包"
+        case .worktree:
+            return "扫描遗留的 Git worktree。将整棵 checkout 送进废纸篓。不宣称可安全删除。"
+        case .agent:
+            return "扫描 Agent 容器、会话与缓存残留（不是 Git checkout）。默认进废纸篓。不宣称可安全删除。"
         }
     }
 
@@ -63,6 +82,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "挑要执行的"
         case .purge: return "挑要净化的"
         case .installer: return "挑要清理的"
+        case .worktree: return "挑要移走的 checkout"
+        case .agent: return "挑要移走的残留"
         }
     }
 
@@ -72,6 +93,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "Applying · 优化中"
         case .purge: return "Applying · 净化中"
         case .installer: return "Applying · 清理中"
+        case .worktree: return "Applying · 清理中"
+        case .agent: return "Applying · 清理中"
         }
     }
 
@@ -81,6 +104,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "正在优化"
         case .purge: return "正在净化"
         case .installer: return "正在清理安装包"
+        case .worktree: return "正在移走 checkout"
+        case .agent: return "正在移走残留"
         }
     }
 
@@ -94,6 +119,10 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
             return "默认进废纸篓；开启永久删除则直接删除；需管理员权限的文件经 root权限助手。"
         case .installer:
             return "默认进废纸篓；开启永久删除则直接删除；需管理员权限的文件经 root权限助手。"
+        case .worktree:
+            return "将整棵 Git checkout 送进废纸篓。不宣称可安全删除。需管理员权限的文件经 root权限助手。"
+        case .agent:
+            return "将 Agent 容器 / 会话 / 缓存残留送进废纸篓。不宣称可安全删除。需管理员权限的文件经 root权限助手。"
         }
     }
 
@@ -103,6 +132,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "执行所选"
         case .purge: return "净化所选"
         case .installer: return "清理所选"
+        case .worktree: return "清理所选"
+        case .agent: return "清理所选"
         }
     }
 
@@ -117,6 +148,10 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
             base = "将净化已选构建物（默认进废纸篓；需管理员权限的文件经 root权限助手，未就绪则跳过）"
         case .installer:
             base = "将清理已选安装包（默认进废纸篓；需管理员权限的文件经 root权限助手，未就绪则跳过）"
+        case .worktree:
+            base = "将删除已选的整棵 Git checkout（默认进废纸篓；需管理员权限的文件经 root权限助手，未就绪则跳过）。不宣称可安全删除"
+        case .agent:
+            base = "将删除已选的 Agent 容器 / 会话 / 缓存残留（默认进废纸篓；需管理员权限的文件经 root权限助手，未就绪则跳过）。不宣称可安全删除"
         }
         if permanentDelete && supportsPermanentDelete {
             return base + "。将永久删除，不可从废纸篓恢复"
@@ -130,6 +165,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "确认执行"
         case .purge: return "确认净化"
         case .installer: return "确认清理"
+        case .worktree: return "确认清理"
+        case .agent: return "确认清理"
         }
     }
 
@@ -139,6 +176,8 @@ enum PlanModuleKind: String, CaseIterable, Identifiable {
         case .optimize: return "优化完成"
         case .purge: return "净化完成"
         case .installer: return "安装包清理完成"
+        case .worktree: return "Worktree 清理完成"
+        case .agent: return "Agent 清理完成"
         }
     }
 

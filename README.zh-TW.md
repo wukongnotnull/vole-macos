@@ -33,6 +33,10 @@
   <img src="images/candidates.png" alt="清理候選列表" width="48%" />
 </p>
 
+<p align="center">
+  <img src="images/sidebar-ten.png" alt="十項側欄，含 Worktree 與 Agent" width="48%" />
+</p>
+
 ---
 
 ## 能做什麼
@@ -44,6 +48,8 @@
 | **最佳化** | 執行一組有界的系統維護工作（如快取重建等） |
 | **淨化** | 清理陳舊專案建置物等佔空間的大件 |
 | **安裝套件** | 找出磁碟上落灰的 `.dmg` / `.pkg` 等安裝套件 |
+| **Worktree** | 掃描遺留的 Git worktree，將整棵 checkout 送進廢紙簍。不宣稱可安全刪除。 |
+| **Agent** | 掃描 Agent 容器、工作階段與快取殘留（不是 Git checkout）。預設進廢紙簍。不宣稱可安全刪除。 |
 | **分析** | 看目錄誰佔空間、大檔在哪 |
 | **歷史** | 回看做過的清理與刪除紀錄 |
 | **狀態** | 一眼看健康分數、CPU、記憶體、磁碟 |

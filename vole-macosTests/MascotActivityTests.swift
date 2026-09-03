@@ -37,28 +37,28 @@ final class MascotActivityTests: XCTestCase {
         XCTAssertEqual(
             MascotActivity.resolve(
                 clean: .scanning,
-                plans: [.idle, .idle, .idle, .idle]
+                plans: [.idle, .idle, .idle, .idle, .idle, .idle]
             ),
             .scanning
         )
         XCTAssertEqual(
             MascotActivity.resolve(
                 clean: .candidates,
-                plans: [.idle, .applying, .idle, .idle]
+                plans: [.idle, .applying, .idle, .idle, .idle, .idle]
             ),
             .applying
         )
         XCTAssertEqual(
             MascotActivity.resolve(
                 clean: .idle,
-                plans: [.candidates, .idle, .result, .idle]
+                plans: [.candidates, .idle, .result, .idle, .idle, .idle]
             ),
             .success
         )
         XCTAssertEqual(
             MascotActivity.resolve(
                 clean: .idle,
-                plans: [.idle, .idle, .idle, .idle]
+                plans: [.idle, .idle, .idle, .idle, .idle, .idle]
             ),
             .idle
         )

@@ -121,6 +121,21 @@ sign_sidecar() {
 }
 sign_sidecar "$MACOS_DIR/$SIDECAR_NAME"
 
+REQUIRED_SIDECAR_VERSION="2.20.0"
+ver_line="$("$MACOS_DIR/$SIDECAR_NAME" --version 2>/dev/null | head -n 1 || true)"
+if [[ ! "$ver_line" =~ ([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+  echo "error: could not parse sidecar --version from: ${ver_line:-<empty>}" >&2
+  echo "hint: VOLE_SRC must be vole 2.20.0 (tag v2.20.0). Do not embed unpublished CLI." >&2
+  exit 1
+fi
+got_ver="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+if [[ "$got_ver" != "$REQUIRED_SIDECAR_VERSION" ]]; then
+  echo "error: embedded sidecar must be exactly vole ${REQUIRED_SIDECAR_VERSION}, got: $ver_line" >&2
+  echo "hint: point VOLE_SRC at wukongnotnull/vole @ v2.20.0 (do not edit the CLI repo in this milestone)" >&2
+  exit 1
+fi
+echo "note: sidecar --version OK ($ver_line)"
+
 if [[ -n "$PRODUCT_NAME" && -e "$MACOS_DIR/$PRODUCT_NAME" ]]; then
   sidecar_ino="$(stat -f '%i' "$MACOS_DIR/$SIDECAR_NAME")"
   app_ino="$(stat -f '%i' "$MACOS_DIR/$PRODUCT_NAME")"
