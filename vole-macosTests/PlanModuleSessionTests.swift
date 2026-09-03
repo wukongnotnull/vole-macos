@@ -105,4 +105,60 @@ final class PlanModuleSessionTests: XCTestCase {
         XCTAssertTrue(wtPerm.contains("将永久删除，不可从废纸篓恢复"))
         XCTAssertTrue(agPerm.contains("将永久删除，不可从废纸篓恢复"))
     }
+
+    @MainActor
+    func test_scanArgumentsMatchCLI() {
+        XCTAssertEqual(
+            PlanModuleSession.scanArguments(command: "worktree", planPath: "/tmp/w.json"),
+            ["worktree", "--plan", "--json-stream", "--plan-out", "/tmp/w.json"]
+        )
+        XCTAssertEqual(
+            PlanModuleSession.scanArguments(command: "agent", planPath: "/tmp/a.json"),
+            ["agent", "--plan", "--json-stream", "--plan-out", "/tmp/a.json"]
+        )
+    }
+
+    @MainActor
+    func test_applyArgumentsWorktreeAgent() {
+        XCTAssertEqual(
+            PlanModuleSession.applyArguments(
+                command: "worktree",
+                planPath: "/tmp/w.json",
+                permanent: true
+            ),
+            ["worktree", "--apply", "/tmp/w.json", "--json-stream", "--permanent"]
+        )
+        XCTAssertEqual(
+            PlanModuleSession.applyArguments(
+                command: "agent",
+                planPath: "/tmp/a.json",
+                permanent: false
+            ),
+            ["agent", "--apply", "/tmp/a.json", "--json-stream"]
+        )
+    }
+
+    func test_canStartScanRespectsVersionGate() {
+        XCTAssertTrue(
+            PlanModuleSession.canStartScan(kind: .purge, sidecarVersion: "vole 2.19.0")
+        )
+        XCTAssertTrue(
+            PlanModuleSession.canStartScan(kind: .worktree, sidecarVersion: "vole 2.20.0")
+        )
+        XCTAssertFalse(
+            PlanModuleSession.canStartScan(kind: .worktree, sidecarVersion: "vole 2.19.0")
+        )
+        XCTAssertFalse(
+            PlanModuleSession.canStartScan(kind: .agent, sidecarVersion: "")
+        )
+    }
+
+    @MainActor
+    func test_startScanBlockedWhenSidecarNot220() {
+        let session = PlanModuleSession(kind: .worktree)
+        session.voleVersion = "vole 2.19.0"
+        session.startScan()
+        XCTAssertEqual(session.phase, .idle)
+        XCTAssertEqual(session.errorMessage, "需要内嵌 vole 2.20")
+    }
 }

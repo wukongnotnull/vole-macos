@@ -42,6 +42,19 @@ final class PlanModuleSession: ObservableObject {
         return args
     }
 
+    nonisolated static func scanArguments(command: String, planPath: String) -> [String] {
+        [command, "--plan", "--json-stream", "--plan-out", planPath]
+    }
+
+    nonisolated static func canStartScan(kind: PlanModuleKind, sidecarVersion: String) -> Bool {
+        switch kind {
+        case .worktree, .agent:
+            return SidecarVersion.supportsWorktreeAgent(sidecarVersion)
+        case .uninstall, .optimize, .purge, .installer:
+            return true
+        }
+    }
+
     func refreshVersion() {
         Task {
             let proc = VoleProcess()
@@ -56,6 +69,11 @@ final class PlanModuleSession: ObservableObject {
     }
 
     func startScan() {
+        if !Self.canStartScan(kind: kind, sidecarVersion: voleVersion) {
+            errorMessage = "需要内嵌 vole 2.20"
+            phase = .idle
+            return
+        }
         cleanupFullPlan()
         fullPlan = nil
         coverageNote = nil
@@ -75,9 +93,10 @@ final class PlanModuleSession: ObservableObject {
                 let dir = try PlanIO.cachesDirectory()
                 let planURL = dir.appendingPathComponent("\(kind.planFilePrefix)-\(UUID().uuidString).json")
                 fullPlanURL = planURL
-                let exit = await process.run(arguments: [
-                    kind.command, "--plan", "--json-stream", "--plan-out", planURL.path,
-                ]) { [weak self] line in
+                let exit = await process.run(arguments: Self.scanArguments(
+                    command: kind.command,
+                    planPath: planURL.path
+                )) { [weak self] line in
                     Task { @MainActor in
                         self?.handleStreamLine(line)
                     }

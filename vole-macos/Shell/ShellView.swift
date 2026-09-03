@@ -42,7 +42,7 @@ struct ShellView: View {
     @State private var selection: ShellModule = .clean
     @State private var showSettings = false
 
-    private let sidebarWidth: CGFloat = 148
+    private let sidebarWidth: CGFloat = 168
     /// Uniform outer margin around sidebar + detail cards.
     private let shellGutter: CGFloat = VoleTheme.Spacing.sm
 
@@ -54,6 +54,8 @@ struct ShellView: View {
                 optimizeSession.phase.mascotSessionPhase,
                 purgeSession.phase.mascotSessionPhase,
                 installerSession.phase.mascotSessionPhase,
+                worktreeSession.phase.mascotSessionPhase,
+                agentSession.phase.mascotSessionPhase,
             ]
         )
     }
