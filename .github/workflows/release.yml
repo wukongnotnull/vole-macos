@@ -20,6 +20,7 @@ jobs:
         with:
           repository: wukongnotnull/vole
           path: vole
+          ref: v2.20.0
 
       - name: Require signing + notary secrets
         env:
