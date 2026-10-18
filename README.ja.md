@@ -9,7 +9,7 @@
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/github/v/tag/wukongnotnull/vole-macos?label=version)](https://github.com/wukongnotnull/vole-macos/releases)
-[![Platform](https://img.shields.io/badge/platform-macOS-black.svg)](https://github.com/wukongnotnull/vole-macos)
+[![Platform](https://img.shields.io/badge/platform-macOS%2026.5%2B-black.svg)](https://github.com/wukongnotnull/vole-macos)
 [![Download](https://img.shields.io/github/downloads/wukongnotnull/vole-macos/total.svg)](https://github.com/wukongnotnull/vole-macos/releases/latest)
 [![Stars](https://img.shields.io/github/stars/wukongnotnull/vole-macos?style=social)](https://github.com/wukongnotnull/vole-macos/stargazers)
 
@@ -59,6 +59,8 @@
 ---
 
 ## ダウンロードとインストール
+
+**macOS 26.5 以降**が必要です。
 
 1. [最新 Release](https://github.com/wukongnotnull/vole-macos/releases/latest) を開く
 2. **`Vole-*.dmg`** をダウンロード（`.zip` もあり）
