@@ -17,14 +17,15 @@ extension XCTestCase {
         b.click()
     }
 
-    /// Captures Vole's own window; `app.screenshot()` grabs whatever is frontmost.
+    /// Attaches one screenshot per display. `XCUIScreen.main` alone misses a window on
+    /// an external display, and `XCUIElement.screenshot()` hard-fails there.
     func snap(_ app: XCUIApplication, _ label: String) {
-        let window = app.windows.firstMatch
-        let shot = window.exists ? window.screenshot() : XCUIScreen.main.screenshot()
-        let a = XCTAttachment(screenshot: shot)
-        a.name = label
-        a.lifetime = .keepAlways
-        add(a)
+        for (i, screen) in XCUIScreen.screens.enumerated() {
+            let a = XCTAttachment(screenshot: screen.screenshot())
+            a.name = XCUIScreen.screens.count > 1 ? "\(label) (display \(i + 1))" : label
+            a.lifetime = .keepAlways
+            add(a)
+        }
     }
 
     /// Dismisses the Full Disk Access alert if it shows; returns whether it appeared.

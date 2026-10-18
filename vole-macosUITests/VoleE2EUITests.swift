@@ -1,3 +1,4 @@
+import AppKit
 import XCTest
 
 /// Opt-in end-to-end click-through that really applies plans, but only against a
@@ -195,12 +196,19 @@ final class VoleE2EUITests: XCTestCase {
         let goTo = app.sheets.matching(identifier: "GoToWindow").firstMatch
         XCTAssertTrue(goTo.waitForExistence(timeout: 5), "go-to sheet missing\n\(app.debugDescription)")
         let field = goTo.textFields.firstMatch.exists ? goTo.textFields.firstMatch : goTo.comboBoxes.firstMatch
-        // The panel runs out of process and opens at the real home; type the fixture
-        // path into a cleared field and wait for it before pressing Return.
+        // The panel runs out of process and opens at the real home. Paste the fixture
+        // path into a cleared field (typing "/" goes through the active input method,
+        // which a Chinese IME turns into "、") and wait for it before pressing Return.
         field.click()
         field.typeKey("a", modifierFlags: .command)
         field.typeKey(.delete, modifierFlags: [])
-        field.typeText(home)
+        let pasteboard = NSPasteboard.general
+        let saved = pasteboard.string(forType: .string)
+        pasteboard.clearContents()
+        pasteboard.setString(home, forType: .string)
+        field.typeKey("v", modifierFlags: .command)
+        pasteboard.clearContents()
+        if let saved { pasteboard.setString(saved, forType: .string) }
         expectation(for: NSPredicate(format: "value == %@", home), evaluatedWith: field)
         waitForExpectations(timeout: 5)
         field.typeKey(.return, modifierFlags: [])
