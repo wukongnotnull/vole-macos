@@ -17,8 +17,11 @@ extension XCTestCase {
         b.click()
     }
 
+    /// Captures Vole's own window; `app.screenshot()` grabs whatever is frontmost.
     func snap(_ app: XCUIApplication, _ label: String) {
-        let a = XCTAttachment(screenshot: app.screenshot())
+        let window = app.windows.firstMatch
+        let shot = window.exists ? window.screenshot() : XCUIScreen.main.screenshot()
+        let a = XCTAttachment(screenshot: shot)
         a.name = label
         a.lifetime = .keepAlways
         add(a)

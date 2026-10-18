@@ -73,10 +73,20 @@ final class VoleSmokeUITests: XCTestCase {
         // Rescan right away: the cancelled sidecar must have released the clean lock.
         windowButton(app, "开始扫描").click()
         dismissFDAIfShown(app, timeout: 1)
-        XCTAssertTrue(windowButton(app, "取消").waitForExistence(timeout: 10), "rescan did not start")
-        XCTAssertFalse(staticText(app, "另一个").waitForExistence(timeout: 3), "rescan hit lock error")
-        windowButton(app, "取消").click()
-        XCTAssertTrue(windowButton(app, "开始扫描").waitForExistence(timeout: 5), "did not return to idle after second cancel")
+        let cancelAgain = windowButton(app, "取消")
+        XCTAssertTrue(cancelAgain.waitForExistence(timeout: 10), "rescan did not start")
+        XCTAssertFalse(staticText(app, "另一个").exists, "rescan hit lock error")
+        // With an empty HOME the system-level scan can finish in a few seconds, so the
+        // rescan may already be on the candidates view by the time cancel is clicked.
+        if cancelAgain.isHittable { cancelAgain.click() }
+        let idle = windowButton(app, "开始扫描")
+        let candidates = windowButton(app, "重新扫描")
+        let deadline = Date().addingTimeInterval(10)
+        while Date() < deadline, !idle.exists, !candidates.exists {
+            _ = idle.waitForExistence(timeout: 1)
+        }
+        XCTAssertTrue(idle.exists || candidates.exists, "rescan neither cancelled nor finished\n\(app.debugDescription)")
+        XCTAssertFalse(staticText(app, "另一个").exists, "rescan hit lock error")
     }
 
     func testPurgeScanOfEmptyHomeFinishesWithoutApplying() {

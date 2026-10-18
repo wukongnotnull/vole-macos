@@ -9,6 +9,11 @@ import XCTest
 /// contains the fixture HOME path and a fixture name. Tests are numbered because
 /// test12 checks the history written by the earlier applies.
 final class VoleE2EUITests: XCTestCase {
+    private struct FixtureError: Error, CustomStringConvertible {
+        let description: String
+        init(_ description: String) { self.description = description }
+    }
+
     static let markerName = ".vole-ui-fixture"
 
     private var app: XCUIApplication!
@@ -19,13 +24,19 @@ final class VoleE2EUITests: XCTestCase {
         guard let fixtureHome = ProcessInfo.processInfo.environment["VOLE_UI_HOME"], !fixtureHome.isEmpty else {
             throw XCTSkip("set TEST_RUNNER_VOLE_UI_HOME to a folder made by scripts/make-ui-fixtures.sh")
         }
+        // VOLE_UI_HOME is set, so a bad fixture fails loudly instead of skipping.
         let resolved = URL(fileURLWithPath: fixtureHome).standardizedFileURL.resolvingSymlinksInPath().path
         let realHome = URL(fileURLWithPath: NSHomeDirectory()).standardizedFileURL.resolvingSymlinksInPath().path
         guard resolved != realHome, resolved != "/" else {
-            throw XCTSkip("VOLE_UI_HOME must not be the real home folder")
+            throw FixtureError("VOLE_UI_HOME must not be the real home folder")
+        }
+        // These prefixes are on the root helper's whitelist, so rows there go to the
+        // helper instead of the sidecar trash and the fixture is never removed.
+        for prefix in ["/private/tmp", "/private/var/tmp"] where resolved == prefix || resolved.hasPrefix(prefix + "/") {
+            throw FixtureError("VOLE_UI_HOME must not be under /tmp or /var/tmp; use the script's default ($TMPDIR)")
         }
         guard FileManager.default.fileExists(atPath: resolved + "/" + Self.markerName) else {
-            throw XCTSkip("VOLE_UI_HOME has no \(Self.markerName); build it with scripts/make-ui-fixtures.sh")
+            throw FixtureError("VOLE_UI_HOME has no \(Self.markerName); build it with scripts/make-ui-fixtures.sh")
         }
         home = fixtureHome
         app = XCUIApplication()
@@ -184,8 +195,15 @@ final class VoleE2EUITests: XCTestCase {
         let goTo = app.sheets.matching(identifier: "GoToWindow").firstMatch
         XCTAssertTrue(goTo.waitForExistence(timeout: 5), "go-to sheet missing\n\(app.debugDescription)")
         let field = goTo.textFields.firstMatch.exists ? goTo.textFields.firstMatch : goTo.comboBoxes.firstMatch
+        // The panel runs out of process and opens at the real home; type the fixture
+        // path into a cleared field and wait for it before pressing Return.
         field.click()
-        field.typeText(home + "\r")
+        field.typeKey("a", modifierFlags: .command)
+        field.typeKey(.delete, modifierFlags: [])
+        field.typeText(home)
+        expectation(for: NSPredicate(format: "value == %@", home), evaluatedWith: field)
+        waitForExpectations(timeout: 5)
+        field.typeKey(.return, modifierFlags: [])
         let row = panel.textFields.matching(NSPredicate(format: "value == %@", "AnalyzeMe")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10), "AnalyzeMe row missing in panel\n\(app.debugDescription)")
         row.click()
