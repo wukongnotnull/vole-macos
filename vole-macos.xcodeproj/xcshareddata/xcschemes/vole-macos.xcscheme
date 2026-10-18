@@ -54,6 +54,17 @@
                ReferencedContainer = "container:vole-macos.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "67FB4F9F301BA00200E0AFC2"
+               BuildableName = "vole-macosUITests.xctest"
+               BlueprintName = "vole-macosUITests"
+               ReferencedContainer = "container:vole-macos.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
